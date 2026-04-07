@@ -1,4 +1,3 @@
-import process from "node:process";
 import { defineConfig } from "@playwright/test";
 
 const baseURL = "http://127.0.0.1:4321";
@@ -15,7 +14,7 @@ export default defineConfig({
   webServer: {
     command: "npm run preview:ci",
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     stdout: "ignore",
     stderr: "pipe",
   },
