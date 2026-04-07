@@ -1,0 +1,9 @@
+- 背景（Why）:
+- 変更内容（What）:
+- 技術仕様（How）:
+- スコープ外（Out of Scope）:
+- 受け入れ条件（Acceptance Criteria）:
+  - [ ]
+- ベースブランチ（Base branch）:
+- タスク性質（Task Nature）: Issue-based
+- タスクサイズ（Task Size）: <Small|Medium|Large>
