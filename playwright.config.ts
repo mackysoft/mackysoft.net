@@ -9,7 +9,7 @@ export default defineConfig({
   retries: 0,
   use: {
     baseURL,
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
   },
   webServer: {
     command: "npm run preview:ci",
