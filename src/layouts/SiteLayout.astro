@@ -1,0 +1,234 @@
+---
+import { externalLinks, primaryNav, siteMeta } from "../lib/site";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const { title, description = siteMeta.description } = Astro.props;
+const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="site-header">
+        <a href="/" class="site-brand">{siteMeta.name}</a>
+        <nav aria-label="Global">
+          <ul class="site-nav">
+            {primaryNav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={currentPath === item.href ? "page" : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+      <main class="site-main">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <p>{siteMeta.description}</p>
+        <ul class="footer-links">
+          {externalLinks.map((link) => (
+            <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
+          ))}
+        </ul>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg-color: #f5f1e8;
+    --surface-color: rgba(255, 252, 246, 0.78);
+    --surface-strong-color: #ece5d8;
+    --text-color: #1e1b18;
+    --muted-color: #635b52;
+    --accent-color: #0e6b63;
+    --border-color: rgba(30, 27, 24, 0.16);
+    --code-bg-color: #181512;
+    --code-text-color: #f5efe2;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background:
+      radial-gradient(circle at top left, rgba(14, 107, 99, 0.14), transparent 28rem),
+      linear-gradient(180deg, #f7f4ed 0%, #f2ede3 100%);
+    color: var(--text-color);
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    line-height: 1.7;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  a {
+    color: var(--accent-color);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  code,
+  pre {
+    font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  }
+
+  pre {
+    overflow-x: auto;
+    padding: 1rem 1.1rem;
+    border-radius: 1rem;
+    background: var(--code-bg-color);
+    color: var(--code-text-color);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+
+  blockquote {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--accent-color);
+    background: rgba(14, 107, 99, 0.06);
+  }
+
+  .shell {
+    width: min(72rem, calc(100vw - 2rem));
+    margin: 0 auto;
+    padding: 1rem 0 4rem;
+  }
+
+  .site-header {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem 0 1.5rem;
+  }
+
+  .site-brand {
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem);
+    font-weight: 700;
+    color: var(--text-color);
+    text-decoration: none;
+  }
+
+  .site-nav,
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-nav a,
+  .footer-links a {
+    display: inline-flex;
+    padding: 0.2rem 0;
+    color: var(--muted-color);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-nav a[aria-current="page"] {
+    color: var(--text-color);
+    border-color: var(--text-color);
+  }
+
+  .site-main {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .site-footer {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--muted-color);
+  }
+
+  .site-footer p {
+    margin: 0;
+  }
+
+  .page-hero,
+  .content-panel {
+    padding: 1.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1.4rem;
+    background: var(--surface-color);
+    backdrop-filter: blur(12px);
+  }
+
+  .page-hero h1,
+  .content-panel h1,
+  .content-panel h2,
+  .content-panel h3 {
+    line-height: 1.2;
+  }
+
+  .content-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .button-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--text-color);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.45);
+  }
+
+  @media (min-width: 900px) {
+    .site-header {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+    }
+
+    .site-nav {
+      justify-content: flex-end;
+    }
+  }
+</style>

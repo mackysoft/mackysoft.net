@@ -1,0 +1,51 @@
+---
+import ArticleCard from "../../components/ArticleCard.astro";
+import type { WritingItem } from "../../lib/articles";
+import { getLocalArticles, toLocalWritingItem } from "../../lib/articles";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getLocalArticles();
+  const tags = new Set(articles.flatMap((article) => article.data.tags));
+
+  return Array.from(tags).sort((left, right) => left.localeCompare(right, "ja")).map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      articles: articles
+        .filter((article) => article.data.tags.includes(tag))
+        .map(toLocalWritingItem),
+    },
+  }));
+}
+
+const { tag, articles } = Astro.props as { tag: string; articles: WritingItem[] };
+---
+
+<SiteLayout title={`Tag: ${tag}`} description={`${tag} に紐づく記事一覧です。`}>
+  <section class="page-hero">
+    <p class="eyebrow">Tag</p>
+    <h1>{tag}</h1>
+    <p>{articles.length} 件の記事があります。</p>
+  </section>
+
+  <section class="content-grid">
+    {articles.map((article) => (
+      <ArticleCard article={article} />
+    ))}
+  </section>
+</SiteLayout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-color);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+  }
+
+  h1 {
+    margin: 0 0 0.6rem;
+  }
+</style>

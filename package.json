@@ -12,6 +12,7 @@
     "preview": "astro preview",
     "preview:ci": "astro preview --host 127.0.0.1 --port 4322",
     "check": "astro check",
+    "import:wordpress": "node scripts/import-wordpress.mjs",
     "test:unit": "vitest run",
     "test:e2e:setup": "playwright install --with-deps chromium",
     "test:e2e:run": "playwright test",
@@ -23,7 +24,10 @@
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.5.2",
     "astro": "^6.1.4",
+    "cheerio": "^1.1.2",
     "typescript": "^5.9.3",
+    "turndown": "^7.2.1",
+    "turndown-plugin-gfm": "^1.0.2",
     "vitest": "^4.1.3"
   }
 }

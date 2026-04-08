@@ -1,0 +1,58 @@
+---
+import ArticleCard from "../../../components/ArticleCard.astro";
+import type { WritingItem } from "../../../lib/articles";
+import { getLocalArticles, toLocalWritingItem } from "../../../lib/articles";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getLocalArticles();
+  const yearMonths = new Map();
+
+  for (const article of articles) {
+    const year = String(article.data.publishedAt.getFullYear());
+    const month = String(article.data.publishedAt.getMonth() + 1).padStart(2, "0");
+    const key = `${year}-${month}`;
+    const current = yearMonths.get(key) ?? [];
+    current.push(toLocalWritingItem(article));
+    yearMonths.set(key, current);
+  }
+
+  return Array.from(yearMonths.entries()).sort(([left], [right]) => left.localeCompare(right)).map(([key, monthArticles]) => {
+    const [year, month] = key.split("-");
+    return {
+      params: { yyyy: year, mm: month },
+      props: { year, month, articles: monthArticles },
+    };
+  });
+}
+
+const { year, month, articles } = Astro.props as { year: string; month: string; articles: WritingItem[] };
+---
+
+<SiteLayout title={`Archive ${year}/${month}`} description={`${year} 年 ${month} 月の記事一覧です。`}>
+  <section class="page-hero">
+    <p class="eyebrow">Archive</p>
+    <h1>{year}/{month}</h1>
+    <p>{articles.length} 件の記事があります。</p>
+  </section>
+
+  <section class="content-grid">
+    {articles.map((article) => (
+      <ArticleCard article={article} />
+    ))}
+  </section>
+</SiteLayout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-color);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+  }
+
+  h1 {
+    margin: 0 0 0.6rem;
+  }
+</style>
