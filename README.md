@@ -18,4 +18,13 @@ npm run dev
 npm run build
 npm run preview
 npm run check
+npm run import:wordpress
+```
+
+## WordPress Import
+
+旧 WordPress ブログ記事をローカル原本へ移すときは、次を実行します。
+
+```bash
+npm run import:wordpress
 ```
