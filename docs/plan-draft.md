@@ -19,11 +19,13 @@
 
 * WordPress はやめる
 * GitHub を正本にする
-* ローカル + GitHub で全管理
-* 静的サイトとして構築
+* ローカル + GitHub で全管理する
+* 静的サイトとして構築する
 * サイト本体は **Astro**
 * ホスティングは当面 **GitHub Pages**
 * 将来必要なら Cloudflare 系へ移行可能な構成にする
+* **旧URL移行を先に設計してから実装する**
+* **canonical host はコードに直書きせず、Astro の `site` 設定1か所で切り替える**
 
 ---
 
@@ -31,7 +33,7 @@
 
 * **フレームワーク**: Astro
 * **言語**: TypeScript
-* **記事**: Markdown
+* **記事**: Markdown / MDX
 * **ゲーム / アセット詳細**: MDX または専用 `.astro`
 * **コンテンツ管理**: Astro Content Collections
 * **検索**: Pagefind
@@ -40,34 +42,82 @@
 * **多言語基盤**: Astro i18n
 * **デプロイ**: GitHub Actions
 * **ホスティング**: GitHub Pages
-* **メタ**: OGP / Sitemap / RSS
+* **メタ**: OGP / Sitemap / RSS / `hreflang`
 * **画像**: Astro の画像機能
+* **移行補助**: `url-map.csv`, `taxonomy-map.yml`, `media-audit.csv`
 
 ---
 
 # 4. コンテンツ設計
 
-コンテンツは最初から型で分ける。
+Content Collection は最初から増やしすぎない。
+
+Collection に入れるのはこれだけにする。
 
 * `blog`
 * `games`
 * `assets`
-* `pages`
-* `links`
+
+固定ページは Collection に入れない。
+
+* `about`
 * `contact`
+* `privacy-policy`
+* `search`
 
 役割はこう。
 
 * `blog`: 過去記事アーカイブ
 * `games`: ゲーム一覧・詳細
 * `assets`: アセット一覧・詳細
-* `pages`: About など固定ページ
-* `links`: 外部活動の正式一覧
-* `contact`: 連絡先ページ
+* `about`: プロフィールと外部活動への正式導線
+
+## `blog` frontmatter
+
+必須項目は最小限に絞る。
+
+* `title`
+* `description`
+* `publishedAt`
+
+任意項目:
+
+* `updatedAt`
+* `tags`
+* `cover`
+* `coverAlt` (`cover` がある場合は必須)
+* `draft`
+
+## `games` / `assets` frontmatter
+
+必須項目はこれで固定する。
+
+* `title`
+* `description`
+* `status`
+* `cover`
+* `coverAlt`
+
+任意項目:
+
+* `publishedAt`
+* `updatedAt`
+* `tags`
+* `platforms`
+* `repoUrl`
+* `demoUrl`
+
+`status` は次の3値に固定する。
+
+* `active`
+* `archived`
+* `prototype`
 
 ---
 
 # 5. URL設計
+
+正式ルートはこれで固定する。
 
 * `/`
 * `/about/`
@@ -81,8 +131,8 @@
 * `/archive/[yyyy]/`
 * `/archive/[yyyy]/[mm]/`
 * `/search/`
-* `/links/`
 * `/contact/`
+* `/privacy-policy/`
 
 補助:
 
@@ -90,11 +140,37 @@
 * `/sitemap.xml`
 * `/llms.txt`（任意）
 
+## 旧URL移行契約
+
+旧 WordPress 記事の個別URLは主に `/<slug>/` のフラット構造なので、**新記事URLとは別に移行契約を持つ**。
+
+方針:
+
+* 新サイトの記事URLは **`/blog/[slug]/`**
+* 旧 WordPress 記事URL **`/<slug>/`** はすべて新URLへ誘導
+* 旧ゲームURL **`/treasure-rogue/`** は `/games/treasure-rogue/` へ誘導
+* 旧 Privacy Policy **`/treasure-rogue/privacy-policy/`** は `/privacy-policy/` へ誘導
+
+移行の正本は `docs/migration/url-map.csv` にする。
+
+列はこれで固定する。
+
+* `legacy_path`
+* `new_path`
+* `content_type`
+* `redirect_kind`
+* `status`
+
+この表を次の両方で使える形にする。
+
+* GitHub Pages 上の静的リダイレクト生成
+* 将来ホスト側で 301 を張るときの元データ
+
 ---
 
 # 6. 多言語設計
 
-方針はこれで固定。
+方針はこれで固定する。
 
 * デフォルト言語は **日本語**
 * 日本語URLには `ja` を付けない
@@ -110,10 +186,27 @@
 * `defaultLocale = ja`
 * `prefixDefaultLocale = false`
 
-翻訳運用:
+## 初期運用
 
-* 固定ページは手書き
-* 記事は日本語原文を正本にして、英語版は LLM 生成 + 必要なら手修正
+英語は段階導入にする。
+
+* 最初に英語化するのは固定ページ中心
+* 記事、ゲーム詳細、アセット詳細は**翻訳があるものだけ** `/en/` を作る
+* 未翻訳ページの `/en/...` は生成しない
+* 未翻訳ページの `/en/...` は **404** とする
+
+## SEOルール
+
+* `canonical` はそのページ自身の正式URLを出す
+* `hreflang` は**実在する言語ペアだけ**出す
+* 日本語しか存在しないページでは、英語向け `hreflang` は出さない
+
+## 翻訳運用
+
+* 日本語原文を正本にする
+* 固定ページは手書きで管理する
+* 英語版は LLM 生成を補助に使ってよいが、公開前に人間が確認する
+* 翻訳の鮮度差があることを前提に、**未翻訳を無理に fallback しない**
 
 ---
 
@@ -179,15 +272,14 @@ TOP はブログホームではなく**活動ハブの玄関**として作る。
 
 1. Header
 2. Hero
-3. Featured Games
-4. Featured Assets
+3. 代表ゲーム
+4. 代表アセット
 5. About Preview
 6. Latest Writing
 7. Latest Releases
 8. Search Teaser
-9. Links / Activity Hub CTA
-10. Contact CTA
-11. Footer
+9. About / Contact CTA
+10. Footer
 
 ## Hero
 
@@ -199,11 +291,13 @@ TOP はブログホームではなく**活動ハブの玄関**として作る。
 * CTA: `Games / Assets / Writing`
 * 外部導線: `GitHub / X / Zenn / note / YouTube`
 
-## Featured Games / Assets
+## 代表ゲーム / 代表アセット
 
 * 代表作だけ固定表示
 * カルーセルは使わない
 * 各カードにサムネ、短い説明、CTA
+* TOP に載せる対象は手動で選ぶ
+* 表示順は編集方針として管理する
 
 ## Latest Writing
 
@@ -212,6 +306,7 @@ TOP はブログホームではなく**活動ハブの玄関**として作る。
 * note
 * 最大3件
 * 記事系だけ表示
+* 生の時系列ログではなく、**表示契約を満たした活動サマリ**として扱う
 
 ## Latest Releases
 
@@ -222,13 +317,12 @@ TOP はブログホームではなく**活動ハブの玄関**として作る。
 
 ## Search Teaser
 
-* `Open Search` 導線をTOPにも置く
+* `Open Search` 導線を TOP にも置く
 
-## Links / Contact
+## About / Contact
 
-* 外部活動一覧 `/links/`
-* 連絡先 `/contact/`
-  への導線をTOP下部に置く
+* `About` に外部活動への正式導線をまとめる
+* `/about/` と `/contact/` への導線を TOP 下部に置く
 
 ---
 
@@ -260,7 +354,6 @@ TOPでは使わない。
 
 * 記事ページの目次
 * 作品詳細ページの右カラム
-
   * 概要
   * リンク
   * 技術情報
@@ -273,7 +366,7 @@ TOPでは使わない。
 入れるべき場所:
 
 * テーマトグル
-* 言語ドロップダウン
+* 言語切替
 * モバイルメニュー
 * カード hover / focus
 * 検索UI
@@ -301,22 +394,23 @@ TOPでは使わない。
 置く場所は3層。
 
 * **TOP の Hero 直下**
+* **About**
 * **フッター**
-* **`/links/`**
 
 補助的に:
 
-* About
 * 作品ページ
 * 記事末尾
 
-ヘッダーにはSNSアイコン群を常設しない。
+ヘッダーには SNS アイコン群を常設しない。
 
 ---
 
 # 14. Contact 設計
 
 `/contact/` を作る。
+
+外部活動への導線は `About` に集約し、`/contact/` は連絡手段に絞る。
 
 連絡手段は用途で分ける。
 
@@ -355,22 +449,29 @@ frontmatter の最小実用セット:
 * `title`
 * `description`
 * `publishedAt`
+
+任意項目:
+
 * `updatedAt`
 * `tags`
 * `cover`
-* `coverAlt`
+* `coverAlt` (`cover` がある場合は必須)
 * `draft`
-* `lang`
 
 記事カードは frontmatter を正本にして作る。
 
 表示項目:
 
-* cover
-* title
-* description
-* publishedAt
-* tags
+* `title`
+* `description`
+* `publishedAt`
+* `tags`
+* `cover`（ある場合）
+
+移行補助:
+
+* WordPress categories / tags の変換表は `docs/migration/taxonomy-map.yml`
+* 画像棚卸しは `docs/migration/media-audit.csv`
 
 ---
 
@@ -381,6 +482,8 @@ frontmatter の最小実用セット:
 * 完全に自由なページ: `.astro`
 
 つまり、**md でもリッチなページでも両方いける構成**にする。
+
+固定ページは `src/pages/` 側で持つ。
 
 ---
 
@@ -396,9 +499,10 @@ frontmatter の最小実用セット:
 * `src/generated/` = 自動収集データ
 * `public/` = そのまま配るファイル
 * `tests/` = テスト
+* `docs/migration/` = 移行契約と棚卸し
 
 つまり、
-**pages = 入口、content = 原本、components = 部品、lib = 処理、generated = 自動生成、public = 生ファイル**
+**pages = 入口、content = 原本、components = 部品、lib = 処理、generated = 自動生成、public = 生ファイル、docs/migration = 移行の正本**
 
 ---
 
@@ -414,25 +518,64 @@ TOP の更新欄は自動更新にする。
 
 方法:
 
-* GitHub Actions の定期実行
+* GitHub Actions の **定期実行**
+* GitHub Actions の **手動実行**
 * 外部データ取得
-* 正規化して `activity.json` などを生成
+* 正規化して `activity.json` を生成
 * Astro が読んでビルド
 * GitHub Pages に再公開
 
-重要ルール:
+## 公開契約
+
+記事系とリリース系は分ける。
+
+`writing`:
+
+* `id`
+* `source`
+* `title`
+* `url`
+* `publishedAt`
+
+`release`:
+
+* `groupId`
+* `source`
+* `repo`
+* `name`
+* `version`
+* `url`
+* `publishedAt`
+
+`groupId` は **`source:repo`** で固定する。
+
+## 重要ルール
 
 * **記事系とリリース系は分離**
 * **同一パッケージのリリースは1件に集約**
 * TOP は生の時系列ログではなく、**編集された活動サマリ**
+* **取得失敗時は前回成功した `activity.json` を使い続ける**
+* 失敗時に TOP を空にしない
 
 ---
 
 # 19. 検索
 
 * Pagefind を採用
-* 記事だけでなく `games`, `assets`, `pages` も検索対象
+* 記事だけでなく `games`, `assets`, 固定ページも検索対象
 * 将来的に type フィルタを持てる構成にする
+
+## 検索メタ契約
+
+各検索対象ページで次のメタを同じ意味で露出する。
+
+* `type`
+* `tags`
+* `updatedAt`
+* `image`
+* `imageAlt`
+
+最初からこれを埋める前提でカード設計とテンプレートを作る。
 
 ---
 
@@ -441,48 +584,114 @@ TOP の更新欄は自動更新にする。
 * GA4 を導入
 * 共通レイアウトに直埋め
 
-最低限計測するもの:
+イベント名はこれで固定する。
 
-* page_view
-* 検索
-* 外部リンククリック
-* ゲーム / アセットページの CTA クリック
+* `view_search_results`
+* `external_link_click`
+* `project_cta_click`
+* `locale_switch`
+* `theme_switch`
 
 ---
 
-# 21. テスト / CI
+# 21. 品質要件 / テスト / CI
 
 最小構成はこれ。
 
-* **Vitest**: 小さなロジックテスト
+* **Vitest**: ロジックテスト
 * **Playwright**: E2E テスト
 * **GitHub Actions**: CI
 
-CI で回すもの:
+## build / CI で止めるもの
 
-* `npm run build`
-* unit test
-* Playwright の基本導線テスト
+* schema 不整合
+* 存在しない画像参照
+* 重複URL
+* 移行対象なのに `url-map.csv` 未登録
+* `url-map.csv` と content の不整合
 
-優先度:
+## 単体テスト対象
 
-1. build が通ること
-2. 主要導線の E2E
-3. ロジックテスト
+* URL 生成
+* redirect 生成
+* taxonomy 変換
+* activity 正規化
+* canonical / `hreflang` 生成
+
+## E2E 対象
+
+* ヘッダー導線
+* テーマ切替
+* 検索
+* 代表的な `blog`, `games`, `assets` 詳細
+* 旧URLから新URLへの誘導
+* `/en/about/` の表示
+* 未翻訳 `/en/blog/...` の 404
+
+## 非機能要件
+
+アクセシビリティ:
+
+* キーボード操作可能
+* `focus-visible` 対応
+* モーダルの focus trap
+* 言語切替とテーマ切替に明示ラベル
+
+性能:
+
+* OGP / カバー画像サイズを管理する
+* LCP 対象を意識して Hero と代表作品を設計する
+* 一覧ページのカード数は初期表示を絞る
+
+運用:
+
+* broken link チェック
+* OGP 崩れチェック
+* 外部同期失敗時の fallback 確認
+
+Definition of Done:
+
+* 各フェーズで `npm run build` と `npm run check` が通る
+* そのフェーズで追加した受け入れ条件を満たす
 
 ---
 
-# 22. ドメイン方針
+# 22. ドメイン移行方針
 
-* `mackysoft.net` は維持する
+`mackysoft.net` は維持する。
+
+ただし、これは「公開」ではなく**独立した移行計画**として扱う。
+
+## 固定事項
+
 * サイト本体は Xserver から外す
 * 当面は GitHub Pages
 * 将来は Cloudflare DNS / Registrar へ移行余地あり
-
-注意:
-
 * Xserver は先に解約しない
-* 移行と維持方針を固めてから動く
+
+## 実装時に持つ前提
+
+* canonical host は**まだ未決定**
+* ただし、切替点は `site` 設定1か所に限定する
+* 公開前に **domain verification** を済ませる
+* **apex / `www` の両方**を張れる前提で準備する
+* 最終的にどちらか一方を canonical とし、もう一方は redirect
+
+## 切替当日の確認項目
+
+* DNS 反映
+* GitHub Pages 側の custom domain 設定
+* HTTPS 有効化
+* canonical URL
+* `www` / apex の redirect
+* 主要ページ表示
+* 旧URLから新URLへの誘導
+
+## Xserver 停止条件
+
+* custom domain が安定して解決する
+* 主要ページが新環境で表示できる
+* redirect と HTTPS を確認済み
 
 ---
 
@@ -516,59 +725,85 @@ CI で回すもの:
 
 # 25. 実装フェーズ
 
-## フェーズ1: 土台
+## フェーズ0: 決定事項の凍結
 
-* Astro プロジェクト作成
-* Content Collections 設計
+* Collection 構成
+* frontmatter スキーマ
+* 正式ルート
+* `url-map.csv` 形式
+* 検索メタ契約
+* GA4 イベント名
+* フェーズごとの Definition of Done
+* `site` 設定の切替点
+
+## フェーズ1: 基盤
+
+* Astro プロジェクト土台
+* 共通 Layout / Components
 * Header / Footer / Theme / Language
 * Light / Dark
 * レスポンシブ
+* Content Collections
 * OGP / Sitemap / RSS
-* GA4
-* Pagefind
+* build / CI
 
-## フェーズ2: 情報設計
+## フェーズ2: コアページ
 
 * About
 * Games
 * Assets
 * Writing
 * Search
-* Links
 * Contact
+* Privacy Policy
+* 各詳細ページ
 
-## フェーズ3: TOP
+## フェーズ3: 既存コンテンツ移行
+
+* WordPress 旧記事の Markdown / MDX 化
+* `url-map.csv` 作成
+* `url-map.csv` と content の照合
+* `taxonomy-map.yml` 作成
+* `media-audit.csv` 作成
+* 画像 / 埋め込み / 外部リンク整理
+
+## フェーズ4: TOP の編集設計
 
 * Hero
-* Featured Games
-* Featured Assets
+* 代表ゲーム
+* 代表アセット
 * About Preview
 * Latest Writing
 * Latest Releases
 * Search Teaser
-* Links CTA
-* Contact CTA
+* About / Contact CTA
 
-## フェーズ4: コンテンツ移行
+## フェーズ5: 検索と計測
 
-* WordPress 旧記事の Markdown 化
-* ゲーム / アセット情報整理
-* 画像 / 動画 / 外部リンク整理
+* Pagefind 導入
+* 検索メタ埋め込み
+* GA4 導入
+* 最低限の E2E
 
-## フェーズ5: 自動化
+## フェーズ6: 外部同期
 
 * Zenn / note / GitHub Releases 自動収集
-* TOP 更新欄の自動生成
+* `schedule` + `workflow_dispatch`
+* `activity.json` の自動生成
+* 失敗時 fallback の確認
 
-## フェーズ6: 公開
+## フェーズ7: 多言語
+
+* `/en/` 導入
+* 固定ページの英語化
+* 未翻訳ページの 404 方針適用
+* `hreflang` / canonical の調整
+
+## フェーズ8: 公開 / ドメイン切替
 
 * GitHub Pages 公開
+* custom domain 設定
+* domain verification
 * `mackysoft.net` 接続
 * DNS 切替
-
-## フェーズ7: 将来拡張
-
-* `/en/`
-* 記事翻訳運用
-* Cloudflare 検討
-* Playwright 拡張
+* apex / `www` redirect 確認
