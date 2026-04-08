@@ -72,7 +72,7 @@ Collection に入れるのはこれだけにする。
 - `assets`: アセット一覧・詳細
 - `about`: プロフィールと外部活動への正式導線
 
-`Writing` 一覧は、自サイト記事と外部記事をまとめて見せる。
+`Articles` 一覧は、自サイト記事と外部記事をまとめて見せる。
 
 ## `article` frontmatter
 
@@ -257,7 +257,7 @@ Collection に入れるのはこれだけにする。
 Desktop:
 
 - 左: `mackysoft.net`
-- 中: `About / Games / Assets / Writing / Search / Contact`
+- 中: `About / Games / Assets / Articles / Search / Contact`
 - 右: `Theme Toggle / Language`
 
 Mobile:
@@ -270,7 +270,7 @@ Mobile:
 - About
 - Games
 - Assets
-- Writing
+- Articles
 - Search
 - Contact
 - Language
@@ -292,7 +292,7 @@ TOP は記事一覧ホームではなく**活動ハブの玄関**として作る
 3. 代表ゲーム
 4. 代表アセット
 5. About Preview
-6. Latest Writing
+6. Latest Articles
 7. Latest Releases
 8. Search Teaser
 9. About / Contact CTA
@@ -305,7 +305,7 @@ TOP は記事一覧ホームではなく**活動ハブの玄関**として作る
 - 名前 / ブランド
 - 一行の肩書き
 - 2〜4行の短い説明
-- CTA: `Games / Assets / Writing`
+- CTA: `Games / Assets / Articles`
 - 外部導線: `GitHub / X / Zenn / note / YouTube`
 
 ## 代表ゲーム / 代表アセット
@@ -316,7 +316,7 @@ TOP は記事一覧ホームではなく**活動ハブの玄関**として作る
 - TOP に載せる対象は手動で選ぶ
 - 表示順は編集方針として管理する
 
-## Latest Writing
+## Latest Articles
 
 - 自サイト記事と外部記事を同じ一覧で扱う
 - 外部記事のリンク先は元サイト
@@ -801,7 +801,7 @@ Definition of Done:
 - About
 - Games
 - Assets
-- Writing
+- Articles
 - Search
 - Contact
 - Privacy Policy
@@ -823,7 +823,7 @@ Definition of Done:
 - 代表ゲーム
 - 代表アセット
 - About Preview
-- Latest Writing
+- Latest Articles
 - Latest Releases
 - Search Teaser
 - About / Contact CTA
