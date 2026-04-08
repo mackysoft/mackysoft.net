@@ -44,7 +44,7 @@
 * **ホスティング**: GitHub Pages
 * **メタ**: OGP / Sitemap / RSS / `hreflang`
 * **画像**: Astro の画像機能
-* **移行補助**: `url-map.csv`, `taxonomy-map.yml`, `media-audit.csv`
+* **移行補助**: `url-map.csv`, `taxonomy-map.yaml`, `media-audit.csv`
 
 ---
 
@@ -155,6 +155,8 @@ Collection に入れるのはこれだけにする。
 
 * 新サイトの記事URLは **`/articles/[slug]/`**
 * 旧 WordPress 記事URL **`/<slug>/`** はすべて新URLへ誘導
+* 旧 category / tag URL も `url-map.csv` の対象に含める
+* 旧 date archive URL も `url-map.csv` の対象に含める
 * 旧ゲームURL **`/treasure-rogue/`** は `/games/treasure-rogue/` へ誘導
 * 旧 Privacy Policy **`/treasure-rogue/privacy-policy/`** は `/privacy-policy/` へ誘導
 
@@ -172,6 +174,10 @@ Collection に入れるのはこれだけにする。
 
 * GitHub Pages 上の静的リダイレクト生成
 * 将来ホスト側で 301 を張るときの元データ
+
+`taxonomy-map.yaml` は旧 category / tag から新 `/tags/[tag]/` への変換表とする。
+
+旧 date archive は `/archive/[yyyy]/` または `/archive/[yyyy]/[mm]/` へ誘導する。
 
 ---
 
@@ -198,16 +204,18 @@ Collection に入れるのはこれだけにする。
 追加言語は段階導入にする。
 
 * 最初に対応する追加言語は固定ページ中心
-* 記事、ゲーム詳細、アセット詳細は**翻訳がある言語だけ** `/<locale>/...` を作る
-* 未翻訳ページの `/<locale>/...` は生成しない
-* 未翻訳ページの `/<locale>/...` はデフォルト言語のURLへ誘導する
+* `articles`, `games`, `assets` の翻訳対応は、同一 slug を共有する各言語ページ同士とする
+* 記事、ゲーム詳細、アセット詳細は**翻訳がある言語だけ** `/<locale>/...` の本文ページを作る
+* 未翻訳ページの `/<locale>/...` には、デフォルト言語へ誘導するリダイレクト用ルートだけを作る
+
+対応関係は URL と slug で決める。
 
 ## SEOルール
 
 * `canonical` はそのページ自身の正式URLを出す
 * `hreflang` は**実在する言語ペアだけ**出す
 * 日本語しか存在しないページでは、追加言語向け `hreflang` は出さない
-* 未翻訳ページへの `/<locale>/...` アクセスは、日本語版の正式URLへ誘導する
+* 未翻訳ページへの `/<locale>/...` アクセスは、リダイレクト用ルートから日本語版の正式URLへ誘導する
 
 ## 翻訳運用
 
@@ -215,6 +223,7 @@ Collection に入れるのはこれだけにする。
 * 固定ページは手書きで管理する
 * 各言語版は LLM 生成を補助に使ってよいが、公開前に人間が確認する
 * 翻訳がないページは、追加言語版として見せず日本語版へ誘導する
+* `hreflang` と未翻訳時の誘導は、URL と slug の対応関係から決める
 
 ---
 
@@ -482,7 +491,7 @@ frontmatter の最小実用セット:
 
 移行補助:
 
-* WordPress categories / tags の変換表は `docs/migration/taxonomy-map.yml`
+* WordPress categories / tags の変換表は `docs/migration/taxonomy-map.yaml`
 * 画像棚卸しは `docs/migration/media-audit.csv`
 
 ---
@@ -666,7 +675,7 @@ v1 では、1つの repo から複数の package や asset を配布していて
 * 代表的な `articles`, `games`, `assets` 詳細
 * 旧URLから新URLへの誘導
 * 代表的な追加言語ページの表示
-* 未翻訳 `/<locale>/articles/...` から日本語版への誘導
+* 未翻訳 `/<locale>/articles/...` のリダイレクト用ルートから日本語版への誘導
 
 ## 非機能要件
 
@@ -803,7 +812,8 @@ Definition of Done:
 * WordPress 旧記事の Markdown / MDX 化
 * `url-map.csv` 作成
 * `url-map.csv` と content の照合
-* `taxonomy-map.yml` 作成
+* `taxonomy-map.yaml` 作成
+* category / tag / date archive URL の移行整理
 * `media-audit.csv` 作成
 * 画像 / 埋め込み / 外部リンク整理
 
@@ -836,7 +846,8 @@ Definition of Done:
 
 * 追加言語プレフィックス導入
 * 固定ページの多言語対応
-* 未翻訳ページのデフォルト言語への誘導方針適用
+* 翻訳対応を URL と slug の対応関係で決める
+* 未翻訳ページ向けリダイレクト用ルートの生成
 * `hreflang` / canonical の調整
 
 ## フェーズ8: 公開 / ドメイン切替
