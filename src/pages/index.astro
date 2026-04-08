@@ -1,5 +1,8 @@
 ---
-const title = "mackysoft.net";
+import { getHomePageTitle, homePageContent } from "../features/home/content";
+
+const title = getHomePageTitle();
+const { statusMessage } = homePageContent;
 ---
 
 <!doctype html>
@@ -12,7 +15,7 @@ const title = "mackysoft.net";
   <body>
     <main>
       <h1>{title}</h1>
-      <p>Astro minimum bootstrap is ready.</p>
+      <p>{statusMessage}</p>
     </main>
   </body>
 </html>
