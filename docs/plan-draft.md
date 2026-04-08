@@ -54,7 +54,7 @@ Content Collection は最初から増やしすぎない。
 
 Collection に入れるのはこれだけにする。
 
-* `blog`
+* `articles`
 * `games`
 * `assets`
 
@@ -67,12 +67,14 @@ Collection に入れるのはこれだけにする。
 
 役割はこう。
 
-* `blog`: 過去記事アーカイブ
+* `articles`: 自サイト記事の原本と詳細ページ
 * `games`: ゲーム一覧・詳細
 * `assets`: アセット一覧・詳細
 * `about`: プロフィールと外部活動への正式導線
 
-## `blog` frontmatter
+`Writing` 一覧は、自サイト記事と外部記事をまとめて見せる。
+
+## `article` frontmatter
 
 必須項目は最小限に絞る。
 
@@ -88,7 +90,7 @@ Collection に入れるのはこれだけにする。
 * `coverAlt` (`cover` がある場合は必須)
 * `draft`
 
-## `games` / `assets` frontmatter
+## `game` / `asset` frontmatter
 
 必須項目はこれで固定する。
 
@@ -125,14 +127,19 @@ Collection に入れるのはこれだけにする。
 * `/games/[slug]/`
 * `/assets/`
 * `/assets/[slug]/`
-* `/blog/`
-* `/blog/[slug]/`
+* `/articles/`
+* `/articles/[slug]/`
 * `/tags/[tag]/`
 * `/archive/[yyyy]/`
 * `/archive/[yyyy]/[mm]/`
 * `/search/`
 * `/contact/`
 * `/privacy-policy/`
+
+補足:
+
+* `/articles/` は自サイト記事と外部記事を含む記事一覧
+* `/articles/[slug]/` は自サイト記事の詳細ページ
 
 補助:
 
@@ -146,7 +153,7 @@ Collection に入れるのはこれだけにする。
 
 方針:
 
-* 新サイトの記事URLは **`/blog/[slug]/`**
+* 新サイトの記事URLは **`/articles/[slug]/`**
 * 旧 WordPress 記事URL **`/<slug>/`** はすべて新URLへ誘導
 * 旧ゲームURL **`/treasure-rogue/`** は `/games/treasure-rogue/` へ誘導
 * 旧 Privacy Policy **`/treasure-rogue/privacy-policy/`** は `/privacy-policy/` へ誘導
@@ -267,7 +274,7 @@ Mobile:
 
 # 9. TOP構成
 
-TOP はブログホームではなく**活動ハブの玄関**として作る。
+TOP は記事一覧ホームではなく**活動ハブの玄関**として作る。
 
 順番はこれで確定。
 
@@ -302,17 +309,17 @@ TOP はブログホームではなく**活動ハブの玄関**として作る。
 
 ## Latest Writing
 
-* 自サイト記事
-* Zenn
-* note
+* 自サイト記事と外部記事を同じ一覧で扱う
+* 外部記事のリンク先は元サイト
 * 最大3件
 * 記事系だけ表示
 * 生の時系列ログではなく、**表示契約を満たした活動サマリ**として扱う
+* `/articles/` も同じ方針で一覧を作る
 
 ## Latest Releases
 
 * GitHub Releases を表示
-* **同じパッケージのリリースは1件に集約**
+* **同一リポジトリのリリースは1件に集約**
 * 最大3件
 * 記事欄とは分離
 
@@ -431,12 +438,14 @@ TOPでは使わない。
 
 # 15. 記事設計
 
+この章は**自サイト記事**の設計とする。
+
 記事は **1記事1フォルダ** で管理する。
 
 例:
 
 ```text
-src/content/blog/some-article/
+src/content/articles/some-article/
   index.mdx
   cover.png
   image-1.png
@@ -444,6 +453,8 @@ src/content/blog/some-article/
 ```
 
 これで、記事専用画像を記事の近くに置ける。
+
+外部記事は `src/content/` に持たず、記事一覧では外部同期データから混在表示する。
 
 frontmatter の最小実用セット:
 
@@ -576,7 +587,8 @@ v1 では、1つの repo から複数の package や asset を配布していて
 # 19. 検索
 
 * Pagefind を採用
-* 記事だけでなく `games`, `assets`, 固定ページも検索対象
+* 検索対象は `articles`, `games`, `assets`, `about` を基本とする
+* `contact`, `privacy-policy`, 検索ページ, 404, リダイレクト用ページは検索対象外
 * 将来的に type フィルタを持てる構成にする
 
 ## 検索メタ契約
@@ -589,12 +601,12 @@ v1 では、1つの repo から複数の package や asset を配布していて
 
 `type` は次の4値に固定する。
 
-* `blog`
+* `article`
 * `game`
 * `asset`
 * `page`
 
-固定ページは `type = page` とする。
+`about` は `type = page` とする。
 
 既定値つき共通メタ:
 
@@ -651,10 +663,10 @@ v1 では、1つの repo から複数の package や asset を配布していて
 * ヘッダー導線
 * テーマ切替
 * 検索
-* 代表的な `blog`, `games`, `assets` 詳細
+* 代表的な `articles`, `games`, `assets` 詳細
 * 旧URLから新URLへの誘導
 * 代表的な追加言語ページの表示
-* 未翻訳 `/<locale>/blog/...` から日本語版への誘導
+* 未翻訳 `/<locale>/articles/...` から日本語版への誘導
 
 ## 非機能要件
 
