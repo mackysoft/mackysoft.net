@@ -1,11 +1,11 @@
 ---
 import ArticleCard from "../components/ArticleCard.astro";
 import { homePageContent } from "../features/home/content";
-import { getWritingItems } from "../lib/articles";
+import { getArticleItems } from "../lib/articles";
 import { externalLinks, siteMeta } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
-const latestArticles = (await getWritingItems()).slice(0, 3);
+const latestArticles = (await getArticleItems()).slice(0, 3);
 ---
 
 <SiteLayout>
@@ -34,13 +34,13 @@ const latestArticles = (await getWritingItems()).slice(0, 3);
     <div class="section-head">
       <div>
         <p class="eyebrow">Latest Articles</p>
-        <h2>移行済みの記事</h2>
+        <h2>最新の記事</h2>
       </div>
       <a href="/articles/" class="button-link">Open Articles</a>
     </div>
-    <div class="content-grid">
+    <div class="content-grid latest-articles-grid">
       {latestArticles.map((article) => (
-        <ArticleCard article={article} />
+        <ArticleCard article={article} layout="vertical" />
       ))}
     </div>
   </section>
@@ -122,5 +122,9 @@ const latestArticles = (await getWritingItems()).slice(0, 3);
 
   .feature-grid {
     grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+
+  .latest-articles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
 </style>

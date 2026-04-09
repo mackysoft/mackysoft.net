@@ -1,7 +1,7 @@
 ---
 import ArticleCard from "../../components/ArticleCard.astro";
-import type { WritingItem } from "../../lib/articles";
-import { getLocalArticles, toLocalWritingItem } from "../../lib/articles";
+import type { ArticleItem } from "../../lib/articles";
+import { getLocalArticles, toLocalArticleItem } from "../../lib/articles";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -14,12 +14,12 @@ export async function getStaticPaths() {
       tag,
       articles: articles
         .filter((article) => article.data.tags.includes(tag))
-        .map(toLocalWritingItem),
+        .map(toLocalArticleItem),
     },
   }));
 }
 
-const { tag, articles } = Astro.props as { tag: string; articles: WritingItem[] };
+const { tag, articles } = Astro.props as { tag: string; articles: ArticleItem[] };
 ---
 
 <SiteLayout title={`Tag: ${tag}`} description={`${tag} に紐づく記事一覧です。`}>
