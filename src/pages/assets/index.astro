@@ -1,5 +1,5 @@
 ---
-import PageIntro from "../../components/PageIntro.astro";
+import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
@@ -8,7 +8,7 @@ import SiteLayout from "../../layouts/SiteLayout.astro";
 <SiteLayout title="Assets" description="アセットの新しい一覧ページです。">
   <PageHeader title="Assets" eyebrow={formatPageBreadcrumb("Home", "Assets")} />
 
-  <PageIntro panel>
+  <PageLead panel>
     <p>アセット一覧は新しい分類と説明文で再構築します。旧ページ本文は移行せず、作品単位で整え直します。</p>
-  </PageIntro>
+  </PageLead>
 </SiteLayout>

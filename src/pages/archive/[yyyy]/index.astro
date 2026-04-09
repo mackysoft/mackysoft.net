@@ -1,6 +1,6 @@
 ---
 import ArticleCard from "../../../components/ArticleCard.astro";
-import PageCollection from "../../../components/PageCollection.astro";
+import PageLead from "../../../components/PageLead.astro";
 import PageHeader from "../../../components/PageHeader.astro";
 import type { ArticleItem } from "../../../lib/articles";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
@@ -28,9 +28,9 @@ const { year, articles } = Astro.props as { year: string; articles: ArticleItem[
 <SiteLayout title={`Archive ${year}`} description={`${year} 年の記事一覧です。`}>
   <PageHeader title={year} eyebrow={formatPageBreadcrumb("Home", "Articles", "Archive")} />
 
-  <PageCollection summary={`${articles.length} 件の記事があります。`}>
+  <PageLead summary={`${articles.length} 件の記事があります。`}>
     {articles.map((article) => (
       <ArticleCard article={article} />
     ))}
-  </PageCollection>
+  </PageLead>
 </SiteLayout>

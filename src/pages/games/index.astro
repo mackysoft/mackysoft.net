@@ -1,5 +1,5 @@
 ---
-import PageIntro from "../../components/PageIntro.astro";
+import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
@@ -8,10 +8,10 @@ import SiteLayout from "../../layouts/SiteLayout.astro";
 <SiteLayout title="Games" description="ゲームの新しい一覧ページです。">
   <PageHeader title="Games" eyebrow={formatPageBreadcrumb("Home", "Games")} />
 
-  <PageIntro panel>
+  <PageLead panel>
     <p>旧サイトのゲーム紹介は引き継がず、新しい情報設計で再構成します。現時点では Treasure Rogue の導線だけを残しています。</p>
     <div class="button-row">
       <a href="/games/treasure-rogue/" class="button-link">Treasure Rogue</a>
     </div>
-  </PageIntro>
+  </PageLead>
 </SiteLayout>

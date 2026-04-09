@@ -1,5 +1,5 @@
 ---
-import PageIntro from "../components/PageIntro.astro";
+import PageLead from "../components/PageLead.astro";
 import PageHeader from "../components/PageHeader.astro";
 import { externalLinks } from "../lib/site";
 import { formatPageBreadcrumb } from "../lib/page-header";
@@ -9,14 +9,14 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 <SiteLayout title="Contact" description="現時点の連絡導線です。">
   <PageHeader title="Contact" eyebrow={formatPageBreadcrumb("Home", "Contact")} />
 
-  <PageIntro panel>
+  <PageLead panel>
     <p>連絡手段は新しいサイト構成に合わせて整理中です。公開中の連絡導線は次の外部サービスです。</p>
     <ul class="link-list">
       {externalLinks.map((link) => (
         <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
       ))}
     </ul>
-  </PageIntro>
+  </PageLead>
 </SiteLayout>
 
 <style>
