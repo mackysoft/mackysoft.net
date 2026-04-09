@@ -1,25 +1,14 @@
 ---
+import PageIntro from "../../components/PageIntro.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 ---
 
 <SiteLayout title="Treasure Rogue" description="Treasure Rogue の新しい導線です。">
-  <section class="page-hero">
-    <p class="eyebrow">Game</p>
-    <h1>Treasure Rogue</h1>
+  <PageHeader title="Treasure Rogue" eyebrow={formatPageBreadcrumb("Home", "Games")} />
+
+  <PageIntro panel>
     <p>旧ページ本文は移さず、作品情報を新しい構成へ載せ替える予定です。現時点では旧 URL の受け皿として維持しています。</p>
-  </section>
+  </PageIntro>
 </SiteLayout>
-
-<style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
-    margin: 0 0 0.6rem;
-  }
-</style>

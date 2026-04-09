@@ -1,0 +1,54 @@
+---
+type Props = {
+  title: string;
+  eyebrow?: string;
+  as?: "section" | "header";
+  class?: string;
+  titleClass?: string;
+};
+
+const { title, eyebrow, as = "section", class: className, titleClass } = Astro.props as Props;
+const Tag = as;
+const hasBody = Astro.slots.has("default");
+const showEyebrow = eyebrow && eyebrow !== title;
+const classes = ["page-header", className].filter(Boolean).join(" ");
+const titleClasses = ["page-header__title", hasBody && "page-header__title--with-body", titleClass].filter(Boolean).join(" ");
+---
+
+<Tag class={classes}>
+  {showEyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <h1 class={titleClasses}>{title}</h1>
+  {hasBody && (
+    <div class="page-header__body">
+      <slot />
+    </div>
+  )}
+</Tag>
+
+<style>
+  .page-header {
+    display: grid;
+  }
+
+  .page-header__title {
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .page-header__title--with-body {
+    margin-bottom: 0.6rem;
+  }
+
+  .page-header__body {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .page-header__body > :where(p, ul, ol) {
+    margin: 0;
+  }
+
+  .page-header__body > :last-child {
+    margin-bottom: 0;
+  }
+</style>

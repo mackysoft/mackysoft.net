@@ -1,7 +1,10 @@
 ---
 import ArticleCard from "../../../components/ArticleCard.astro";
+import PageCollection from "../../../components/PageCollection.astro";
+import PageHeader from "../../../components/PageHeader.astro";
 import type { ArticleItem } from "../../../lib/articles";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
+import { formatPageBreadcrumb } from "../../../lib/page-header";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -23,29 +26,11 @@ const { year, articles } = Astro.props as { year: string; articles: ArticleItem[
 ---
 
 <SiteLayout title={`Archive ${year}`} description={`${year} 年の記事一覧です。`}>
-  <section class="page-hero">
-    <p class="eyebrow">Archive</p>
-    <h1>{year}</h1>
-    <p>{articles.length} 件の記事があります。</p>
-  </section>
+  <PageHeader title={year} eyebrow={formatPageBreadcrumb("Home", "Articles", "Archive")} />
 
-  <section class="content-grid">
+  <PageCollection summary={`${articles.length} 件の記事があります。`}>
     {articles.map((article) => (
       <ArticleCard article={article} />
     ))}
-  </section>
+  </PageCollection>
 </SiteLayout>
-
-<style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
-    margin: 0 0 0.6rem;
-  }
-</style>

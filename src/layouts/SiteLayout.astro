@@ -46,7 +46,6 @@ const footerLinks = externalLinks.filter((link) => link.label !== "YouTube");
         <slot />
       </main>
       <footer class="site-footer">
-        <p>{siteMeta.description}</p>
         <ul class="footer-links">
           {footerLinks.map((link) => (
             <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
@@ -160,6 +159,11 @@ const footerLinks = externalLinks.filter((link) => link.label !== "YouTube");
   }
 
   .eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-color);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
     font-family: var(--font-mono);
     font-weight: 500;
   }
@@ -202,11 +206,6 @@ const footerLinks = externalLinks.filter((link) => link.label !== "YouTube");
     color: var(--muted-color);
   }
 
-  .site-footer p {
-    margin: 0;
-  }
-
-  .page-hero,
   .content-panel {
     padding: 1.6rem;
     border: 1px solid var(--border-color);
@@ -215,7 +214,6 @@ const footerLinks = externalLinks.filter((link) => link.label !== "YouTube");
     backdrop-filter: blur(12px);
   }
 
-  .page-hero h1,
   .content-panel h1,
   .content-panel h2,
   .content-panel h3 {

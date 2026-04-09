@@ -15,7 +15,7 @@ export const primaryNav = [
 
 export const externalLinks = [
   { href: "https://github.com/mackysoft", label: "GitHub" },
-  { href: "https://twitter.com/makihiro_dev", label: "X" },
+  { href: "https://twitter.com/makihiro_dev", label: "Twitter" },
   { href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
   { href: "https://www.youtube.com/channel/UCzO3iwkiy6u1mARt-HOysZA", label: "YouTube" },
 ] as const;

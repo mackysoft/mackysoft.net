@@ -2,8 +2,10 @@
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 
+import PageHeader from "../../components/PageHeader.astro";
 import type { ArticleEntry } from "../../lib/articles";
 import { formatDate } from "../../lib/articles";
+import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -21,9 +23,12 @@ const { Content } = await render(article);
 
 <SiteLayout title={article.data.title} description={article.data.description}>
   <article class="article-page">
-    <header class="page-hero">
-      <p class="eyebrow">Article</p>
-      <h1>{article.data.title}</h1>
+    <PageHeader
+      as="header"
+      title={article.data.title}
+      eyebrow={formatPageBreadcrumb("Home", "Articles")}
+      class="article-hero"
+    >
       <p class="lede">{article.data.description}</p>
       <p class="meta">
         <span>公開日: {formatDate(article.data.publishedAt)}</span>
@@ -41,7 +46,7 @@ const { Content } = await render(article);
           <Image src={article.data.cover} alt={article.data.coverAlt ?? ""} widths={[1200, 720]} sizes="(max-width: 960px) 100vw, 60rem" />
         </div>
       )}
-    </header>
+    </PageHeader>
 
     <section class="content-panel prose">
       <Content />
@@ -55,15 +60,7 @@ const { Content } = await render(article);
     gap: 1.5rem;
   }
 
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
+  :global(.article-hero h1) {
     margin: 0;
     font-size: clamp(2rem, 1.5rem + 2vw, 3.4rem);
   }

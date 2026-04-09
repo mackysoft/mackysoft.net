@@ -1,40 +1,26 @@
 ---
 import ArticleCard from "../../components/ArticleCard.astro";
+import PageCollection from "../../components/PageCollection.astro";
+import PageHeader from "../../components/PageHeader.astro";
 import { getArticleItems } from "../../lib/articles";
+import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 const articleItems = await getArticleItems();
 ---
 
 <SiteLayout title="Articles" description="自サイトと Zenn に公開した記事一覧です。">
-  <section class="page-hero">
-    <p class="eyebrow">Articles</p>
-    <h1>Articles</h1>
-    <p>mackysoft.net に移行した記事と、Zenn に公開した記事を時系列でまとめています。</p>
-  </section>
+  <PageHeader title="Articles" eyebrow={formatPageBreadcrumb("Home", "Articles")} />
 
-  <section class="content-grid">
+  <PageCollection class="articles-list">
     {articleItems.map((article) => (
       <ArticleCard article={article} />
     ))}
-  </section>
+  </PageCollection>
 </SiteLayout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
-    margin: 0 0 0.6rem;
-    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
-  }
-
-  .page-hero p:last-child {
-    margin: 0;
+  .articles-list {
+    grid-template-columns: 1fr;
   }
 </style>

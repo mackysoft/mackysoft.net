@@ -1,4 +1,5 @@
 ---
+import PageHeader from "../components/PageHeader.astro";
 import { aboutPageContent } from "../features/about/content";
 import { externalLinks } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
@@ -13,23 +14,30 @@ const aboutExternalLinks = aboutPageContent.externalLinks.flatMap((link) => {
 
   return [{ ...link, href }];
 });
-const heroAvatarHref = externalLinkMap.get("X") ?? aboutPageContent.hero.avatar.href;
+const heroAvatarHref = externalLinkMap.get("Twitter") ?? aboutPageContent.hero.avatar.href;
 ---
 
 <SiteLayout title={aboutPageContent.title} description={aboutPageContent.description}>
-  <section class="page-hero about-main">
-    <p class="eyebrow">{aboutPageContent.hero.eyebrow}</p>
-    <h1>{aboutPageContent.hero.title}</h1>
-    <a
-      href={heroAvatarHref}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="X を開く"
-      class="avatar-link"
-      style="width: clamp(7rem, 14vw, 11rem); height: clamp(7rem, 14vw, 11rem);"
-    >
-      <img src={aboutPageContent.hero.avatar.src} alt={aboutPageContent.hero.avatar.alt} class="avatar" loading="eager" />
-    </a>
+  <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
+
+  <section class="content-panel about-main">
+    <div class="profile-intro">
+      <a
+        href={heroAvatarHref}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Twitter を開く"
+        class="avatar-link"
+        style="width: clamp(6rem, 12vw, 9rem); height: clamp(6rem, 12vw, 9rem);"
+      >
+        <img src={aboutPageContent.hero.avatar.src} alt={aboutPageContent.hero.avatar.alt} class="avatar" loading="eager" />
+      </a>
+      <div class="profile-copy">
+        <p class="profile-name">{aboutPageContent.profile.name}</p>
+        <p>{aboutPageContent.profile.summary}</p>
+      </div>
+    </div>
+
     <section class="about-section">
       <h2>{aboutPageContent.whatIDo.heading}</h2>
       <div class="content-grid">
@@ -38,6 +46,7 @@ const heroAvatarHref = externalLinkMap.get("X") ?? aboutPageContent.hero.avatar.
         ))}
       </div>
     </section>
+
     <section class="about-section">
       <h2>{aboutPageContent.domainsAndInterests.heading}</h2>
       <ul class="interest-list">
@@ -91,22 +100,8 @@ const heroAvatarHref = externalLinkMap.get("X") ?? aboutPageContent.hero.avatar.
 </SiteLayout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1,
   h2 {
     margin-top: 0;
-  }
-
-  h1 {
-    margin-bottom: 0;
-    font-size: clamp(1.55rem, 1.25rem + 1vw, 2.35rem);
   }
 
   h2 {
@@ -115,7 +110,26 @@ const heroAvatarHref = externalLinkMap.get("X") ?? aboutPageContent.hero.avatar.
 
   .about-main {
     display: grid;
-    gap: 0.75rem;
+    gap: 1.1rem;
+  }
+
+  .profile-intro {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .profile-copy {
+    display: grid;
+    align-content: center;
+    gap: 0.35rem;
+  }
+
+  .profile-name {
+    margin: 0;
+    font-size: clamp(1.3rem, 1.05rem + 1vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.25;
   }
 
   .avatar-link {
@@ -200,5 +214,11 @@ const heroAvatarHref = externalLinkMap.get("X") ?? aboutPageContent.hero.avatar.
 
   .button-link {
     margin-top: 1rem;
+  }
+
+  @media (min-width: 720px) {
+    .profile-intro {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
   }
 </style>

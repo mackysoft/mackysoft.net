@@ -1,25 +1,14 @@
 ---
+import PageIntro from "../../components/PageIntro.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 ---
 
 <SiteLayout title="Assets" description="アセットの新しい一覧ページです。">
-  <section class="page-hero">
-    <p class="eyebrow">Assets</p>
-    <h1>Assets</h1>
+  <PageHeader title="Assets" eyebrow={formatPageBreadcrumb("Home", "Assets")} />
+
+  <PageIntro panel>
     <p>アセット一覧は新しい分類と説明文で再構築します。旧ページ本文は移行せず、作品単位で整え直します。</p>
-  </section>
+  </PageIntro>
 </SiteLayout>
-
-<style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
-    margin: 0 0 0.6rem;
-  }
-</style>

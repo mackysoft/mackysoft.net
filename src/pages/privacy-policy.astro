@@ -1,25 +1,14 @@
 ---
+import PageIntro from "../components/PageIntro.astro";
+import PageHeader from "../components/PageHeader.astro";
+import { formatPageBreadcrumb } from "../lib/page-header";
 import SiteLayout from "../layouts/SiteLayout.astro";
 ---
 
 <SiteLayout title="Privacy Policy" description="現時点のプライバシーポリシーです。">
-  <section class="page-hero">
-    <p class="eyebrow">Privacy Policy</p>
-    <h1>Privacy Policy</h1>
+  <PageHeader title="Privacy Policy" eyebrow={formatPageBreadcrumb("Home", "Privacy Policy")} />
+
+  <PageIntro panel>
     <p>現時点のサイトは静的配信を前提にしており、問い合わせフォームは設置していません。アクセス解析などを追加した場合は、このページを更新します。</p>
-  </section>
+  </PageIntro>
 </SiteLayout>
-
-<style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
-    margin: 0 0 0.6rem;
-  }
-</style>

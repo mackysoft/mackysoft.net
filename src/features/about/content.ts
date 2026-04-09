@@ -1,20 +1,25 @@
+import { formatPageBreadcrumb } from "../../lib/page-header";
+
 export const aboutPageContent = {
   title: "About | Hiroya Aramaki（荒牧裕也）/ Makihiro",
   description:
     "Hiroya Aramaki（荒牧裕也）/ Makihiro のプロフィール、ゲーム開発を軸にした活動領域、このサイトの役割、外部リンク、連絡導線をまとめたページです。",
   hero: {
-    eyebrow: "About",
-    title: "Hiroya Aramaki（荒牧裕也）/ Makihiro",
+    eyebrow: formatPageBreadcrumb("Home", "About"),
+    title: "About",
     avatar: {
       src: "https://github.com/mackysoft.png",
       href: "https://twitter.com/makihiro_dev",
       alt: "Makihiro のアイコン",
     },
   },
+  profile: {
+    name: "Hiroya Aramaki（荒牧裕也）/ Makihiro",
+    summary: "ゲームと開発アセットを作っている個人開発者です。ゲーム開発を軸に、技術・アセット制作・発信を続けています。",
+  },
   whatIDo: {
     heading: "何をしている人か",
     paragraphs: [
-      "ゲームと開発アセットを作っている個人開発者です。ゲーム開発を軸に、技術・アセット制作・発信を続けています。",
       "主な活動はゲーム開発です。個人制作のゲームを形にするだけでなく、制作中に必要になる設計、実装、ツール整備まで含めて継続的に積み上げています。",
       "あわせて、開発中に得た知見を技術記事や公開リポジトリとして整理し、ゲーム開発やソフトウェア開発に再利用できる形で残しています。",
     ],
@@ -63,7 +68,7 @@ export const aboutPageContent = {
       description: "OSS、ライブラリ、公開リポジトリをまとめています。",
     },
     {
-      label: "X",
+      label: "Twitter",
       description: "短い近況や日々の発信はこちらです。",
     },
     {
