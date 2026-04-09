@@ -10,7 +10,6 @@ export const primaryNav = [
   { href: "/games/", label: "Games" },
   { href: "/assets/", label: "Assets" },
   { href: "/articles/", label: "Articles" },
-  { href: "/search/", label: "Search" },
   { href: "/contact/", label: "Contact" },
 ] as const;
 
