@@ -14,8 +14,10 @@ export const primaryNav = [
 ] as const;
 
 export const externalLinks = [
-  { href: "https://github.com/mackysoft", label: "GitHub" },
-  { href: "https://twitter.com/makihiro_dev", label: "Twitter" },
-  { href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
-  { href: "https://www.youtube.com/channel/UCzO3iwkiy6u1mARt-HOysZA", label: "YouTube" },
+  { id: "github", href: "https://github.com/mackysoft", label: "GitHub" },
+  { id: "twitter", href: "https://twitter.com/makihiro_dev", label: "Twitter" },
+  { id: "zenn", href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
+  { id: "youtube", href: "https://www.youtube.com/channel/UCzO3iwkiy6u1mARt-HOysZA", label: "YouTube" },
 ] as const;
+
+export type ExternalLinkId = (typeof externalLinks)[number]["id"];

@@ -1,4 +1,5 @@
 import { formatPageBreadcrumb } from "../../lib/page-header";
+import type { ExternalLinkId } from "../../lib/site";
 
 export const aboutPageContent = {
   title: "About | Hiroya Aramaki（荒牧裕也）/ Makihiro",
@@ -7,15 +8,15 @@ export const aboutPageContent = {
   hero: {
     eyebrow: formatPageBreadcrumb("Home", "About"),
     title: "About",
-    avatar: {
-      src: "https://github.com/mackysoft.png",
-      href: "https://twitter.com/makihiro_dev",
-      alt: "Makihiro のアイコン",
-    },
   },
   profile: {
     name: "Hiroya Aramaki（荒牧裕也）/ Makihiro",
     summary: "ゲームと開発アセットを作っている個人開発者です。ゲーム開発を軸に、技術・アセット制作・発信を続けています。",
+    avatar: {
+      src: "https://github.com/mackysoft.png",
+      alt: "Makihiro のアイコン",
+    },
+    primaryExternalLinkId: "twitter" as ExternalLinkId,
   },
   whatIDo: {
     heading: "何をしている人か",
@@ -64,15 +65,15 @@ export const aboutPageContent = {
   externalLinksHeading: "リンク",
   externalLinks: [
     {
-      label: "GitHub",
+      id: "github" as ExternalLinkId,
       description: "OSS、ライブラリ、公開リポジトリをまとめています。",
     },
     {
-      label: "Twitter",
+      id: "twitter" as ExternalLinkId,
       description: "短い近況や日々の発信はこちらです。",
     },
     {
-      label: "Zenn",
+      id: "zenn" as ExternalLinkId,
       description: "技術記事やまとまった知見を公開しています。",
     },
   ],

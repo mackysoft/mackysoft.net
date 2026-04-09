@@ -9,7 +9,7 @@ type Props = {
 const { title, description = siteMeta.description } = Astro.props;
 const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
-const footerLinks = externalLinks.filter((link) => link.label !== "YouTube");
+const footerLinks = externalLinks.filter((link) => link.id !== "youtube");
 ---
 
 <!doctype html>

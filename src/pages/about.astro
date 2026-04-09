@@ -4,17 +4,17 @@ import { aboutPageContent } from "../features/about/content";
 import { externalLinks } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
-const externalLinkMap = new Map(externalLinks.map((link) => [link.label, link.href]));
+const externalLinkMap = new Map(externalLinks.map((link) => [link.id, link]));
 const aboutExternalLinks = aboutPageContent.externalLinks.flatMap((link) => {
-  const href = externalLinkMap.get(link.label);
+  const externalLink = externalLinkMap.get(link.id);
 
-  if (!href) {
+  if (!externalLink) {
     return [];
   }
 
-  return [{ ...link, href }];
+  return [{ ...link, href: externalLink.href, label: externalLink.label }];
 });
-const heroAvatarHref = externalLinkMap.get("Twitter") ?? aboutPageContent.hero.avatar.href;
+const profilePrimaryExternalLink = externalLinkMap.get(aboutPageContent.profile.primaryExternalLinkId);
 ---
 
 <SiteLayout title={aboutPageContent.title} description={aboutPageContent.description}>
@@ -23,14 +23,14 @@ const heroAvatarHref = externalLinkMap.get("Twitter") ?? aboutPageContent.hero.a
   <section class="content-panel about-main">
     <div class="profile-intro">
       <a
-        href={heroAvatarHref}
+        href={profilePrimaryExternalLink?.href}
         target="_blank"
         rel="noreferrer"
-        aria-label="Twitter を開く"
+        aria-label={`${profilePrimaryExternalLink?.label ?? "外部リンク"} を開く`}
         class="avatar-link"
         style="width: clamp(6rem, 12vw, 9rem); height: clamp(6rem, 12vw, 9rem);"
       >
-        <img src={aboutPageContent.hero.avatar.src} alt={aboutPageContent.hero.avatar.alt} class="avatar" loading="eager" />
+        <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
       </a>
       <div class="profile-copy">
         <p class="profile-name">{aboutPageContent.profile.name}</p>
