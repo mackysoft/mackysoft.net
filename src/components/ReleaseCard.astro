@@ -1,0 +1,124 @@
+---
+import { Image } from "astro:assets";
+
+import type { ReleaseActivity } from "../lib/articles";
+import { formatDate } from "../lib/articles";
+
+type Props = {
+  release: ReleaseActivity;
+};
+
+const { release } = Astro.props;
+const repoName = release.repo.split("/").at(-1) ?? release.repo;
+const showReleaseName = release.name !== release.version;
+---
+
+<article class="release-card">
+  <a href={release.url} class="release-card__cover-link" target="_blank" rel="noreferrer">
+    <Image src={release.coverUrl} alt={release.coverAlt} widths={[480]} sizes="(max-width: 720px) 100vw, 20rem" inferSize />
+  </a>
+  <div class="release-card__body">
+    <h3>
+      <a href={release.url} target="_blank" rel="noreferrer">{repoName}</a>
+    </h3>
+    {showReleaseName && <p class="release-card__name">{release.name}</p>}
+    <div class="release-card__footer">
+      <p class="release-card__meta">
+        <span>{formatDate(new Date(release.publishedAt))}</span>
+        <span>{release.source}</span>
+      </p>
+      <p class="release-card__version">{release.version}</p>
+    </div>
+  </div>
+</article>
+
+<style>
+  .release-card {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    min-height: 19.75rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    background: var(--surface-color);
+    overflow: hidden;
+  }
+
+  .release-card__cover-link {
+    display: block;
+    overflow: hidden;
+    border-radius: 0.9rem;
+    aspect-ratio: 1200 / 630;
+    background: var(--surface-strong-color);
+  }
+
+  .release-card__cover-link :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .release-card__body {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0.4rem;
+    min-height: 0;
+  }
+
+  .release-card__name,
+  .release-card__meta,
+  .release-card__version {
+    margin: 0;
+  }
+
+  .release-card h3 {
+    margin: 0;
+    font-size: clamp(0.96rem, 0.9rem + 0.28vw, 1.08rem);
+    line-height: 1.32;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .release-card h3 a {
+    color: var(--text-color);
+    text-decoration: none;
+  }
+
+  .release-card__name {
+    color: var(--muted-color);
+    font-size: 0.92rem;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .release-card__footer {
+    display: grid;
+    gap: 0.55rem;
+    align-content: end;
+    margin-top: auto;
+  }
+
+  .release-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    color: var(--muted-color);
+    font-size: 0.84rem;
+  }
+
+  .release-card__version {
+    width: fit-content;
+    padding: 0.3rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(14, 107, 99, 0.1);
+    color: var(--accent-color);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+</style>

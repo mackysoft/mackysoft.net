@@ -19,6 +19,8 @@ export type ReleaseActivity = {
   version: string;
   url: string;
   publishedAt: string;
+  coverUrl: string;
+  coverAlt: string;
 };
 
 export type ActivityData = {
@@ -42,6 +44,14 @@ export type ArticleItem = {
 
 export function sortArticleItems(articleItems: ArticleItem[]) {
   return articleItems.sort((left, right) => right.publishedAt.valueOf() - left.publishedAt.valueOf());
+}
+
+export function sortReleaseActivities(releases: ReleaseActivity[]) {
+  return releases.sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
+}
+
+export function getLatestReleaseActivities(releases: ReleaseActivity[], limit = 3) {
+  return sortReleaseActivities([...releases]).slice(0, limit);
 }
 
 export function toExternalArticleItem(article: ArticleActivity): ArticleItem {

@@ -7,8 +7,11 @@ const activityData = JSON.parse(
   readFileSync(path.resolve(import.meta.dirname, "../../src/generated/activity.json"), "utf8"),
 ) as {
   articles: Array<{ title: string }>;
+  releases: Array<{ repo: string; coverAlt: string }>;
 };
 const latestZennArticle = activityData.articles[0]!;
+const latestRelease = activityData.releases[0]!;
+const latestReleaseRepoName = latestRelease.repo.split("/").at(-1)!;
 
 test.describe("home page", () => {
   test("renders the home page as an activity hub", async ({ page }) => {
@@ -22,6 +25,10 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
     await expect(page.getByRole("main").locator(".article-card").filter({ hasText: "Zenn" }).first()).toBeVisible();
     await expect(page.getByRole("main").locator(".article-card__tags")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 2, name: "最新のリリース" })).toBeVisible();
+    await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
+    await expect(page.getByRole("main").locator(".release-card").first()).toBeVisible();
+    await expect(page.getByRole("img", { name: latestRelease.coverAlt }).first()).toBeVisible();
   });
 
   test("returns 404 for draft article routes", async ({ page }) => {

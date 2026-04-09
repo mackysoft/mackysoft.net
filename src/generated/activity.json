@@ -41,5 +41,116 @@
       "coverAlt": "チーム開発で『GitHub Discussions』を運用してみた のカバー画像"
     }
   ],
-  "releases": []
+  "releases": [
+    {
+      "groupId": "GitHub:mackysoft/Unity-SerializeReferenceExtensions",
+      "source": "GitHub",
+      "repo": "mackysoft/Unity-SerializeReferenceExtensions",
+      "name": "1.7.0",
+      "version": "1.7.0",
+      "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
+      "publishedAt": "2026-01-18T14:37:19Z",
+      "coverUrl": "https://opengraph.githubassets.com/58f8f7884c78830152a52fa1707b3176cb368f822439c447ba546177c5be77c1/mackysoft/Unity-SerializeReferenceExtensions",
+      "coverAlt": "mackysoft/Unity-SerializeReferenceExtensions のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/MasterTools",
+      "source": "GitHub",
+      "repo": "mackysoft/MasterTools",
+      "name": "1.0.0",
+      "version": "1.0.0",
+      "url": "https://github.com/mackysoft/MasterTools/releases/tag/1.0.0",
+      "publishedAt": "2024-08-15T16:19:05Z",
+      "coverUrl": "https://opengraph.githubassets.com/2da5a17ef9c8c98ecd6cc458bbb8faa7a2d37b8e395ee0b27465e13cdda3dbd9/mackysoft/MasterTools",
+      "coverAlt": "mackysoft/MasterTools のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/Navigathena",
+      "source": "GitHub",
+      "repo": "mackysoft/Navigathena",
+      "name": "1.1.0",
+      "version": "1.1.0",
+      "url": "https://github.com/mackysoft/Navigathena/releases/tag/1.1.0",
+      "publishedAt": "2024-02-14T12:02:45Z",
+      "coverUrl": "https://repository-images.githubusercontent.com/703056380/d12762cb-a193-4856-b79e-f885862aa212",
+      "coverAlt": "mackysoft/Navigathena のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/UnityCapture-URP",
+      "source": "GitHub",
+      "repo": "mackysoft/UnityCapture-URP",
+      "name": "1.0.0",
+      "version": "1.0.0",
+      "url": "https://github.com/mackysoft/UnityCapture-URP/releases/tag/1.0.0",
+      "publishedAt": "2022-12-25T14:49:51Z",
+      "coverUrl": "https://opengraph.githubassets.com/8e90dc9971d1db90eaebc39e8b13415d05b9886d5db36b4890a8c833a83a5d99/mackysoft/UnityCapture-URP",
+      "coverAlt": "mackysoft/UnityCapture-URP のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/Choice",
+      "source": "GitHub",
+      "repo": "mackysoft/Choice",
+      "name": "1.2.3",
+      "version": "1.2.3",
+      "url": "https://github.com/mackysoft/Choice/releases/tag/1.2.3",
+      "publishedAt": "2022-10-27T16:34:43Z",
+      "coverUrl": "https://repository-images.githubusercontent.com/330675720/0097a980-6451-11eb-9c78-aacc073d1bae",
+      "coverAlt": "mackysoft/Choice のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/XPool",
+      "source": "GitHub",
+      "repo": "mackysoft/XPool",
+      "name": "0.1.1",
+      "version": "0.1.1",
+      "url": "https://github.com/mackysoft/XPool/releases/tag/0.1.1",
+      "publishedAt": "2022-03-04T12:02:09Z",
+      "coverUrl": "https://repository-images.githubusercontent.com/453590991/4a5f2fbc-77d6-4423-b8b3-8024396c107a",
+      "coverAlt": "mackysoft/XPool のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/Modiferty",
+      "source": "GitHub",
+      "repo": "mackysoft/Modiferty",
+      "name": "1.1.2",
+      "version": "1.1.2",
+      "url": "https://github.com/mackysoft/Modiferty/releases/tag/1.1.2",
+      "publishedAt": "2021-05-15T19:27:16Z",
+      "coverUrl": "https://repository-images.githubusercontent.com/265178664/087ffc80-9a2e-11ea-8773-447d1a2559e8",
+      "coverAlt": "mackysoft/Modiferty のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/Vision",
+      "source": "GitHub",
+      "repo": "mackysoft/Vision",
+      "name": "1.2.1",
+      "version": "1.2.1",
+      "url": "https://github.com/mackysoft/Vision/releases/tag/1.2.1",
+      "publishedAt": "2021-04-25T07:30:07Z",
+      "coverUrl": "https://repository-images.githubusercontent.com/347625853/1616ed80-853e-11eb-92bb-ff2be88019d7",
+      "coverAlt": "mackysoft/Vision のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/Unity-GitHubActions-ExportPackage-Example",
+      "source": "GitHub",
+      "repo": "mackysoft/Unity-GitHubActions-ExportPackage-Example",
+      "name": "1.0.0",
+      "version": "1.0.0",
+      "url": "https://github.com/mackysoft/Unity-GitHubActions-ExportPackage-Example/releases/tag/1.0.0",
+      "publishedAt": "2021-04-11T10:24:15Z",
+      "coverUrl": "https://opengraph.githubassets.com/17b7acabe7cab923747103df3260644e624518047fd5910dc2797a5640a8a954/mackysoft/Unity-GitHubActions-ExportPackage-Example",
+      "coverAlt": "mackysoft/Unity-GitHubActions-ExportPackage-Example のリポジトリサムネイル"
+    },
+    {
+      "groupId": "GitHub:mackysoft/UniData",
+      "source": "GitHub",
+      "repo": "mackysoft/UniData",
+      "name": "0.1.0-preview",
+      "version": "0.1.0-preview",
+      "url": "https://github.com/mackysoft/UniData/releases/tag/0.1.0-preview",
+      "publishedAt": "2021-04-09T11:31:17Z",
+      "coverUrl": "https://opengraph.githubassets.com/89d65b87bc10b2cd0e72cb540368ed78c7a3f39b2bd976906c4deb73a82ebfb6/mackysoft/UniData",
+      "coverAlt": "mackysoft/UniData のリポジトリサムネイル"
+    }
+  ]
 }
