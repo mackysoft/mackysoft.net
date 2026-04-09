@@ -1,7 +1,7 @@
 ---
 import ArticleCard from "../../../components/ArticleCard.astro";
-import type { WritingItem } from "../../../lib/articles";
-import { getLocalArticles, toLocalWritingItem } from "../../../lib/articles";
+import type { ArticleItem } from "../../../lib/articles";
+import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -13,7 +13,7 @@ export async function getStaticPaths() {
     const month = String(article.data.publishedAt.getMonth() + 1).padStart(2, "0");
     const key = `${year}-${month}`;
     const current = yearMonths.get(key) ?? [];
-    current.push(toLocalWritingItem(article));
+    current.push(toLocalArticleItem(article));
     yearMonths.set(key, current);
   }
 
@@ -26,7 +26,7 @@ export async function getStaticPaths() {
   });
 }
 
-const { year, month, articles } = Astro.props as { year: string; month: string; articles: WritingItem[] };
+const { year, month, articles } = Astro.props as { year: string; month: string; articles: ArticleItem[] };
 ---
 
 <SiteLayout title={`Archive ${year}/${month}`} description={`${year} 年 ${month} 月の記事一覧です。`}>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <item>
+      <title><![CDATA[First article]]></title>
+      <description><![CDATA[ Summary with   line breaks. ]]></description>
+      <link>https://zenn.dev/makihiro_dev/articles/first-article</link>
+      <pubDate>Tue, 06 Jan 2026 03:05:01 GMT</pubDate>
+      <enclosure url="https://res.cloudinary.com/zenn/image/upload/sample-cover.png" length="0" type="false" />
+    </item>
+    <item>
+      <title><![CDATA[Second article]]></title>
+      <description><![CDATA[HTML entity &amp; spaces]]></description>
+      <link>https://zenn.dev/makihiro_dev/articles/second-article</link>
+      <pubDate>Tue, 24 Sep 2024 03:00:05 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
