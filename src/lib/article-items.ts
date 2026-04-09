@@ -15,6 +15,7 @@ export type ReleaseActivity = {
   groupId: string;
   source: string;
   repo: string;
+  stargazerCount: number;
   name: string;
   version: string;
   url: string;

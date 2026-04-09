@@ -31,6 +31,7 @@ export const githubReleasePageSize = 100;
  *   groupId: string;
  *   source: string;
  *   repo: string;
+ *   stargazerCount: number;
  *   name: string;
  *   version: string;
  *   url: string;
@@ -52,6 +53,7 @@ export const githubReleasePageSize = 100;
  *   name: string;
  *   nameWithOwner: string;
  *   openGraphImageUrl: string;
+ *   stargazerCount: number;
  * }} GitHubRepository
  */
 
@@ -132,7 +134,15 @@ export function normalizeGitHubRelease(repository, release) {
   const name = normalizeWhitespace(release.name || version);
   const publishedAt = normalizeWhitespace(release.published_at);
 
-  if (!version || !name || !release.html_url || !publishedAt || !repository.openGraphImageUrl) {
+  if (
+    !version
+    || !name
+    || !release.html_url
+    || !publishedAt
+    || !repository.openGraphImageUrl
+    || !Number.isInteger(repository.stargazerCount)
+    || repository.stargazerCount < 0
+  ) {
     throw new Error(`GitHub release for ${repository.nameWithOwner} is missing required fields.`);
   }
 
@@ -140,6 +150,7 @@ export function normalizeGitHubRelease(repository, release) {
     groupId: createReleaseGroupId(repository.nameWithOwner),
     source: "GitHub",
     repo: repository.nameWithOwner,
+    stargazerCount: repository.stargazerCount,
     name,
     version,
     url: release.html_url,
@@ -250,6 +261,7 @@ export async function fetchGitHubRepositories(fetchImpl = fetch) {
                     name
                     nameWithOwner
                     openGraphImageUrl
+                    stargazerCount
                   }
                 }
               }
@@ -273,7 +285,11 @@ export async function fetchGitHubRepositories(fetchImpl = fetch) {
       throw new Error(`Failed to fetch GitHub repositories for owner ${githubOwner}.`);
     }
 
-    repositories.push(...connection.nodes.filter((node) => node?.nameWithOwner && node?.openGraphImageUrl));
+    repositories.push(
+      ...connection.nodes.filter(
+        (node) => node?.nameWithOwner && node?.openGraphImageUrl && Number.isInteger(node?.stargazerCount),
+      ),
+    );
     hasNextPage = connection.pageInfo.hasNextPage;
     cursor = connection.pageInfo.endCursor;
   }
