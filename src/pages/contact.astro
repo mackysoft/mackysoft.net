@@ -1,0 +1,41 @@
+---
+import { externalLinks } from "../lib/site";
+import SiteLayout from "../layouts/SiteLayout.astro";
+---
+
+<SiteLayout title="Contact" description="現時点の連絡導線です。">
+  <section class="page-hero">
+    <p class="eyebrow">Contact</p>
+    <h1>Contact</h1>
+    <p>連絡手段は新しいサイト構成に合わせて整理中です。公開中の連絡導線は次の外部サービスです。</p>
+  </section>
+
+  <section class="content-panel">
+    <ul class="link-list">
+      {externalLinks.map((link) => (
+        <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
+      ))}
+    </ul>
+  </section>
+</SiteLayout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-color);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+  }
+
+  h1 {
+    margin: 0 0 0.6rem;
+  }
+
+  .link-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+</style>

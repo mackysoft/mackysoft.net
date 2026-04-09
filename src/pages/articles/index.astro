@@ -1,0 +1,40 @@
+---
+import ArticleCard from "../../components/ArticleCard.astro";
+import { getWritingItems } from "../../lib/articles";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const writings = await getWritingItems();
+---
+
+<SiteLayout title="Articles" description="移行済みの記事一覧です。">
+  <section class="page-hero">
+    <p class="eyebrow">Articles</p>
+    <h1>Articles</h1>
+    <p>WordPress の旧ブログ記事はローカルの Markdown 原本へ移し直しました。外部記事は今後ここへ統合します。</p>
+  </section>
+
+  <section class="content-grid">
+    {writings.map((article) => (
+      <ArticleCard article={article} />
+    ))}
+  </section>
+</SiteLayout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-color);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+  }
+
+  h1 {
+    margin: 0 0 0.6rem;
+    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .page-hero p:last-child {
+    margin: 0;
+  }
+</style>
