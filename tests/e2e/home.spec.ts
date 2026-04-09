@@ -29,6 +29,16 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
     await expect(page.getByRole("main").locator(".release-card").first()).toBeVisible();
     await expect(page.getByRole("img", { name: latestRelease.coverAlt }).first()).toBeVisible();
+
+    const firstReleaseStars = page.getByRole("main").locator(".release-card__stars").first();
+    await expect(firstReleaseStars).toBeVisible();
+    await expect(firstReleaseStars).toHaveCSS("display", "flex");
+
+    const firstReleaseStarIconWidth = await firstReleaseStars.locator(".release-card__star-icon").evaluate((element) => {
+      return element.getBoundingClientRect().width;
+    });
+    expect(firstReleaseStarIconWidth).toBeGreaterThan(8);
+    expect(firstReleaseStarIconWidth).toBeLessThan(20);
   });
 
   test("returns 404 for draft article routes", async ({ page }) => {
