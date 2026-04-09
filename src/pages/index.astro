@@ -1,11 +1,13 @@
 ---
 import ArticleCard from "../components/ArticleCard.astro";
+import ReleaseCard from "../components/ReleaseCard.astro";
 import { homePageContent } from "../features/home/content";
-import { getArticleItems } from "../lib/articles";
+import { getArticleItems, getLatestReleases } from "../lib/articles";
 import { externalLinks, siteMeta } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const latestArticles = (await getArticleItems()).slice(0, 3);
+const latestReleases = getLatestReleases();
 ---
 
 <SiteLayout>
@@ -44,6 +46,25 @@ const latestArticles = (await getArticleItems()).slice(0, 3);
       ))}
     </div>
   </section>
+
+  {latestReleases.length > 0 && (
+    <section class="content-panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Latest Releases</p>
+          <h2>最新のリリース</h2>
+        </div>
+        <a href="https://github.com/mackysoft?tab=repositories" class="button-link" target="_blank" rel="noreferrer">
+          Open GitHub
+        </a>
+      </div>
+      <div class="content-grid latest-releases-grid">
+        {latestReleases.map((release) => (
+          <ReleaseCard release={release} />
+        ))}
+      </div>
+    </section>
+  )}
 
   <section class="content-grid feature-grid">
     <section class="content-panel">
@@ -125,6 +146,10 @@ const latestArticles = (await getArticleItems()).slice(0, 3);
   }
 
   .latest-articles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .latest-releases-grid {
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
 </style>
