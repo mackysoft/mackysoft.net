@@ -285,5 +285,5 @@ public class WeightedMultiSpawnLevelProcessor : ILevelProcessor {
 ## 関連記事
 
 -   [ローグライクのマップ生成アルゴリズムについて解説](/articles/roguelike-map-generation-algorithm/)
--   [Weightedなランダムを実装する【C#】](/articles/weighted-random/)
+-   [Weightedなランダムを実装する【C#】](/weighted-random/)
 -   [ゲームを面白くする「コントラスト」【ゲームデザイン】](/articles/gamedesign-contrast-cedec2018/)

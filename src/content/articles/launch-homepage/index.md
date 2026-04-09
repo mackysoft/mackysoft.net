@@ -3,6 +3,7 @@ title: "ゲーム開発ブログを開設！"
 description: "はじめまして、Makihiro（@makihiro_dev）です。 この度、ホームページ兼ブログを開設しました！ はじめに 僕は「ゲームを作って食っていく」ということを掲げています。 しかし、現実はなかなか厳しいです。 … ゲーム開発ブログを開設！"
 publishedAt: "2020-05-23T20:38:23+09:00"
 updatedAt: "2020-05-29T17:50:30+09:00"
+draft: true
 tags:
   - "misc"
 cover: "./cover.png"

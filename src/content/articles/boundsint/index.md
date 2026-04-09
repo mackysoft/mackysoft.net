@@ -3,6 +3,7 @@ title: "【Unity】BoundsIntの使い方"
 description: "BoundsIntとは？ BoundsIntはバウンディングボックス（仮想的な立方体）を表すBoundsのintバージョンです。 仮想的な立方体を使って、位置計算をしたりするときに役立ちます。 using UnityEn … 【Unity】BoundsIntの使い方"
 publishedAt: "2020-06-19T20:20:32+09:00"
 updatedAt: "2020-06-19T20:20:33+09:00"
+draft: true
 tags:
   - "unity"
 cover: "./cover.png"

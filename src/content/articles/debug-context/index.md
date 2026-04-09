@@ -3,6 +3,7 @@ title: "【Unity】Debug.Logのcontextとは？【覚えておくと便利】"
 description: "はじめに GIFの通りですが、この記事ではデバッグの際に便利なDebug.Logのオーバーロードを紹介します。 // いつも使うやつ Debug.Log(string message); // この機能で紹介するDebu … 【Unity】Debug.Logのcontextとは？【覚えておくと便利】"
 publishedAt: "2020-05-31T17:35:48+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
+draft: true
 tags:
   - "unity"
 cover: "./cover.gif"

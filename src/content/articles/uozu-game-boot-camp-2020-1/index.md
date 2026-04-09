@@ -3,6 +3,7 @@ title: "【つくるUOZU】和尚さんのメンタリング整理【BOOT CAMP 2
 description: "はじめに BOOT CAMPは「つくるUOZUプロジェクト」の一環で、プロのクリエイターにゲーム開発のメンタリングをしてもらえるゲームクリエイター養成プログラムです。 前回のBOOT CAMPに引き続き、和尚さん（@Ku … 【つくるUOZU】和尚さんのメンタリング整理【BOOT CAMP 2020 その1】"
 publishedAt: "2020-07-04T02:39:58+09:00"
 updatedAt: "2020-07-04T19:34:08+09:00"
+draft: true
 tags:
   - "game-design"
   - "misc"

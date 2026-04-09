@@ -3,6 +3,7 @@ title: "CinemachineImpulseをScriptableObjectにした話"
 description: "はじめに Cinemachineには、衝撃などの発生時にカメラを振動させるための「CinemachineImpulse」という機能があります。 実際にCinemachineImpulseを使おうとすると、大体このような感 … CinemachineImpulseをScriptableObjectにした話"
 publishedAt: "2020-06-09T21:47:32+09:00"
 updatedAt: "2020-06-10T21:03:10+09:00"
+draft: true
 tags:
   - "cinemachine"
   - "unity"

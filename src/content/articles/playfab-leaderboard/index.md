@@ -3,6 +3,7 @@ title: "【PlayFab】Leaderboardを使ってランキングを実装する【Uni
 description: "この記事でのバージョン PlayFab SDK: 2.86.2005 18 はじめに この記事では、PlayFabのLeaderboard関連のAPIを使用しています。前提条件としてプレイヤーがログインしている必要がある … 【PlayFab】Leaderboardを使ってランキングを実装する【Unity】"
 publishedAt: "2020-05-26T21:56:13+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
+draft: true
 tags:
   - "playfab"
   - "unity"
@@ -18,7 +19,7 @@ coverAlt: "【PlayFab】Leaderboardを使ってランキングを実装する【
 
 この記事では、PlayFabのLeaderboard関連のAPIを使用しています。前提条件としてプレイヤーがログインしている必要があるので、ログインについて知りたい方は以下の記事を見てもらえると幸いです。
 
-[【PlayFab】IDの生成、ログインについて【Unity】](/articles/playfab-login/)
+[【PlayFab】IDの生成、ログインについて【Unity】](/playfab-login/)
 
 ## リーダーボードの作成
 

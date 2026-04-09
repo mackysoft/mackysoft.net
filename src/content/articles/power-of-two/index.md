@@ -3,6 +3,7 @@ title: "【Unity】2の累乗の便利関数＆使用例【Mathf】"
 description: "2の累乗の関数 bool IsPowerOfTwo (int value) valueが2の累乗かどうかを返します。 // false Debug.Log(Mathf.IsPowerOfTwo(7)); // true … 【Unity】2の累乗の便利関数＆使用例【Mathf】"
 publishedAt: "2020-06-01T19:47:09+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
+draft: true
 tags:
   - "unity"
 ---

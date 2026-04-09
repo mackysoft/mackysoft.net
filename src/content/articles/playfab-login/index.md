@@ -3,6 +3,7 @@ title: "【PlayFab】IDの生成、ログインについて【Unity】"
 description: "この記事でのバージョン PlayFab SDK: 2.86.2005 18 はじめに PlayFabには様々な機能がありますが、それらの機能を使うため最初にすべきことはログインです。 「匿名ログイン」と「回復可能なログイ … 【PlayFab】IDの生成、ログインについて【Unity】"
 publishedAt: "2020-05-25T20:54:14+09:00"
 updatedAt: "2020-05-29T03:27:12+09:00"
+draft: true
 tags:
   - "playfab"
   - "unity"

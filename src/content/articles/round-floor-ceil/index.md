@@ -2,6 +2,7 @@
 title: "【Unity】四捨五入、切り捨て、切り上げ【Mathf】"
 description: "「RoundとFloorとCeil、どれがどれだっけな～」みたいなことになりがちなので、備忘録的にまとめました。 関数 説明 Round / RoundToInt 四捨五入 Floor / FloorToInt 切り捨て … 【Unity】四捨五入、切り捨て、切り上げ【Mathf】"
 publishedAt: "2020-06-11T21:08:45+09:00"
+draft: true
 tags:
   - "csharp"
   - "unity"

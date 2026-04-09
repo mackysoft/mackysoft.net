@@ -45,4 +45,25 @@ describe("wordpress import output", () => {
     expect(redirects.get("/treasure-rogue/")).toBe("/games/treasure-rogue/");
     expect(redirects.get("/treasure-rogue/privacy-policy/")).toBe("/privacy-policy/");
   });
+
+  test("marks non-brand articles as draft and excludes their legacy redirects", () => {
+    const excludedMarkdown = readFileSync(path.join(articlesRoot, "round-floor-ceil", "index.md"), "utf8");
+    const publicMarkdown = readFileSync(path.join(articlesRoot, "how-to-complete-game-development", "index.md"), "utf8");
+    const csv = readFileSync(urlMapPath, "utf8").trim().split("\n").slice(1);
+    const rows = csv.map((line) => line.split(","));
+    const excludedRow = rows.find((row) => row[0] === "/round-floor-ceil/");
+    const publicRow = rows.find((row) => row[0] === "/how-to-complete-game-development/");
+
+    expect(excludedMarkdown).toMatch(/^draft: true$/m);
+    expect(publicMarkdown).not.toMatch(/^draft: true$/m);
+
+    expect(excludedRow).toEqual(["/round-floor-ceil/", "", "article", "exact", "excluded"]);
+    expect(publicRow).toEqual([
+      "/how-to-complete-game-development/",
+      "/articles/how-to-complete-game-development/",
+      "article",
+      "exact",
+      "mapped",
+    ]);
+  });
 });

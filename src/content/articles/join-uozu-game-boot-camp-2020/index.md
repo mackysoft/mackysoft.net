@@ -2,6 +2,7 @@
 title: "UOZU GAME BOOT CAMP 2020に参加するぞ！【つくるUOZU】"
 description: "はじめに BOOT CAMPは「つくるUOZUプロジェクト」の一環で、プロのクリエイターにゲーム開発のメンタリングをしてもらえるゲームクリエイター養成プログラムです。 前回のBOOT CAMPに引き続き、今回も参加するこ … UOZU GAME BOOT CAMP 2020に参加するぞ！【つくるUOZU】"
 publishedAt: "2020-06-21T22:21:00+09:00"
+draft: true
 tags:
   - "treasure-rogue"
   - "misc"

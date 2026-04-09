@@ -3,6 +3,7 @@ title: "【C#】Linqで集合演算（Union, Concat, Intersect, Except, Distinct
 description: "和集合や差集合と云った、いわゆる「集合演算」を調べていたのですが、「そんな専門用語使われても分かんねーよ！」となったので、自分なりに分かりやすい言葉で解説します。 演算 説明 和集合（Union） コレクションAとコレク … 【C#】Linqで集合演算（Union, Concat, Intersect, Except, Distinct）"
 publishedAt: "2020-06-07T19:11:00+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
+draft: true
 tags:
   - "csharp"
 ---

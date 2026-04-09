@@ -3,6 +3,7 @@ title: "【PlayFab】PlayFabAuthenticationContextとは？【Unity】"
 description: "はじめに PlayFabを使っているときに「○○Requestに指定できるPlayFabAuthenticationContextって何だろう？」と思ったので、PlayFabAuthenticationContextにつ … 【PlayFab】PlayFabAuthenticationContextとは？【Unity】"
 publishedAt: "2020-05-27T20:00:00+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
+draft: true
 tags:
   - "playfab"
   - "unity"

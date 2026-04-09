@@ -3,6 +3,7 @@ title: "ParticleSystemの再生の終了判定（StopAction）【Unity】"
 description: "はじめに 「ParticleSystemの終了判定ってどうやるんだろう？」ということを調べたので、詳しく解説します。 終了判定はStopActionから行える ParticleSystemが終了ときに処理を行うには、Pa … ParticleSystemの再生の終了判定（StopAction）【Unity】"
 publishedAt: "2020-06-10T19:28:25+09:00"
 updatedAt: "2020-06-10T21:03:10+09:00"
+draft: true
 tags:
   - "unity"
   - "particlesystem"

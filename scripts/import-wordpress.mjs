@@ -11,6 +11,18 @@ const { gfm } = turndownPluginGfm;
 const SITE_URL = "https://mackysoft.net";
 const SITE_ORIGIN = new URL(SITE_URL).origin;
 const JST_OFFSET = "+09:00";
+const PUBLIC_ARTICLE_SLUGS = new Set([
+  "gamedesign-contrast-cedec2018",
+  "how-to-complete-game-development",
+  "modiferty-introduction",
+  "roguelike-map-generation-algorithm",
+  "roguelike-random-enemy-select",
+  "slay-the-spire-review",
+  "turnbased-gameloop",
+  "use-modifierlist",
+  "value-of-the-game",
+  "vision-introduction",
+]);
 
 const repoRoot = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const articlesRoot = path.join(repoRoot, "src/content/articles");
@@ -42,8 +54,13 @@ async function main() {
   await mkdir(articlesRoot, { recursive: true });
   await mkdir(migrationRoot, { recursive: true });
 
-  const urlMapRows = buildUrlMapRows({ posts, pages, categories, tags });
-  const redirectMap = new Map(urlMapRows.map((row) => [row.legacy_path, row.new_path]));
+  const publicPosts = posts.filter(isPublicPost);
+  const urlMapRows = buildUrlMapRows({ posts, publicPosts, pages, categories, tags });
+  const redirectMap = new Map(
+    urlMapRows
+      .filter((row) => row.status === "mapped" && row.new_path)
+      .map((row) => [row.legacy_path, row.new_path]),
+  );
 
   const mediaAuditMap = new Map();
   collectMediaAuditFromEntries(posts, "post", mediaAuditMap);
@@ -69,7 +86,7 @@ async function main() {
 
   await writeFile(
     path.join(migrationRoot, "taxonomy-map.yaml"),
-    toTaxonomyYaml({ categories, tags }),
+    toTaxonomyYaml({ categories, tags, publicPosts }),
     "utf8",
   );
 
@@ -121,16 +138,27 @@ async function fetchAll(initialPath) {
   return collected;
 }
 
-function buildUrlMapRows({ posts, pages, categories, tags }) {
+function buildUrlMapRows({ posts, publicPosts, pages, categories, tags }) {
   const rows = [];
+  const publicCategoryIds = collectTermIds(publicPosts, "categories");
+  const publicTagIds = collectTermIds(publicPosts, "tags");
+  const publicYears = new Set();
+  const publicMonths = new Set();
+
+  for (const post of publicPosts) {
+    const [year, month] = post.date.split("T")[0].split("-");
+    publicYears.add(year);
+    publicMonths.add(`${year}/${month}`);
+  }
 
   for (const post of posts) {
+    const isPublic = isPublicPost(post);
     rows.push({
       legacy_path: normalizeSitePath(post.link),
-      new_path: `/articles/${post.slug}/`,
+      new_path: isPublic ? `/articles/${post.slug}/` : "",
       content_type: "article",
       redirect_kind: "exact",
-      status: "mapped",
+      status: isPublic ? "mapped" : "excluded",
     });
   }
 
@@ -154,22 +182,24 @@ function buildUrlMapRows({ posts, pages, categories, tags }) {
   }
 
   for (const term of categories) {
+    const isPublic = publicCategoryIds.has(term.id);
     rows.push({
       legacy_path: normalizeSitePath(term.link),
-      new_path: `/tags/${getNewTag(term)}/`,
+      new_path: isPublic ? `/tags/${getNewTag(term)}/` : "",
       content_type: "category",
       redirect_kind: "taxonomy",
-      status: "mapped",
+      status: isPublic ? "mapped" : "excluded",
     });
   }
 
   for (const term of tags) {
+    const isPublic = publicTagIds.has(term.id);
     rows.push({
       legacy_path: normalizeSitePath(term.link),
-      new_path: `/tags/${getNewTag(term)}/`,
+      new_path: isPublic ? `/tags/${getNewTag(term)}/` : "",
       content_type: "tag",
       redirect_kind: "taxonomy",
-      status: "mapped",
+      status: isPublic ? "mapped" : "excluded",
     });
   }
 
@@ -183,23 +213,25 @@ function buildUrlMapRows({ posts, pages, categories, tags }) {
   }
 
   for (const year of Array.from(years).sort()) {
+    const isPublic = publicYears.has(year);
     rows.push({
       legacy_path: `/${year}/`,
-      new_path: `/archive/${year}/`,
+      new_path: isPublic ? `/archive/${year}/` : "",
       content_type: "archive",
       redirect_kind: "archive",
-      status: "mapped",
+      status: isPublic ? "mapped" : "excluded",
     });
   }
 
   for (const yearMonth of Array.from(months).sort()) {
     const [year, month] = yearMonth.split("/");
+    const isPublic = publicMonths.has(yearMonth);
     rows.push({
       legacy_path: `/${year}/${month}/`,
-      new_path: `/archive/${year}/${month}/`,
+      new_path: isPublic ? `/archive/${year}/${month}/` : "",
       content_type: "archive",
       redirect_kind: "archive",
-      status: "mapped",
+      status: isPublic ? "mapped" : "excluded",
     });
   }
 
@@ -282,6 +314,10 @@ async function importPost({ post, categoriesById, tagsById, redirectMap }) {
 
   if (post.modified && post.modified !== post.date) {
     frontmatter.push(`updatedAt: ${yamlString(toJstIso(post.modified))}`);
+  }
+
+  if (!isPublicPost(post)) {
+    frontmatter.push("draft: true");
   }
 
   if (articleTags.length > 0) {
@@ -560,28 +596,30 @@ function collectArticleTags(post, categoriesById, tagsById) {
   return collected;
 }
 
-function toTaxonomyYaml({ categories, tags }) {
+function toTaxonomyYaml({ categories, tags, publicPosts }) {
+  const publicCategoryIds = collectTermIds(publicPosts, "categories");
+  const publicTagIds = collectTermIds(publicPosts, "tags");
   const lines = ["categories:"];
   for (const category of categories.sort((left, right) => normalizeSitePath(left.link).localeCompare(normalizeSitePath(right.link), "ja"))) {
-    lines.push(...toYamlEntry(category));
+    lines.push(...toYamlEntry(category, publicCategoryIds.has(category.id) ? "mapped" : "excluded"));
   }
 
   lines.push("tags:");
   for (const tag of tags.sort((left, right) => normalizeSitePath(left.link).localeCompare(normalizeSitePath(right.link), "ja"))) {
-    lines.push(...toYamlEntry(tag));
+    lines.push(...toYamlEntry(tag, publicTagIds.has(tag.id) ? "mapped" : "excluded"));
   }
 
   return `${lines.join("\n")}\n`;
 }
 
-function toYamlEntry(term) {
+function toYamlEntry(term, status) {
   return [
     "  - legacy_path: " + yamlString(normalizeSitePath(term.link)),
     "    legacy_slug: " + yamlString(decodeLegacySlug(term.slug)),
     "    legacy_name: " + yamlString(normalizeWhitespace(term.name)),
     "    new_tag: " + yamlString(getNewTag(term)),
-    "    new_path: " + yamlString(`/tags/${getNewTag(term)}/`),
-    "    status: " + yamlString("mapped"),
+    "    new_path: " + yamlString(status === "mapped" ? `/tags/${getNewTag(term)}/` : ""),
+    "    status: " + yamlString(status),
     "    notes: " + yamlString(""),
   ];
 }
@@ -659,6 +697,18 @@ function collectAssetUrls($) {
   });
 
   return urls;
+}
+
+function collectTermIds(posts, fieldName) {
+  const collected = new Set();
+
+  for (const post of posts) {
+    for (const termId of post[fieldName] ?? []) {
+      collected.add(termId);
+    }
+  }
+
+  return collected;
 }
 
 function collectAssetUrlsFromElement(image) {
@@ -740,6 +790,10 @@ function getNewTag(term) {
     return decodedSlug;
   }
   return normalizeWhitespace(term.name);
+}
+
+function isPublicPost(post) {
+  return PUBLIC_ARTICLE_SLUGS.has(post.slug);
 }
 
 function decodeLegacySlug(slug) {

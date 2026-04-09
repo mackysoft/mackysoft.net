@@ -3,6 +3,7 @@ title: "【Unity】シングルトンなScriptableObjectを実装する"
 description: "はじめに 「○○Settings」のようなものを実装するときに使えるSingletonScriptableObjectの紹介です。 コード using UnityEngine; public abstract class … 【Unity】シングルトンなScriptableObjectを実装する"
 publishedAt: "2020-06-13T21:19:19+09:00"
 updatedAt: "2020-06-13T21:19:20+09:00"
+draft: true
 tags:
   - "unity"
 ---
