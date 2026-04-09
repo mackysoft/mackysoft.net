@@ -11,11 +11,12 @@ type Props = {
 const { release } = Astro.props;
 const repoName = release.repo.split("/").at(-1) ?? release.repo;
 const showReleaseName = release.name !== release.version;
+const stargazerCount = new Intl.NumberFormat("en-US").format(release.stargazerCount);
 ---
 
 <article class="release-card">
   <a href={release.url} class="release-card__cover-link" target="_blank" rel="noreferrer">
-    <Image src={release.coverUrl} alt={release.coverAlt} widths={[480]} sizes="(max-width: 720px) 100vw, 20rem" inferSize />
+    <Image src={release.coverUrl} alt={release.coverAlt} width={1200} height={630} widths={[480]} sizes="(max-width: 720px) 100vw, 20rem" />
   </a>
   <div class="release-card__body">
     <h3>
@@ -27,7 +28,15 @@ const showReleaseName = release.name !== release.version;
         <span>{formatDate(new Date(release.publishedAt))}</span>
         <span>{release.source}</span>
       </p>
-      <p class="release-card__version">{release.version}</p>
+      <div class="release-card__metrics">
+        <p class="release-card__version">{release.version}</p>
+        <p class="release-card__stars" aria-label={`GitHub stars ${stargazerCount}`}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 3.25 14.703 8.728l6.047.879-4.375 4.265 1.033 6.022L12 17.051l-5.408 2.843 1.033-6.022-4.375-4.265 6.047-.879L12 3.25Z" />
+          </svg>
+          <span>{stargazerCount}</span>
+        </p>
+      </div>
     </div>
   </div>
 </article>
@@ -68,7 +77,8 @@ const showReleaseName = release.name !== release.version;
 
   .release-card__name,
   .release-card__meta,
-  .release-card__version {
+  .release-card__version,
+  .release-card__stars {
     margin: 0;
   }
 
@@ -103,6 +113,13 @@ const showReleaseName = release.name !== release.version;
     margin-top: auto;
   }
 
+  .release-card__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
   .release-card__meta {
     display: flex;
     flex-wrap: wrap;
@@ -120,5 +137,26 @@ const showReleaseName = release.name !== release.version;
     font-family: var(--font-mono);
     font-size: 0.82rem;
     font-weight: 500;
+  }
+
+  .release-card__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    width: fit-content;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid rgba(14, 107, 99, 0.16);
+    border-radius: 999px;
+    color: var(--text-color);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .release-card__stars svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: #a86a00;
+    opacity: 1;
   }
 </style>
