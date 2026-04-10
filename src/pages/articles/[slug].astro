@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 
+import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
 import type { ArticleEntry } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
@@ -60,6 +61,7 @@ function formatArticleMetaDate(date: Date) {
           </ul>
         )}
         <Content />
+        <ArticleShare title={article.data.title} />
       </section>
     </div>
   </article>
