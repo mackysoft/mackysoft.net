@@ -1,5 +1,6 @@
 ---
 import PageHeader from "../components/PageHeader.astro";
+import Stack from "../components/Stack.astro";
 import DescribedLinkList from "../features/about/DescribedLinkList.astro";
 import { aboutPageContent } from "../features/about/content";
 import { getExternalLink } from "../lib/site";
@@ -15,8 +16,8 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
 <SiteLayout title={aboutPageContent.title} description={aboutPageContent.description}>
   <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
 
-  <section class="content-panel about-main">
-    <div class="profile-intro">
+  <Stack as="section" class="content-panel about-main" gap="1.1rem">
+    <Stack class="profile-intro">
       <a
         href={profilePrimaryExternalLink.href}
         target="_blank"
@@ -26,40 +27,40 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
       >
         <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
       </a>
-      <div class="profile-copy">
+      <Stack class="profile-copy" gap="0.35rem">
         <p class="profile-name">{aboutPageContent.profile.name}</p>
         <p>{aboutPageContent.profile.summary}</p>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
 
-    <section class="about-section">
+    <Stack as="section" class="about-section" gap="0.55rem">
       <h2>{aboutPageContent.whatIDo.heading}</h2>
-      <div class="content-grid">
+      <div class="content-grid compact-copy">
         {aboutPageContent.whatIDo.paragraphs.map((paragraph) => (
           <p>{paragraph}</p>
         ))}
       </div>
-    </section>
+    </Stack>
 
-    <section class="about-section">
+    <Stack as="section" class="about-section" gap="0.55rem">
       <h2>{aboutPageContent.domainsAndInterests.heading}</h2>
       <ul class="interest-list">
         {aboutPageContent.domainsAndInterests.items.map((item) => (
           <li>{item}</li>
         ))}
       </ul>
-    </section>
+    </Stack>
 
-    <section class="about-section">
+    <Stack as="section" class="about-section" gap="0.55rem">
       <h2>{aboutPageContent.siteGuide.heading}</h2>
-      <div class="content-grid">
+      <div class="content-grid compact-copy">
         {aboutPageContent.siteGuide.paragraphs.map((paragraph) => (
           <p>{paragraph}</p>
         ))}
       </div>
       <DescribedLinkList items={aboutPageContent.siteGuide.items} />
-    </section>
-  </section>
+    </Stack>
+  </Stack>
 
   <section class="content-grid section-grid">
     <section class="content-panel">
@@ -69,7 +70,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
 
     <section class="content-panel">
       <h2>{aboutPageContent.contact.heading}</h2>
-      <div class="content-grid">
+      <div class="content-grid compact-copy">
         {aboutPageContent.contact.paragraphs.map((paragraph) => (
           <p>{paragraph}</p>
         ))}
@@ -88,21 +89,12 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
     margin-bottom: 0.65rem;
   }
 
-  .about-main {
-    display: grid;
-    gap: 1.1rem;
-  }
-
   .profile-intro {
-    display: grid;
-    gap: 1rem;
     align-items: start;
   }
 
   .profile-copy {
-    display: grid;
     align-content: center;
-    gap: 0.35rem;
   }
 
   .profile-name {
@@ -114,6 +106,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
 
   .avatar-link {
     display: block;
+    justify-self: start;
     width: clamp(6rem, 12vw, 9rem);
     height: clamp(6rem, 12vw, 9rem);
     border-radius: 50%;
@@ -130,11 +123,6 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
     border-radius: 50%;
   }
 
-  .about-section {
-    display: grid;
-    gap: 0.55rem;
-  }
-
   .about-section h2 {
     margin-bottom: 0;
   }
@@ -144,8 +132,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
     margin: 0;
   }
 
-  .about-main .content-grid,
-  .content-panel .content-grid {
+  .compact-copy {
     gap: 0.55rem;
   }
 

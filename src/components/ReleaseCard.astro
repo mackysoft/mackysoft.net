@@ -14,17 +14,17 @@ const showReleaseName = release.name !== release.version;
 const stargazerCount = new Intl.NumberFormat("en-US").format(release.stargazerCount);
 ---
 
-<article class="release-card">
-  <a href={release.url} class="release-card__cover-link" target="_blank" rel="noreferrer">
+<article class="release-card activity-card activity-card--compact">
+  <a href={release.url} class="release-card__cover-link activity-card__cover-link" target="_blank" rel="noreferrer">
     <Image src={release.coverUrl} alt={release.coverAlt} width={1200} height={630} widths={[480]} sizes="(max-width: 720px) 100vw, 20rem" />
   </a>
-  <div class="release-card__body">
+  <div class="release-card__body activity-card__body">
     <h3>
-      <a href={release.url} target="_blank" rel="noreferrer">{repoName}</a>
+      <a href={release.url} class="activity-card__title-link" target="_blank" rel="noreferrer">{repoName}</a>
     </h3>
     {showReleaseName && <p class="release-card__name">{release.name}</p>}
     <div class="release-card__footer">
-      <p class="release-card__meta">
+      <p class="release-card__meta activity-card__meta">
         <span>{formatDate(new Date(release.publishedAt))}</span>
         <span>{release.source}</span>
       </p>
@@ -42,37 +42,12 @@ const stargazerCount = new Intl.NumberFormat("en-US").format(release.stargazerCo
 </article>
 
 <style>
-  .release-card {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 0.75rem;
-    min-height: 19.75rem;
-    padding: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 1.25rem;
-    background: var(--surface-color);
-    overflow: hidden;
-  }
-
   .release-card__cover-link {
-    display: block;
-    overflow: hidden;
-    border-radius: 0.9rem;
     aspect-ratio: 1200 / 630;
-    background: var(--surface-strong-color);
-  }
-
-  .release-card__cover-link :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
   }
 
   .release-card__body {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.4rem;
-    min-height: 0;
   }
 
   .release-card__name,
@@ -90,11 +65,6 @@ const stargazerCount = new Intl.NumberFormat("en-US").format(release.stargazerCo
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-  }
-
-  .release-card h3 a {
-    color: var(--text-color);
-    text-decoration: none;
   }
 
   .release-card__name {
@@ -121,10 +91,6 @@ const stargazerCount = new Intl.NumberFormat("en-US").format(release.stargazerCo
   }
 
   .release-card__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    color: var(--muted-color);
     font-size: 0.84rem;
   }
 

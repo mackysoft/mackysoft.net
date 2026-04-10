@@ -221,7 +221,74 @@ const currentPath = Astro.url.pathname;
 
   .content-grid {
     display: grid;
-    gap: 1rem;
+    gap: var(--content-grid-gap, 1rem);
+  }
+
+  .content-grid > :where(p, ul, ol) {
+    margin: 0;
+  }
+
+  .content-grid > :last-child {
+    margin-bottom: 0;
+  }
+
+  .activity-card {
+    display: grid;
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    background: var(--surface-color);
+    overflow: hidden;
+  }
+
+  .activity-card--compact {
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    min-height: 19.75rem;
+    padding: 1rem;
+  }
+
+  .activity-card__cover-link {
+    display: block;
+    overflow: hidden;
+    border-radius: 0.9rem;
+    background: var(--surface-strong-color);
+  }
+
+  .activity-card__cover-link img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .activity-card__body {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: 0;
+  }
+
+  .activity-card__title-link {
+    color: var(--text-color);
+    text-decoration: none;
+  }
+
+  .activity-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    color: var(--muted-color);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .button-row {

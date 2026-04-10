@@ -21,11 +21,11 @@ const verticalCoverStyle = layout === "vertical" ? `--article-cover-ratio: ${cov
 const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
 ---
 
-<article class:list={["article-card", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
+<article class:list={["article-card", "activity-card", layout === "vertical" && "activity-card--compact", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
   {cover ? (
     <a
       href={article.href}
-      class="article-card__cover-link"
+      class="article-card__cover-link activity-card__cover-link"
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noreferrer" : undefined}
       style={verticalCoverStyle}
@@ -39,70 +39,46 @@ const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "
   ) : (
     <div class="article-card__cover-placeholder" aria-hidden="true" style={verticalCoverStyle}></div>
   )}
-  <div class="article-card__body">
+  <div class="article-card__body activity-card__body">
     <h3>
-      <a href={article.href} target={isExternal ? "_blank" : undefined} rel={isExternal ? "noreferrer" : undefined}>
+      <a
+        href={article.href}
+        class="activity-card__title-link"
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noreferrer" : undefined}
+      >
         {article.title}
       </a>
     </h3>
     {showDescription && <p class="article-card__description">{article.description}</p>}
-    <p class="article-card__meta">
+    <p class="article-card__meta activity-card__meta">
       <span>{formatDate(article.publishedAt)}</span>
       <span>{article.source}</span>
     </p>
   </div>
 </article>
 
-<style>
+  <style>
   .article-card {
-    display: grid;
     gap: 1rem;
     height: clamp(19rem, 18rem + 4vw, 22rem);
     padding: 1.25rem;
-    border: 1px solid var(--border-color);
-    border-radius: 1.25rem;
-    background: var(--surface-color);
-    overflow: hidden;
   }
 
   .article-card--vertical {
-    grid-template-rows: auto minmax(0, 1fr);
     align-content: stretch;
-    gap: 0.75rem;
     height: 19.75rem;
-    padding: 1rem;
-  }
-
-  .article-card__cover-link {
-    display: block;
-    overflow: hidden;
-    border-radius: 0.9rem;
-    background: var(--surface-strong-color);
   }
 
   .article-card__cover-placeholder {
     display: none;
   }
 
-  .article-card__cover-link :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
   .article-card__body {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 0.85rem;
-    min-height: 0;
   }
 
   .article-card__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin: 0;
-    color: var(--muted-color);
     font-size: 0.92rem;
   }
 
@@ -113,11 +89,6 @@ const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-  }
-
-  .article-card h3 a {
-    color: var(--text-color);
-    text-decoration: none;
   }
 
   .article-card__description {
