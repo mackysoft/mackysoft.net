@@ -22,8 +22,8 @@
 - ローカル + GitHub で全管理する
 - 静的サイトとして構築する
 - サイト本体は **Astro**
-- ホスティングは当面 **GitHub Pages**
-- 将来必要なら Cloudflare 系へ移行可能な構成にする
+- ホスティングは **Cloudflare Workers**
+- Cloudflare Workers を前提にしつつ、ランタイム固有機能への依存を増やしすぎない構成にする
 - **旧URL移行を先に設計してから実装する**
 - **canonical host はコードに直書きせず、Astro の `site` 設定1か所で切り替える**
 
@@ -41,7 +41,7 @@
 - **テーマ**: Light / Dark
 - **多言語基盤**: Astro i18n
 - **デプロイ**: GitHub Actions
-- **ホスティング**: GitHub Pages
+- **ホスティング**: Cloudflare Workers
 - **メタ**: OGP / Sitemap / RSS / `hreflang`
 - **画像**: Astro の画像機能
 - **移行補助**: `url-map.csv`, `taxonomy-map.yaml`, `media-audit.csv`
@@ -172,8 +172,8 @@ Collection に入れるのはこれだけにする。
 
 この表を次の両方で使える形にする。
 
-- GitHub Pages 上の静的リダイレクト生成
-- 将来ホスト側で 301 を張るときの元データ
+- Cloudflare Workers 配信に含める静的リダイレクト生成
+- 将来 Cloudflare Rules や Worker 条件分岐へ切り替えるときの元データ
 
 `taxonomy-map.yaml` は旧 category / tag から新 `/tags/[tag]/` への変換表とする。
 
@@ -544,7 +544,7 @@ TOP の更新欄は自動更新にする。
 - 外部データ取得
 - 正規化して `activity.json` を生成
 - Astro が読んでビルド
-- GitHub Pages に再公開
+- Cloudflare Workers に再デプロイ
 
 ## 公開契約
 
@@ -714,22 +714,22 @@ Definition of Done:
 ## 固定事項
 
 - サイト本体は Xserver から外す
-- 当面は GitHub Pages
-- 将来は Cloudflare DNS / Registrar へ移行余地あり
+- 公開基盤は Cloudflare Workers
+- DNS / Registrar の移管は必須にしない
 - Xserver は先に解約しない
 
 ## 実装時に持つ前提
 
 - canonical host は**まだ未決定**
 - ただし、切替点は `site` 設定1か所に限定する
-- 公開前に **domain verification** を済ませる
-- **apex / `www` の両方**を張れる前提で準備する
+- ドメイン切替前に **domain verification** を済ませる
+- **apex / `www` の両方**を custom domain / Worker ルートで張れる前提で準備する
 - 最終的にどちらか一方を canonical とし、もう一方は redirect
 
 ## 切替当日の確認項目
 
 - DNS 反映
-- GitHub Pages 側の custom domain 設定
+- Cloudflare 側の custom domain / Worker ルート設定
 - HTTPS 有効化
 - canonical URL
 - `www` / apex の redirect
@@ -739,20 +739,12 @@ Definition of Done:
 ## Xserver 停止条件
 
 - custom domain が安定して解決する
-- 主要ページが新環境で表示できる
+- Worker 配信の主要ページが表示できる
 - redirect と HTTPS を確認済み
 
 ---
 
-# 23. Cloudflare / Workers の位置づけ
-
-- 今すぐ必須ではない
-- 第一段階は GitHub Pages で十分
-- 将来、DNS・ドメイン管理・軽い動的処理・高度な言語振り分けが必要なら Cloudflare を検討
-
----
-
-# 24. 設計思想
+# 23. 設計思想
 
 このサイトに適用するモダン設計は次の7本柱。
 
@@ -772,7 +764,7 @@ Definition of Done:
 
 ---
 
-# 25. 実装フェーズ
+# 24. 実装フェーズ
 
 ## フェーズ0: 決定事項の凍結
 
@@ -852,8 +844,8 @@ Definition of Done:
 
 ## フェーズ8: 公開 / ドメイン切替
 
-- GitHub Pages 公開
-- custom domain 設定
+- Cloudflare Workers 公開
+- custom domain / Worker ルート設定
 - domain verification
 - `mackysoft.net` 接続
 - DNS 切替
