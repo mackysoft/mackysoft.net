@@ -80,8 +80,7 @@ export const aboutPageContent = {
   contact: {
     heading: "仕事・問い合わせ",
     paragraphs: [
-      "仕事や相談、問い合わせは Contact からどうぞ。",
-      "OSS やアセットに関する話は GitHub も利用できます。",
+      "仕事・相談や OSS 関連の連絡は Contact からどうぞ。",
     ],
     ctaLabel: "Contact を開く",
     href: "/contact/",

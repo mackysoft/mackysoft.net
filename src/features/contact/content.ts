@@ -1,0 +1,39 @@
+import { formatPageBreadcrumb } from "../../lib/page-header";
+import type { ExternalLinkId } from "../../lib/site";
+
+export const contactPageContent = {
+  title: "Contact",
+  description: "仕事・相談と OSS 関連の連絡窓口、返信方針をまとめたページです。",
+  hero: {
+    eyebrow: formatPageBreadcrumb("Home", "Contact"),
+    title: "Contact",
+  },
+  lead: "連絡は以下からどうぞ。用途に近い窓口から送ってください。",
+  channels: [
+    {
+      heading: "仕事・相談",
+      description: "相談や問い合わせ、仕事の連絡はメールで受けています。",
+      action: {
+        type: "email",
+        href: "mailto:mackysoft0129@gmail.com",
+        label: "メールで連絡する",
+      },
+    },
+    {
+      heading: "OSS・アセット関連",
+      description: "不具合報告や技術的な話は GitHub から受けています。",
+      action: {
+        type: "external",
+        externalLinkId: "github" as ExternalLinkId,
+        label: "GitHub を開く",
+      },
+    },
+  ],
+  replyPolicy: {
+    heading: "返信について",
+    paragraphs: [
+      "全ての連絡に返信できるとは限りません。",
+      "確認や判断に時間がかかることがあります。",
+    ],
+  },
+} as const;
