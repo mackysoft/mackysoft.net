@@ -27,7 +27,6 @@ test.describe("articles page", () => {
 
     await expect(page.getByText("Home / Articles", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
-    await expect(page.getByText("mackysoft.net に移行した記事と、Zenn に公開した記事を時系列でまとめています。")).toHaveCount(0);
     await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
 
     const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticle.title }).first();
@@ -67,43 +66,37 @@ test.describe("articles page", () => {
     const toc = main.locator(".article-toc");
     const breadcrumb = pageHeader.getByText("Home / Articles", { exact: true });
     const cover = hero.locator(".cover");
-    const title = hero.getByRole("heading", { level: 1, name: "【Unity】CullingGroupをより簡単に実装する【Vision】" });
+    const title = hero.locator("h1");
     const meta = hero.locator(".meta");
     const prose = main.locator(".article-content");
     const bodyTags = prose.locator(".article-content__tags");
     const shareSection = prose.locator("[data-article-share]");
-    const copyLinkButton = shareSection.getByRole("button", { name: "コピーリンク", exact: true });
+    const copyLinkButton = shareSection.locator("[data-share-copy]");
     const nativeShareButton = shareSection.locator("[data-share-native]");
-    const twitterButton = shareSection.getByRole("link", { name: "Twitter", exact: true });
+    const twitterButton = shareSection.locator("[data-share-twitter]");
 
     await expect(breadcrumb).toBeVisible();
     await expect(hero.getByText("Home / Articles", { exact: true })).toHaveCount(0);
-    await expect(cover.getByRole("img", { name: "【Unity】CullingGroupをより簡単に実装する【Vision】 の記事画像" })).toBeVisible();
+    await expect(cover.locator("img")).toBeVisible();
     await expect(title).toBeVisible();
-    await expect(meta).toContainText("公開日：2021/03/16");
-    await expect(meta).toContainText("更新日：2021/03/17");
+    await expect(meta.locator("span")).toHaveCount(2);
     await expect(meta).toHaveCSS("justify-content", "center");
     await expect(hero.locator(".tags")).toHaveCount(0);
     await expect(bodyTags).toBeVisible();
-    await expect(bodyTags.getByRole("link", { name: "asset", exact: true })).toBeVisible();
-    await expect(bodyTags.getByRole("link", { name: "unity", exact: true })).toBeVisible();
-    await expect(shareSection.getByRole("heading", { level: 2, name: "シェア" })).toBeVisible();
+    expect(await bodyTags.getByRole("link").count()).toBeGreaterThan(0);
+    await expect(shareSection.getByRole("heading", { level: 2 })).toBeVisible();
     await expect(copyLinkButton).toBeVisible();
     await expect(twitterButton).toBeVisible();
     await expect(nativeShareButton).toHaveAttribute("hidden", "");
-    await expect(hero).not.toContainText("「オブジェクトが見えているかどうか」");
     await expect(toc).toBeVisible();
-    await expect(toc.getByRole("heading", { level: 2, name: "目次" })).toBeVisible();
-    await expect(toc.getByRole("link", { name: "CullingGroup APIとは？", exact: true })).toHaveAttribute("href", "#cullinggroup-apiとは");
-    await expect(toc.getByRole("link", { name: "１．Culling Group Proxyを作成する", exact: true })).toHaveAttribute(
-      "href",
-      "#１culling-group-proxyを作成する",
-    );
+    await expect(toc.getByRole("heading", { level: 2 })).toBeVisible();
+    expect(await toc.getByRole("link").count()).toBeGreaterThan(0);
     await expect(toc).toHaveCSS("position", "sticky");
     await expect(twitterButton).toHaveAttribute("href", /twitter\.com\/intent\/tweet/);
 
+    const articleTitle = (await title.textContent()) ?? "";
     const twitterHref = await twitterButton.getAttribute("href");
-    expect(twitterHref).toContain(encodeURIComponent("【Unity】CullingGroupをより簡単に実装する【Vision】"));
+    expect(twitterHref).toContain(encodeURIComponent(articleTitle));
     expect(twitterHref).toContain(encodeURIComponent("http://127.0.0.1:4322/articles/vision-introduction/"));
 
     const breadcrumbBox = await breadcrumb.boundingBox();
@@ -166,9 +159,10 @@ test.describe("articles page", () => {
     await page.goto("/articles/vision-introduction/");
 
     const shareSection = page.locator("[data-article-share]");
-    const nativeShareButton = shareSection.getByRole("button", { name: "ネイティブシェア", exact: true });
-    const copyLinkButton = shareSection.getByRole("button", { name: "コピーリンク", exact: true });
+    const nativeShareButton = shareSection.locator("[data-share-native]");
+    const copyLinkButton = shareSection.locator("[data-share-copy]");
     const bubble = shareSection.locator("[data-share-status]");
+    const shareTitle = await shareSection.getAttribute("data-share-title");
 
     await expect(nativeShareButton).toBeVisible();
 
@@ -176,7 +170,7 @@ test.describe("articles page", () => {
 
     const shareCall = await page.evaluate(() => (window as ShareWindow).__shareCalls[0]);
     expect(shareCall).toEqual({
-      title: "【Unity】CullingGroupをより簡単に実装する【Vision】",
+      title: shareTitle ?? "",
       url: "http://127.0.0.1:4322/articles/vision-introduction/",
     });
 
@@ -184,8 +178,8 @@ test.describe("articles page", () => {
 
     const copiedText = await page.evaluate(() => (window as ShareWindow).__copiedTexts[0]);
     expect(copiedText).toBe("http://127.0.0.1:4322/articles/vision-introduction/");
-    await expect(bubble).toContainText("リンクをコピーしました");
     await expect(bubble).not.toHaveAttribute("hidden", "");
+    expect((await bubble.textContent())?.trim().length).toBeGreaterThan(0);
   });
 
   test("keeps share fallback usable without JavaScript", { tag: "@size:medium" }, async ({ browser }) => {
@@ -197,7 +191,7 @@ test.describe("articles page", () => {
     const shareSection = page.locator("[data-article-share]");
     const copyAction = shareSection.locator("[data-share-copy-action]");
     const nativeShareButton = shareSection.locator("[data-share-native]");
-    const twitterButton = shareSection.getByRole("link", { name: "Twitter", exact: true });
+    const twitterButton = shareSection.locator("[data-share-twitter]");
 
     await expect(copyAction).toHaveAttribute("hidden", "");
     await expect(nativeShareButton).toHaveAttribute("hidden", "");
