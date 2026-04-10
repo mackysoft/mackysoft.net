@@ -17,7 +17,7 @@ const latestReleases = getLatestReleases();
         <p class="eyebrow">Latest Articles</p>
         <h2>最新の記事</h2>
       </div>
-      <a href="/articles/" class="button-link">Open Articles</a>
+      <a href="/articles/" class="button-link">View Articles</a>
     </div>
     <div class="content-grid latest-articles-grid">
       {latestArticles.map((article) => (
@@ -29,13 +29,11 @@ const latestReleases = getLatestReleases();
   {latestReleases.length > 0 && (
     <section class="content-panel">
       <div class="section-head">
-        <div>
+      <div>
           <p class="eyebrow">Latest Releases</p>
           <h2>最新のリリース</h2>
         </div>
-        <a href="https://github.com/mackysoft?tab=repositories" class="button-link" target="_blank" rel="noreferrer">
-          Open GitHub
-        </a>
+        <a href="/assets/" class="button-link">View Assets</a>
       </div>
       <div class="content-grid latest-releases-grid">
         {latestReleases.map((release) => (

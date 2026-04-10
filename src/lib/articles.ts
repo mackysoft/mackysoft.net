@@ -20,6 +20,8 @@ export type ReleaseActivity = {
   groupId: string;
   source: string;
   repo: string;
+  description: string;
+  license: string;
   stargazerCount: number;
   name: string;
   version: string;
@@ -49,6 +51,7 @@ export type ArticleItem = {
 };
 
 const activity = activityData as ActivityData;
+const releaseStarCountFormatter = new Intl.NumberFormat("en-US");
 
 export function sortArticleItems(articleItems: ArticleItem[]) {
   return articleItems.sort((left, right) => right.publishedAt.valueOf() - left.publishedAt.valueOf());
@@ -60,6 +63,18 @@ export function sortReleaseActivities(releases: ReleaseActivity[]) {
 
 export function getLatestReleaseActivities(releases: ReleaseActivity[], limit = 3) {
   return sortReleaseActivities([...releases]).slice(0, limit);
+}
+
+export function getReleaseActivities() {
+  return sortReleaseActivities([...activity.releases]);
+}
+
+export function getReleaseRepoName(repo: string) {
+  return repo.split("/").at(-1) ?? repo;
+}
+
+export function formatReleaseStargazerCount(stargazerCount: number) {
+  return releaseStarCountFormatter.format(stargazerCount);
 }
 
 export function toExternalArticleItem(article: ArticleActivity): ArticleItem {
@@ -90,7 +105,7 @@ export async function getArticleItems() {
 }
 
 export function getLatestReleases(limit = 3) {
-  return getLatestReleaseActivities(activity.releases, limit);
+  return getReleaseActivities().slice(0, limit);
 }
 
 export function toLocalArticleItem(article: ArticleEntry): ArticleItem {
