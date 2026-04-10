@@ -105,7 +105,6 @@ const currentPath = Astro.url.pathname;
   pre {
     overflow-x: auto;
     padding: 1rem 1.1rem;
-    border-radius: 1rem;
     background: var(--code-bg-color);
     color: var(--code-text-color);
   }
@@ -311,6 +310,10 @@ const currentPath = Astro.url.pathname;
   }
 
   @media (min-width: 900px) {
+    .shell {
+      width: min(64rem, calc(100vw - 4rem));
+    }
+
     .site-header {
       grid-template-columns: auto 1fr;
       align-items: center;

@@ -2,9 +2,8 @@
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 
-import PageHeader from "../../components/PageHeader.astro";
+import ArticleToc from "../../components/ArticleToc.astro";
 import type { ArticleEntry } from "../../lib/articles";
-import { formatDate } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
@@ -18,63 +17,98 @@ export async function getStaticPaths() {
 }
 
 const { article } = Astro.props as { article: ArticleEntry };
-const { Content } = await render(article);
+const { Content, headings } = await render(article);
+const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
+
+function formatArticleMetaDate(date: Date) {
+  return new Intl.DateTimeFormat("ja-JP", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
 ---
 
 <SiteLayout title={article.data.title} description={article.data.description}>
   <article class="article-page">
-    <PageHeader
-      as="header"
-      title={article.data.title}
-      eyebrow={formatPageBreadcrumb("Home", "Articles")}
-      class="article-hero"
-    >
-      <p class="lede">{article.data.description}</p>
-      <p class="meta">
-        <span>公開日: {formatDate(article.data.publishedAt)}</span>
-        {article.data.updatedAt && <span>更新日: {formatDate(article.data.updatedAt)}</span>}
-      </p>
-      {article.data.tags.length > 0 && (
-        <ul class="tags" aria-label="Article tags">
-          {article.data.tags.map((tag) => (
-            <li><a href={`/tags/${tag}/`}>{tag}</a></li>
-          ))}
-        </ul>
-      )}
+    <section class="page-header article-page-header">
+      <p class="eyebrow">{formatPageBreadcrumb("Home", "Articles")}</p>
+    </section>
+
+    <header class="article-hero">
       {article.data.cover && (
         <div class="cover">
-          <Image src={article.data.cover} alt={article.data.coverAlt ?? ""} widths={[1200, 720]} sizes="(max-width: 960px) 100vw, 60rem" />
+          <Image src={article.data.cover} alt={article.data.coverAlt ?? ""} widths={[960, 720]} sizes="(max-width: 48rem) 100vw, 46rem" />
         </div>
       )}
-    </PageHeader>
+      <h1>{article.data.title}</h1>
+      <p class="meta">
+        <span>公開日：{formatArticleMetaDate(article.data.publishedAt)}</span>
+        {article.data.updatedAt && <span>更新日：{formatArticleMetaDate(article.data.updatedAt)}</span>}
+      </p>
+    </header>
 
-    <section class="content-panel prose">
-      <Content />
-    </section>
+    <div class:list={["article-layout", tocHeadings.length > 0 && "article-layout--with-toc"]}>
+      {tocHeadings.length > 0 && <ArticleToc headings={tocHeadings} />}
+
+      <section class="content-panel prose article-content">
+        {article.data.tags.length > 0 && (
+          <ul class="tags article-content__tags" aria-label="Article tags">
+            {article.data.tags.map((tag) => (
+              <li><a href={`/tags/${tag}/`}>{tag}</a></li>
+            ))}
+          </ul>
+        )}
+        <Content />
+      </section>
+    </div>
   </article>
 </SiteLayout>
 
 <style>
   .article-page {
     display: grid;
+    gap: 0;
+  }
+
+  .article-page-header {
+    margin-bottom: 0.85rem;
+  }
+
+  .article-page-header > .eyebrow {
+    margin-bottom: 0;
+  }
+
+  .article-hero {
+    display: grid;
+    gap: 0.85rem;
+    width: min(100%, 46rem);
+    margin: 0 auto 1.5rem;
+    justify-items: center;
+  }
+
+  .article-layout {
+    display: grid;
     gap: 1.5rem;
   }
 
-  :global(.article-hero h1) {
-    margin: 0;
-    font-size: clamp(2rem, 1.5rem + 2vw, 3.4rem);
-  }
-
-  .lede,
   .meta {
     margin: 0;
-  }
-
-  .meta {
     display: flex;
     flex-wrap: wrap;
     gap: 0.8rem;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
     color: var(--muted-color);
+  }
+
+  .article-hero h1 {
+    margin: 0;
+    line-height: 1.2;
+    width: fit-content;
+    max-width: 100%;
+    text-align: left;
   }
 
   .tags {
@@ -96,6 +130,7 @@ const { Content } = await render(article);
   }
 
   .cover {
+    width: 100%;
     overflow: hidden;
     border-radius: 1.1rem;
   }
@@ -109,6 +144,11 @@ const { Content } = await render(article);
   .prose {
     display: grid;
     gap: 1rem;
+    min-width: 0;
+  }
+
+  .article-content__tags {
+    margin-bottom: 0;
   }
 
   .prose :global(h2),
@@ -128,5 +168,26 @@ const { Content } = await render(article);
     width: 100%;
     border: 0;
     border-top: 1px solid var(--border-color);
+  }
+
+  .prose :global(h2),
+  .prose :global(h3),
+  .prose :global(h4) {
+    scroll-margin-top: 1.5rem;
+  }
+
+  @media (min-width: 1080px) {
+    .article-layout--with-toc {
+      grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+      align-items: start;
+    }
+
+    .article-content {
+      order: 0;
+    }
+
+    :global(.article-toc) {
+      order: 1;
+    }
   }
 </style>
