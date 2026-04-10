@@ -1,17 +1,20 @@
 ---
 type Props = {
   title: string;
+  shareUrl: string;
 };
 
-const { title } = Astro.props as Props;
-const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}`;
+const { title, shareUrl } = Astro.props as Props;
+const fallbackTwitterUrl = new URL("https://twitter.com/intent/tweet");
+fallbackTwitterUrl.searchParams.set("text", title);
+fallbackTwitterUrl.searchParams.set("url", shareUrl);
 ---
 
 <section class="article-share" aria-labelledby="article-share-title" data-article-share data-share-title={title}>
   <h2 id="article-share-title">シェア</h2>
 
   <div class="button-row article-share__actions">
-    <div class="article-share__action">
+    <div class="article-share__action" data-share-copy-action hidden>
       <button type="button" class="button-link article-share__button" data-share-copy aria-label="コピーリンク">
         <svg class="article-share__icon article-share__icon--stroke" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <rect x="8.25" y="7.25" width="9.5" height="11.5" rx="2.25" />
@@ -32,7 +35,7 @@ const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURICo
       <span class="visually-hidden">ネイティブシェア</span>
     </button>
     <a
-      href={fallbackTwitterHref}
+      href={fallbackTwitterUrl.toString()}
       target="_blank"
       rel="noreferrer"
       class="button-link"
@@ -61,15 +64,12 @@ const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURICo
 
     const title = root.dataset.shareTitle ?? "";
     const currentUrl = window.location.href;
+    const copyAction = root.querySelector("[data-share-copy-action]");
     const copyButton = root.querySelector("[data-share-copy]");
     const nativeShareButton = root.querySelector("[data-share-native]");
     const twitterLink = root.querySelector("[data-share-twitter]");
     const status = root.querySelector("[data-share-status]");
     let statusTimer = 0;
-
-    if (!(copyButton instanceof HTMLButtonElement)) {
-      continue;
-    }
 
     const setStatus = (message) => {
       if (status instanceof HTMLElement) {
@@ -89,14 +89,21 @@ const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURICo
       twitterLink.href = twitterUrl.toString();
     }
 
-    copyButton.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(currentUrl);
-        setStatus("リンクをコピーしました");
-      } catch {
-        setStatus("コピーに失敗しました");
-      }
-    });
+    if (
+      copyAction instanceof HTMLElement &&
+      copyButton instanceof HTMLButtonElement &&
+      typeof navigator.clipboard?.writeText === "function"
+    ) {
+      copyAction.hidden = false;
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(currentUrl);
+          setStatus("リンクをコピーしました");
+        } catch {
+          setStatus("コピーに失敗しました");
+        }
+      });
+    }
 
     if (typeof navigator.share === "function" && nativeShareButton instanceof HTMLButtonElement) {
       nativeShareButton.hidden = false;

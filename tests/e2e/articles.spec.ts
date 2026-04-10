@@ -58,6 +58,7 @@ test.describe("articles page", () => {
       });
     });
 
+    await page.setViewportSize({ width: 1024, height: 900 });
     await page.goto("/articles/vision-introduction/");
 
     const main = page.getByRole("main");
@@ -185,5 +186,26 @@ test.describe("articles page", () => {
     expect(copiedText).toBe("http://127.0.0.1:4322/articles/vision-introduction/");
     await expect(bubble).toContainText("リンクをコピーしました");
     await expect(bubble).not.toHaveAttribute("hidden", "");
+  });
+
+  test("keeps share fallback usable without JavaScript", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+
+    await page.goto("http://127.0.0.1:4322/articles/vision-introduction/");
+
+    const shareSection = page.locator("[data-article-share]");
+    const copyAction = shareSection.locator("[data-share-copy-action]");
+    const nativeShareButton = shareSection.locator("[data-share-native]");
+    const twitterButton = shareSection.getByRole("link", { name: "Twitter", exact: true });
+
+    await expect(copyAction).toHaveAttribute("hidden", "");
+    await expect(nativeShareButton).toHaveAttribute("hidden", "");
+    await expect(twitterButton).toHaveAttribute("href", /twitter\.com\/intent\/tweet/);
+
+    const twitterHref = await twitterButton.getAttribute("href");
+    expect(twitterHref).toContain(encodeURIComponent("https://mackysoft.net/articles/vision-introduction/"));
+
+    await context.close();
   });
 });
