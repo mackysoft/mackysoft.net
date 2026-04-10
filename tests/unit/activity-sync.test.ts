@@ -5,7 +5,7 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 
 import activityData from "../../src/generated/activity.json";
-import { getLatestReleaseActivities, sortArticleItems, toExternalArticleItem } from "../../src/lib/article-items";
+import { getLatestReleaseActivities, sortArticleItems, toExternalArticleItem } from "../../src/lib/articles";
 import type { ReleaseActivity } from "../../src/lib/articles";
 import {
   githubApiBaseUrl,
