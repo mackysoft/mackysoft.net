@@ -17,7 +17,19 @@ export const externalLinks = [
   { id: "github", href: "https://github.com/mackysoft", label: "GitHub" },
   { id: "twitter", href: "https://twitter.com/makihiro_dev", label: "Twitter" },
   { id: "zenn", href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
-  { id: "youtube", href: "https://www.youtube.com/channel/UCzO3iwkiy6u1mARt-HOysZA", label: "YouTube" },
 ] as const;
 
+type ExternalLink = (typeof externalLinks)[number];
 export type ExternalLinkId = (typeof externalLinks)[number]["id"];
+
+const externalLinkMap = new Map<ExternalLinkId, ExternalLink>(externalLinks.map((link) => [link.id, link]));
+
+export function getExternalLink(id: ExternalLinkId) {
+  const link = externalLinkMap.get(id);
+
+  if (!link) {
+    throw new Error(`Unknown external link id: ${id}`);
+  }
+
+  return link;
+}

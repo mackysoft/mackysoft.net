@@ -9,7 +9,6 @@ type Props = {
 const { title, description = siteMeta.description } = Astro.props;
 const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
-const footerLinks = externalLinks.filter((link) => link.id !== "youtube");
 ---
 
 <!doctype html>
@@ -47,7 +46,7 @@ const footerLinks = externalLinks.filter((link) => link.id !== "youtube");
       </main>
       <footer class="site-footer">
         <ul class="footer-links">
-          {footerLinks.map((link) => (
+          {externalLinks.map((link) => (
             <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
           ))}
         </ul>

@@ -1,0 +1,31 @@
+---
+type Props = {
+  as?: "div" | "section" | "header";
+  class?: string;
+  gap?: string;
+};
+
+const { as = "div", class: className, gap } = Astro.props as Props;
+const Tag = as;
+const classes = ["stack", className].filter(Boolean).join(" ");
+const style = gap ? `--stack-gap: ${gap};` : undefined;
+---
+
+<Tag class={classes} style={style}>
+  <slot />
+</Tag>
+
+<style>
+  .stack {
+    display: grid;
+    gap: var(--stack-gap, 1rem);
+  }
+
+  .stack > :where(p, ul, ol) {
+    margin: 0;
+  }
+
+  .stack > :last-child {
+    margin-bottom: 0;
+  }
+</style>

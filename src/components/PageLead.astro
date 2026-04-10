@@ -1,4 +1,6 @@
 ---
+import Stack from "./Stack.astro";
+
 type Props = {
   as?: "section" | "div";
   class?: string;
@@ -11,27 +13,14 @@ const Tag = as;
 const classes = ["page-lead", panel && "content-panel", className].filter(Boolean).join(" ");
 ---
 
-<Tag class={classes}>
+<Stack as={Tag} class={classes}>
   {summary && <p class="page-lead__summary">{summary}</p>}
   <slot />
-</Tag>
+</Stack>
 
 <style>
-  .page-lead {
-    display: grid;
-    gap: 1rem;
-  }
-
   .page-lead__summary {
     margin: 0;
     color: var(--muted-color);
-  }
-
-  .page-lead > :where(p, ul, ol) {
-    margin: 0;
-  }
-
-  .page-lead > :last-child {
-    margin-bottom: 0;
   }
 </style>

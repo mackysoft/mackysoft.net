@@ -1,4 +1,6 @@
 ---
+import Stack from "./Stack.astro";
+
 type Props = {
   title: string;
   eyebrow?: string;
@@ -19,9 +21,9 @@ const titleClasses = ["page-header__title", hasBody && "page-header__title--with
   {showEyebrow && <p class="eyebrow">{eyebrow}</p>}
   <h1 class={titleClasses}>{title}</h1>
   {hasBody && (
-    <div class="page-header__body">
+    <Stack class="page-header__body">
       <slot />
-    </div>
+    </Stack>
   )}
 </Tag>
 
@@ -37,18 +39,5 @@ const titleClasses = ["page-header__title", hasBody && "page-header__title--with
 
   .page-header__title--with-body {
     margin-bottom: 0.6rem;
-  }
-
-  .page-header__body {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .page-header__body > :where(p, ul, ol) {
-    margin: 0;
-  }
-
-  .page-header__body > :last-child {
-    margin-bottom: 0;
   }
 </style>

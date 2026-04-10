@@ -1,20 +1,15 @@
 ---
 import PageHeader from "../components/PageHeader.astro";
+import DescribedLinkList from "../features/about/DescribedLinkList.astro";
 import { aboutPageContent } from "../features/about/content";
-import { externalLinks } from "../lib/site";
+import { getExternalLink } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
-const externalLinkMap = new Map(externalLinks.map((link) => [link.id, link]));
-const aboutExternalLinks = aboutPageContent.externalLinks.flatMap((link) => {
-  const externalLink = externalLinkMap.get(link.id);
-
-  if (!externalLink) {
-    return [];
-  }
-
-  return [{ ...link, href: externalLink.href, label: externalLink.label }];
+const aboutExternalLinks = aboutPageContent.externalLinks.map((link) => {
+  const externalLink = getExternalLink(link.id);
+  return { ...link, href: externalLink.href, label: externalLink.label };
 });
-const profilePrimaryExternalLink = externalLinkMap.get(aboutPageContent.profile.primaryExternalLinkId);
+const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.primaryExternalLinkId);
 ---
 
 <SiteLayout title={aboutPageContent.title} description={aboutPageContent.description}>
@@ -23,12 +18,11 @@ const profilePrimaryExternalLink = externalLinkMap.get(aboutPageContent.profile.
   <section class="content-panel about-main">
     <div class="profile-intro">
       <a
-        href={profilePrimaryExternalLink?.href}
+        href={profilePrimaryExternalLink.href}
         target="_blank"
         rel="noreferrer"
-        aria-label={`${profilePrimaryExternalLink?.label ?? "外部リンク"} を開く`}
+        aria-label={`${profilePrimaryExternalLink.label} を開く`}
         class="avatar-link"
-        style="width: clamp(6rem, 12vw, 9rem); height: clamp(6rem, 12vw, 9rem);"
       >
         <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
       </a>
@@ -63,28 +57,14 @@ const profilePrimaryExternalLink = externalLinkMap.get(aboutPageContent.profile.
           <p>{paragraph}</p>
         ))}
       </div>
-      <ul class="section-link-list">
-        {aboutPageContent.siteGuide.items.map((item) => (
-          <li class="section-link-item">
-            <a href={item.href}>{item.label}</a>
-            <p>{item.description}</p>
-          </li>
-        ))}
-      </ul>
+      <DescribedLinkList items={aboutPageContent.siteGuide.items} />
     </section>
   </section>
 
   <section class="content-grid section-grid">
     <section class="content-panel">
       <h2>{aboutPageContent.externalLinksHeading}</h2>
-      <ul class="link-list">
-        {aboutExternalLinks.map((link) => (
-          <li class="link-list-item">
-            <a href={link.href} target="_blank" rel="noreferrer">{link.label}</a>
-            <p>{link.description}</p>
-          </li>
-        ))}
-      </ul>
+      <DescribedLinkList items={aboutExternalLinks} />
     </section>
 
     <section class="content-panel">
@@ -134,6 +114,8 @@ const profilePrimaryExternalLink = externalLinkMap.get(aboutPageContent.profile.
 
   .avatar-link {
     display: block;
+    width: clamp(6rem, 12vw, 9rem);
+    height: clamp(6rem, 12vw, 9rem);
     border-radius: 50%;
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -171,45 +153,11 @@ const profilePrimaryExternalLink = externalLinkMap.get(aboutPageContent.profile.
     grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
   }
 
-  .link-list {
-    display: grid;
-    gap: 0.9rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .link-list-item {
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  .link-list-item p {
-    color: var(--muted-color);
-  }
-
   .interest-list {
     display: grid;
     gap: 0.8rem;
     margin: 0;
     padding-left: 1.2rem;
-  }
-
-  .section-link-list {
-    display: grid;
-    gap: 0.8rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .section-link-item {
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  .section-link-item p {
-    color: var(--muted-color);
   }
 
   .button-link {
