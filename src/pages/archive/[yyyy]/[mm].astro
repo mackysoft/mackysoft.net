@@ -2,6 +2,7 @@
 import ArticleCard from "../../../components/ArticleCard.astro";
 import PageLead from "../../../components/PageLead.astro";
 import PageHeader from "../../../components/PageHeader.astro";
+import { getArticleYearMonth } from "../../../lib/article-dates";
 import type { ArticleItem } from "../../../lib/articles";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
 import { formatPageBreadcrumb } from "../../../lib/page-header";
@@ -12,8 +13,7 @@ export async function getStaticPaths() {
   const yearMonths = new Map();
 
   for (const article of articles) {
-    const year = String(article.data.publishedAt.getFullYear());
-    const month = String(article.data.publishedAt.getMonth() + 1).padStart(2, "0");
+    const { year, month } = getArticleYearMonth(article.data.publishedAt);
     const key = `${year}-${month}`;
     const current = yearMonths.get(key) ?? [];
     current.push(toLocalArticleItem(article));

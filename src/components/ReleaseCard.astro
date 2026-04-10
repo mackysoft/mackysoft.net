@@ -1,8 +1,8 @@
 ---
 import { Image } from "astro:assets";
 
+import { formatArticleDate } from "../lib/article-dates";
 import type { ReleaseActivity } from "../lib/articles";
-import { formatDate } from "../lib/articles";
 
 type Props = {
   release: ReleaseActivity;
@@ -25,7 +25,7 @@ const stargazerCount = new Intl.NumberFormat("en-US").format(release.stargazerCo
     {showReleaseName && <p class="release-card__name">{release.name}</p>}
     <div class="release-card__footer">
       <p class="release-card__meta activity-card__meta">
-        <span>{formatDate(new Date(release.publishedAt))}</span>
+        <span>{formatArticleDate(new Date(release.publishedAt))}</span>
         <span>{release.source}</span>
       </p>
       <div class="release-card__metrics">

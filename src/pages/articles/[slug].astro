@@ -4,6 +4,7 @@ import { getCollection, render } from "astro:content";
 
 import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
+import { formatArticleNumericDate } from "../../lib/article-dates";
 import type { ArticleEntry } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
@@ -20,14 +21,6 @@ export async function getStaticPaths() {
 const { article } = Astro.props as { article: ArticleEntry };
 const { Content, headings } = await render(article);
 const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
-
-function formatArticleMetaDate(date: Date) {
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
 ---
 
 <SiteLayout title={article.data.title} description={article.data.description}>
@@ -44,8 +37,8 @@ function formatArticleMetaDate(date: Date) {
       )}
       <h1>{article.data.title}</h1>
       <p class="meta">
-        <span>公開日：{formatArticleMetaDate(article.data.publishedAt)}</span>
-        {article.data.updatedAt && <span>更新日：{formatArticleMetaDate(article.data.updatedAt)}</span>}
+        <span>公開日：{formatArticleNumericDate(article.data.publishedAt)}</span>
+        {article.data.updatedAt && <span>更新日：{formatArticleNumericDate(article.data.updatedAt)}</span>}
       </p>
     </header>
 

@@ -40,11 +40,3 @@ export function toLocalArticleItem(article: ArticleEntry): ArticleItem {
     coverAlt: article.data.coverAlt,
   };
 }
-
-export function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("ja-JP", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(date);
-}
