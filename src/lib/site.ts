@@ -1,8 +1,6 @@
 export const siteMeta = {
   name: "mackysoft.net",
   description: "ゲーム、アセット、技術記事を整理して残すための活動ハブ。",
-  role: "Game Developer / Engineer",
-  heroLabel: "静かな技術系ポートフォリオ",
 } as const;
 
 export const primaryNav = [

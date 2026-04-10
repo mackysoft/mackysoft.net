@@ -2,6 +2,7 @@
 import ArticleCard from "../../../components/ArticleCard.astro";
 import PageLead from "../../../components/PageLead.astro";
 import PageHeader from "../../../components/PageHeader.astro";
+import { getArticleYear } from "../../../lib/article-dates";
 import type { ArticleItem } from "../../../lib/articles";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
 import { formatPageBreadcrumb } from "../../../lib/page-header";
@@ -9,14 +10,14 @@ import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
   const articles = await getLocalArticles();
-  const years = new Set(articles.map((article) => String(article.data.publishedAt.getFullYear())));
+  const years = new Set(articles.map((article) => getArticleYear(article.data.publishedAt)));
 
   return Array.from(years).sort().map((year) => ({
     params: { yyyy: year },
     props: {
       year,
       articles: articles
-        .filter((article) => String(article.data.publishedAt.getFullYear()) === year)
+        .filter((article) => getArticleYear(article.data.publishedAt) === year)
         .map(toLocalArticleItem),
     },
   }));

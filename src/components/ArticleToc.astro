@@ -1,0 +1,75 @@
+---
+type TocHeading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
+
+type Props = {
+  headings: TocHeading[];
+};
+
+const { headings } = Astro.props as Props;
+---
+
+<aside class="article-toc" aria-labelledby="article-toc-title">
+  <div class="article-toc__inner content-panel">
+    <h2 id="article-toc-title" class="article-toc__title">目次</h2>
+    <nav aria-label="Article table of contents">
+      <ol class="article-toc__list">
+        {headings.map((heading) => (
+          <li class:list={["article-toc__item", heading.depth > 2 && "article-toc__item--nested"]}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .article-toc {
+    align-self: start;
+  }
+
+  .article-toc__inner {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .article-toc__title {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .article-toc__list {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .article-toc__item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .article-toc__item a {
+    color: var(--muted-color);
+    text-decoration: none;
+    line-height: 1.45;
+  }
+
+  .article-toc__item--nested {
+    padding-left: 0.9rem;
+    border-left: 1px solid var(--border-color);
+  }
+
+  @media (min-width: 960px) {
+    .article-toc {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+</style>

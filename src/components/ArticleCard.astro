@@ -1,8 +1,8 @@
 ---
 import { Image } from "astro:assets";
 
+import { formatArticleDate } from "../lib/article-dates";
 import type { ArticleItem } from "../lib/articles";
-import { formatDate } from "../lib/articles";
 
 type Props = {
   article: ArticleItem;
@@ -52,7 +52,7 @@ const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "
     </h3>
     {showDescription && <p class="article-card__description">{article.description}</p>}
     <p class="article-card__meta activity-card__meta">
-      <span>{formatDate(article.publishedAt)}</span>
+      <span>{formatArticleDate(article.publishedAt)}</span>
       <span>{article.source}</span>
     </p>
   </div>
