@@ -39,10 +39,12 @@ const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURICo
       data-share-twitter
       aria-label="Twitter"
     >
-      <svg class="article-share__icon article-share__icon--twitter" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path
-          d="M18.244 3H21.5l-7.11 8.126L22.75 21h-6.548l-5.127-6.592L5.305 21H2.047l7.605-8.692L1.625 3H8.34l4.619 6.116L18.244 3Zm-1.141 16.05h1.804L7.36 4.848H5.424L17.103 19.05Z"
-        />
+      <svg class="article-share__icon article-share__icon--twitter" viewBox="0 0 1227 1227" aria-hidden="true" focusable="false">
+        <g transform="translate(13.5 0)">
+          <path
+            d="M714.163 519.284 1160.89 0h-105.37L667.137 451.332 356.37 0H0l468.492 681.821L0 1226h105.37l409.858-476.228L843.63 1226H1200L714.137 519.284h.026ZM568.63 688.424l-47.232-67.536L145.748 83.676H308.096L611.294 517.34l47.232 67.536 397.034 567.748H893.211L568.63 688.45v-.026Z"
+          />
+        </g>
       </svg>
       <span class="visually-hidden">Twitter</span>
     </a>
@@ -149,8 +151,8 @@ const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURICo
 
   .article-share__icon {
     display: block;
-    width: 1.7rem;
-    height: 1.7rem;
+    height: 1.5rem;
+    width: auto;
     fill: currentColor;
   }
 
@@ -163,8 +165,7 @@ const fallbackTwitterHref = `https://twitter.com/intent/tweet?text=${encodeURICo
   }
 
   .article-share__icon--twitter {
-    width: 1.45rem;
-    height: 1.45rem;
+    height: 1.28rem;
   }
 
   .article-share__bubble {
