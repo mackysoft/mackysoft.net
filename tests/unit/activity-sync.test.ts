@@ -5,7 +5,13 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 
 import activityData from "../../src/generated/activity.json";
-import { getLatestReleaseActivities, sortArticleItems, toExternalArticleItem } from "../../src/lib/articles";
+import {
+  getLatestReleaseActivities,
+  getLatestReleases,
+  getReleaseActivities,
+  sortArticleItems,
+  toExternalArticleItem,
+} from "../../src/lib/articles";
 import type { ReleaseActivity } from "../../src/lib/articles";
 import {
   githubApiBaseUrl,
@@ -80,26 +86,71 @@ async function createSuccessfulFetchMock(): Promise<(input: string | URL | Reque
                 {
                   name: "Alpha",
                   nameWithOwner: "mackysoft/Alpha",
+                  description: "Alpha description",
+                  licenseInfo: {
+                    spdxId: "MIT",
+                    name: "MIT License",
+                  },
+                  isArchived: false,
                   openGraphImageUrl: "https://opengraph.githubassets.com/mock/alpha",
                   stargazerCount: 137,
                 },
                 {
                   name: "Beta",
                   nameWithOwner: "mackysoft/Beta",
+                  description: "Beta description",
+                  licenseInfo: {
+                    spdxId: "Apache-2.0",
+                    name: "Apache License 2.0",
+                  },
+                  isArchived: false,
                   openGraphImageUrl: "https://opengraph.githubassets.com/mock/beta",
                   stargazerCount: 42,
                 },
                 {
                   name: "Gamma",
                   nameWithOwner: "mackysoft/Gamma",
+                  description: null,
+                  licenseInfo: null,
+                  isArchived: false,
                   openGraphImageUrl: "https://opengraph.githubassets.com/mock/gamma",
                   stargazerCount: 7,
                 },
                 {
                   name: "DraftOnly",
                   nameWithOwner: "mackysoft/DraftOnly",
+                  description: "Draft only description",
+                  licenseInfo: {
+                    spdxId: "MIT",
+                    name: "MIT License",
+                  },
+                  isArchived: false,
                   openGraphImageUrl: "https://opengraph.githubassets.com/mock/draft-only",
                   stargazerCount: 1,
+                },
+                {
+                  name: "Unity-GitHubActions-ExportPackage-Example",
+                  nameWithOwner: "mackysoft/Unity-GitHubActions-ExportPackage-Example",
+                  description: "Tutorial repository that should be excluded.",
+                  licenseInfo: {
+                    spdxId: "MIT",
+                    name: "MIT License",
+                  },
+                  isArchived: false,
+                  openGraphImageUrl: "https://opengraph.githubassets.com/mock/export-package-example",
+                  stargazerCount: 12,
+                },
+                {
+                  name: "ArchivedRepo",
+                  nameWithOwner: "mackysoft/ArchivedRepo",
+                  description: "Archived repository that should be excluded.",
+                  licenseInfo: {
+                    spdxId: "MIT",
+                    name: "MIT License",
+                  },
+                  isArchived: true,
+                  openGraphImageUrl: "https://opengraph.githubassets.com/mock/archived-repo",
+                  stargazerCount: 9,
                 },
               ],
             },
@@ -163,6 +214,28 @@ async function createSuccessfulFetchMock(): Promise<(input: string | URL | Reque
               html_url: "https://github.com/mackysoft/DraftOnly/releases/tag/2.0.0",
               published_at: "2025-01-01T00:00:00.000Z",
               draft: true,
+              prerelease: false,
+            },
+          ] : []);
+        case "mackysoft/Unity-GitHubActions-ExportPackage-Example":
+          return createJsonResponse(page === "1" ? [
+            {
+              name: "1.0.0",
+              tag_name: "1.0.0",
+              html_url: "https://github.com/mackysoft/Unity-GitHubActions-ExportPackage-Example/releases/tag/1.0.0",
+              published_at: "2024-01-01T00:00:00.000Z",
+              draft: false,
+              prerelease: false,
+            },
+          ] : []);
+        case "mackysoft/ArchivedRepo":
+          return createJsonResponse(page === "1" ? [
+            {
+              name: "1.0.0",
+              tag_name: "1.0.0",
+              html_url: "https://github.com/mackysoft/ArchivedRepo/releases/tag/1.0.0",
+              published_at: "2024-06-01T00:00:00.000Z",
+              draft: false,
               prerelease: false,
             },
           ] : []);
@@ -238,6 +311,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/Alpha",
         source: "GitHub",
         repo: "mackysoft/Alpha",
+        description: "Alpha description",
+        license: "MIT",
         stargazerCount: 137,
         name: "1.8.5",
         version: "1.8.5",
@@ -250,6 +325,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/Beta",
         source: "GitHub",
         repo: "mackysoft/Beta",
+        description: "Beta description",
+        license: "Apache-2.0",
         stargazerCount: 42,
         name: "Stable name",
         version: "1.0.0",
@@ -262,6 +339,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/Gamma",
         source: "GitHub",
         repo: "mackysoft/Gamma",
+        description: "",
+        license: "",
         stargazerCount: 7,
         name: "1.1.0",
         version: "1.1.0",
@@ -271,6 +350,8 @@ describe("sync-activity", () => {
         coverAlt: "mackysoft/Gamma のリポジトリサムネイル",
       },
     ]);
+    expect(activity.releases.some((release) => release.repo === "mackysoft/Unity-GitHubActions-ExportPackage-Example")).toBe(false);
+    expect(activity.releases.some((release) => release.repo === "mackysoft/ArchivedRepo")).toBe(false);
 
     await expect(readFile(outputPath, "utf8")).resolves.toContain("\"coverUrl\": \"https://opengraph.githubassets.com/mock/alpha\"");
     await rm(tempDir, { recursive: true, force: true });
@@ -282,6 +363,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/old",
         source: "GitHub",
         repo: "mackysoft/old",
+        description: "old",
+        license: "MIT",
         stargazerCount: 10,
         name: "1.0.0",
         version: "1.0.0",
@@ -294,6 +377,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/newest",
         source: "GitHub",
         repo: "mackysoft/newest",
+        description: "newest",
+        license: "Apache-2.0",
         stargazerCount: 40,
         name: "4.0.0",
         version: "4.0.0",
@@ -306,6 +391,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/middle",
         source: "GitHub",
         repo: "mackysoft/middle",
+        description: "middle",
+        license: "MIT",
         stargazerCount: 30,
         name: "3.0.0",
         version: "3.0.0",
@@ -318,6 +405,8 @@ describe("sync-activity", () => {
         groupId: "GitHub:mackysoft/third",
         source: "GitHub",
         repo: "mackysoft/third",
+        description: "third",
+        license: "MIT",
         stargazerCount: 20,
         name: "2.0.0",
         version: "2.0.0",
@@ -333,6 +422,22 @@ describe("sync-activity", () => {
       "mackysoft/middle",
       "mackysoft/third",
     ]);
+  });
+
+  test("returns all checked-in releases in descending order", () => {
+    const releases = getReleaseActivities();
+    const expected = [...activityData.releases].sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
+
+    expect(releases).toEqual(expected);
+  });
+
+  test("returns the newest checked-in releases in descending order", () => {
+    expect(activityData.releases.length).toBeGreaterThanOrEqual(3);
+
+    const latestReleases = getLatestReleases();
+    const expected = getReleaseActivities().slice(0, 3);
+
+    expect(latestReleases).toEqual(expected);
   });
 
   test("does not overwrite an existing activity.json when GitHub sync fails", async () => {
@@ -355,6 +460,8 @@ describe("sync-activity", () => {
           groupId: "GitHub:mackysoft/existing",
           source: "GitHub",
           repo: "mackysoft/existing",
+          description: "Existing release",
+          license: "MIT",
           stargazerCount: 99,
           name: "1.0.0",
           version: "1.0.0",

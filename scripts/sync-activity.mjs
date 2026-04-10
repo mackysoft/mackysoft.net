@@ -12,6 +12,10 @@ export const githubGraphqlUrl = `${githubApiBaseUrl}/graphql`;
 export const githubOwner = "mackysoft";
 export const articleDescriptionMaxLength = 160;
 export const githubReleasePageSize = 100;
+export const githubReleaseRepoBlacklist = new Set([
+  "mackysoft/Unity-GitHubActions-ExportPackage-Example",
+  "mackysoft/Unity-GitHubActions-Build-Example",
+]);
 
 /**
  * @typedef {{
@@ -31,6 +35,8 @@ export const githubReleasePageSize = 100;
  *   groupId: string;
  *   source: string;
  *   repo: string;
+ *   description: string;
+ *   license: string;
  *   stargazerCount: number;
  *   name: string;
  *   version: string;
@@ -52,6 +58,12 @@ export const githubReleasePageSize = 100;
  * @typedef {{
  *   name: string;
  *   nameWithOwner: string;
+ *   description: string | null;
+ *   licenseInfo: {
+ *     spdxId: string | null;
+ *     name: string | null;
+ *   } | null;
+ *   isArchived: boolean;
  *   openGraphImageUrl: string;
  *   stargazerCount: number;
  * }} GitHubRepository
@@ -104,6 +116,14 @@ export function isStableGitHubRelease(release) {
   return !release.draft && !release.prerelease;
 }
 
+export function isBlacklistedGitHubReleaseRepository(repository) {
+  return githubReleaseRepoBlacklist.has(repository.nameWithOwner);
+}
+
+export function isArchivedGitHubReleaseRepository(repository) {
+  return repository.isArchived;
+}
+
 export function selectLatestStableRelease(releases) {
   const stableReleases = releases.filter((release) => isStableGitHubRelease(release) && normalizeWhitespace(release.published_at));
   return stableReleases.sort((left, right) => right.published_at.localeCompare(left.published_at))[0];
@@ -133,6 +153,12 @@ export function normalizeGitHubRelease(repository, release) {
   const version = normalizeWhitespace(release.tag_name);
   const name = normalizeWhitespace(release.name || version);
   const publishedAt = normalizeWhitespace(release.published_at);
+  const description = normalizeWhitespace(repository.description ?? "");
+  const license = normalizeWhitespace(
+    repository.licenseInfo?.spdxId && repository.licenseInfo.spdxId !== "NOASSERTION"
+      ? repository.licenseInfo.spdxId
+      : repository.licenseInfo?.name ?? "",
+  );
 
   if (
     !version
@@ -150,6 +176,8 @@ export function normalizeGitHubRelease(repository, release) {
     groupId: createReleaseGroupId(repository.nameWithOwner),
     source: "GitHub",
     repo: repository.nameWithOwner,
+    description,
+    license,
     stargazerCount: repository.stargazerCount,
     name,
     version,
@@ -260,6 +288,12 @@ export async function fetchGitHubRepositories(fetchImpl = fetch) {
                   nodes {
                     name
                     nameWithOwner
+                    description
+                    licenseInfo {
+                      spdxId
+                      name
+                    }
+                    isArchived
                     openGraphImageUrl
                     stargazerCount
                   }
@@ -329,6 +363,10 @@ export async function fetchGitHubReleaseActivities(fetchImpl = fetch) {
   const releases = [];
 
   for (const repository of repositories) {
+    if (isBlacklistedGitHubReleaseRepository(repository) || isArchivedGitHubReleaseRepository(repository)) {
+      continue;
+    }
+
     const repositoryReleases = await fetchAllGitHubReleasesForRepository(repository.nameWithOwner, fetchImpl);
     const stableRelease = selectLatestStableRelease(repositoryReleases);
 
