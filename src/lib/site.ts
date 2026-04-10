@@ -10,13 +10,26 @@ export const primaryNav = [
   { href: "/games/", label: "Games" },
   { href: "/assets/", label: "Assets" },
   { href: "/articles/", label: "Articles" },
-  { href: "/search/", label: "Search" },
   { href: "/contact/", label: "Contact" },
 ] as const;
 
 export const externalLinks = [
-  { href: "https://github.com/mackysoft", label: "GitHub" },
-  { href: "https://twitter.com/makihiro_dev", label: "X" },
-  { href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
-  { href: "https://www.youtube.com/channel/UCzO3iwkiy6u1mARt-HOysZA", label: "YouTube" },
+  { id: "github", href: "https://github.com/mackysoft", label: "GitHub" },
+  { id: "twitter", href: "https://twitter.com/makihiro_dev", label: "Twitter" },
+  { id: "zenn", href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
 ] as const;
+
+type ExternalLink = (typeof externalLinks)[number];
+export type ExternalLinkId = (typeof externalLinks)[number]["id"];
+
+const externalLinkMap = new Map<ExternalLinkId, ExternalLink>(externalLinks.map((link) => [link.id, link]));
+
+export function getExternalLink(id: ExternalLinkId) {
+  const link = externalLinkMap.get(id);
+
+  if (!link) {
+    throw new Error(`Unknown external link id: ${id}`);
+  }
+
+  return link;
+}

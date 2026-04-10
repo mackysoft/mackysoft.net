@@ -1,0 +1,26 @@
+---
+import Stack from "./Stack.astro";
+
+type Props = {
+  as?: "section" | "div";
+  class?: string;
+  panel?: boolean;
+  summary?: string;
+};
+
+const { as = "section", class: className, panel = false, summary } = Astro.props as Props;
+const Tag = as;
+const classes = ["page-lead", panel && "content-panel", className].filter(Boolean).join(" ");
+---
+
+<Stack as={Tag} class={classes}>
+  {summary && <p class="page-lead__summary">{summary}</p>}
+  <slot />
+</Stack>
+
+<style>
+  .page-lead__summary {
+    margin: 0;
+    color: var(--muted-color);
+  }
+</style>

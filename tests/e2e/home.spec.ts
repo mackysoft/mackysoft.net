@@ -18,9 +18,8 @@ test.describe("home page", () => {
     await page.goto("/");
 
     await expect(page).toHaveTitle("mackysoft.net");
-    await expect(page.getByRole("heading", { level: 1, name: "mackysoft.net" })).toBeVisible();
-    await expect(page.getByText("静かな技術系ポートフォリオ")).toBeVisible();
-    await expect(page.getByRole("main").getByRole("link", { name: "Articles", exact: true })).toBeVisible();
+    await expect(page.getByRole("banner").getByRole("link", { name: "mackysoft.net", exact: true })).toBeVisible();
+    await expect(page.locator("main > h1.visually-hidden")).toHaveText("Home");
     await expect(page.getByRole("heading", { level: 2, name: "最新の記事" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
     await expect(page.getByRole("main").locator(".article-card").filter({ hasText: "Zenn" }).first()).toBeVisible();
@@ -29,6 +28,16 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
     await expect(page.getByRole("main").locator(".release-card").first()).toBeVisible();
     await expect(page.getByRole("img", { name: latestRelease.coverAlt }).first()).toBeVisible();
+
+    const firstReleaseStars = page.getByRole("main").locator(".release-card__stars").first();
+    await expect(firstReleaseStars).toBeVisible();
+    await expect(firstReleaseStars).toHaveCSS("display", "flex");
+
+    const firstReleaseStarIconWidth = await firstReleaseStars.locator(".release-card__star-icon").evaluate((element) => {
+      return element.getBoundingClientRect().width;
+    });
+    expect(firstReleaseStarIconWidth).toBeGreaterThan(8);
+    expect(firstReleaseStarIconWidth).toBeLessThan(20);
   });
 
   test("returns 404 for draft article routes", async ({ page }) => {

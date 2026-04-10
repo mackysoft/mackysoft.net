@@ -1,9 +1,7 @@
 ---
 import ArticleCard from "../components/ArticleCard.astro";
 import ReleaseCard from "../components/ReleaseCard.astro";
-import { homePageContent } from "../features/home/content";
 import { getArticleItems, getLatestReleases } from "../lib/articles";
-import { externalLinks, siteMeta } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 const latestArticles = (await getArticleItems()).slice(0, 3);
@@ -11,26 +9,7 @@ const latestReleases = getLatestReleases();
 ---
 
 <SiteLayout>
-  <section class="page-hero">
-    <p class="eyebrow">{homePageContent.heroLabel}</p>
-    <h1>{siteMeta.name}</h1>
-    <p class="role">{homePageContent.role}</p>
-    <div class="content-grid">
-      {homePageContent.intro.map((paragraph) => (
-        <p>{paragraph}</p>
-      ))}
-    </div>
-    <div class="button-row">
-      <a href="/games/" class="button-link">Games</a>
-      <a href="/assets/" class="button-link">Assets</a>
-      <a href="/articles/" class="button-link">Articles</a>
-    </div>
-    <ul class="link-row" aria-label="External links">
-      {externalLinks.map((link) => (
-        <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
-      ))}
-    </ul>
-  </section>
+  <h1 class="visually-hidden">Home</h1>
 
   <section class="content-panel">
     <div class="section-head">
@@ -74,12 +53,6 @@ const latestReleases = getLatestReleases();
       <a href="/about/" class="button-link">About</a>
     </section>
     <section class="content-panel">
-      <p class="eyebrow">Search</p>
-      <h2>検索導線はこれから実装</h2>
-      <p>記事のローカル原本化を優先しつつ、検索 UI は別タスクで追加します。現時点では記事一覧から参照できます。</p>
-      <a href="/search/" class="button-link">Search</a>
-    </section>
-    <section class="content-panel">
       <p class="eyebrow">Contact</p>
       <h2>連絡手段の整理</h2>
       <p>仕事や相談向けの案内は新しい構成に合わせて更新中です。暫定の導線は Contact にまとめています。</p>
@@ -89,47 +62,9 @@ const latestReleases = getLatestReleases();
 </SiteLayout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.4rem;
-    color: var(--accent-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: clamp(2.4rem, 1.8rem + 3vw, 4.8rem);
-  }
-
   h2 {
     margin: 0;
     font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  }
-
-  .role {
-    margin: 0.6rem 0 1.2rem;
-    color: var(--muted-color);
-    font-size: 1.1rem;
-  }
-
-  .page-hero {
-    display: grid;
-    gap: 1rem;
-    padding: clamp(1.6rem, 1.2rem + 2vw, 3rem);
-  }
-
-  .page-hero p {
-    margin: 0;
-  }
-
-  .link-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem 1rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
   }
 
   .section-head {

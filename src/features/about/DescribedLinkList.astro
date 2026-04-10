@@ -1,0 +1,47 @@
+---
+type DescribedLinkItem = {
+  label: string;
+  href: string;
+  description: string;
+};
+
+type Props = {
+  items: readonly DescribedLinkItem[];
+  class?: string;
+};
+
+const { items, class: className } = Astro.props as Props;
+const classes = ["described-link-list", className].filter(Boolean).join(" ");
+const isExternalLink = (href: string) => href.startsWith("http://") || href.startsWith("https://");
+---
+
+<ul class={classes}>
+  {items.map((item) => (
+    <li class="described-link-list__item">
+      <a href={item.href} target={isExternalLink(item.href) ? "_blank" : undefined} rel={isExternalLink(item.href) ? "noreferrer" : undefined}>
+        {item.label}
+      </a>
+      <p>{item.description}</p>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .described-link-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .described-link-list__item {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .described-link-list__item p {
+    margin: 0;
+    color: var(--muted-color);
+  }
+</style>

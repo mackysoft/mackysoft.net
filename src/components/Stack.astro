@@ -1,0 +1,16 @@
+---
+type Props = {
+  as?: "div" | "section" | "header";
+  class?: string;
+  gap?: string;
+};
+
+const { as = "div", class: className, gap } = Astro.props as Props;
+const Tag = as;
+const classes = ["content-grid", className].filter(Boolean).join(" ");
+const style = gap ? `--content-grid-gap: ${gap};` : undefined;
+---
+
+<Tag class={classes} style={style}>
+  <slot />
+</Tag>
