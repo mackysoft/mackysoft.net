@@ -1,5 +1,6 @@
 ---
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
+import SiteHeaderTools from "../components/SiteHeaderTools.astro";
 import { externalLinks, primaryNav, siteMeta } from "../lib/site";
 import "../styles/site.css";
 
@@ -39,7 +40,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
     <div class="shell">
       <header class="site-header" data-site-header>
         <a href="/" class="site-brand">{siteMeta.name}</a>
-        <nav aria-label="Global">
+        <nav class="site-header__nav" aria-label="Global">
           <ul class="site-nav">
             {primaryNav.map((item) => (
               <li>
@@ -50,6 +51,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
             ))}
           </ul>
         </nav>
+        <SiteHeaderTools />
       </header>
       <main class="site-main">
         <slot />

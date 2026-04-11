@@ -81,7 +81,13 @@ blockquote {
 
 .site-header {
   display: grid;
-  gap: 0.3rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "brand"
+    "nav"
+    "tools";
+  align-items: center;
+  gap: 0.55rem 0.8rem;
   padding: 0.35rem 0 0.5rem;
   position: sticky;
   top: 0;
@@ -92,11 +98,101 @@ blockquote {
 }
 
 .site-brand {
+  grid-area: brand;
   font-size: clamp(1.18rem, 1.08rem + 0.45vw, 1.45rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text-color);
   text-decoration: none;
+}
+
+.site-header__nav {
+  grid-area: nav;
+  min-width: 0;
+  justify-self: stretch;
+}
+
+.site-header-tools {
+  grid-area: tools;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  justify-self: start;
+}
+
+.site-header-tool {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.72rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.38);
+  color: var(--muted-color);
+  font: inherit;
+  line-height: 1;
+  opacity: 1;
+  cursor: default;
+}
+
+.site-header-tool:disabled {
+  opacity: 1;
+  color: var(--muted-color);
+}
+
+.site-header-tool--icon {
+  width: 2.25rem;
+  min-width: 2.25rem;
+  padding: 0;
+}
+
+.site-header-tool__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.site-header-tool--theme {
+  gap: 0.16rem;
+  padding: 0.18rem;
+}
+
+.site-header-tool__theme-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: var(--muted-color);
+}
+
+.site-header-tool__theme-option--active {
+  background: rgba(14, 107, 99, 0.12);
+  color: var(--text-color);
+}
+
+.site-header-tool--language {
+  gap: 0.35rem;
+}
+
+.site-header-tool__symbol {
+  width: 1rem;
+  height: 1rem;
+}
+
+.site-header-tool__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.site-header-tool__caret {
+  width: 0.82rem;
+  height: 0.82rem;
 }
 
 h1,
@@ -270,10 +366,18 @@ h3,
   }
 
   .site-header {
-    grid-template-columns: auto 1fr;
-    align-items: center;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "brand nav tools";
     gap: 0.8rem;
     padding: 0.4rem 0 0.55rem;
+  }
+
+  .site-header__nav {
+    justify-self: end;
+  }
+
+  .site-header-tools {
+    justify-self: end;
   }
 
   .site-nav {
