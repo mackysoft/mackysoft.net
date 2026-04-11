@@ -1,5 +1,4 @@
 ---
-import PageLead from "../components/PageLead.astro";
 import PageHeader from "../components/PageHeader.astro";
 import { contactPageContent } from "../features/contact/content";
 import { getExternalLink } from "../lib/site";
@@ -31,31 +30,31 @@ const contactChannels = contactPageContent.channels.map((channel) => {
 <SiteLayout title={contactPageContent.title} description={contactPageContent.description}>
   <PageHeader title={contactPageContent.hero.title} eyebrow={contactPageContent.hero.eyebrow} />
 
-  <PageLead panel>
-    <p>{contactPageContent.lead}</p>
-  </PageLead>
+  <section class="content-panel contact-section">
+    <p class="contact-lead">{contactPageContent.lead}</p>
 
-  <section class="contact-grid">
-    {contactChannels.map((channel) => (
-      <section class="content-panel contact-card">
-        <div class="contact-card__body">
-          <h2>{channel.heading}</h2>
-          <p>{channel.description}</p>
-        </div>
-        <a
-          href={channel.action.href}
-          class="button-link contact-card__action"
-          target={channel.action.isExternal ? "_blank" : undefined}
-          rel={channel.action.isExternal ? "noreferrer" : undefined}
-        >
-          {channel.action.label}
-        </a>
-      </section>
-    ))}
+    <div class="contact-grid">
+      {contactChannels.map((channel) => (
+        <section class="contact-card">
+          <div class="contact-card__body">
+            <h2>{channel.heading}</h2>
+            <p>{channel.description}</p>
+          </div>
+          <a
+            href={channel.action.href}
+            class="button-link contact-card__action"
+            target={channel.action.isExternal ? "_blank" : undefined}
+            rel={channel.action.isExternal ? "noreferrer" : undefined}
+          >
+            {channel.action.label}
+          </a>
+        </section>
+      ))}
+    </div>
   </section>
 
-  <section class="content-panel reply-policy">
-    <h2>{contactPageContent.replyPolicy.heading}</h2>
+  <section class="content-panel reply-policy" aria-labelledby="reply-policy-heading">
+    <h2 id="reply-policy-heading">{contactPageContent.replyPolicy.heading}</h2>
     <div class="content-grid reply-policy__body">
       {contactPageContent.replyPolicy.paragraphs.map((paragraph) => (
         <p>{paragraph}</p>
@@ -69,21 +68,29 @@ const contactChannels = contactPageContent.channels.map((channel) => {
     margin: 0;
   }
 
+  .contact-section {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .contact-lead {
+    margin: 0;
+  }
+
   .contact-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  }
-
-  .contact-card,
-  .reply-policy {
-    display: grid;
-    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
   }
 
   .contact-card {
     display: flex;
     flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.1rem 1.15rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    background: var(--surface-strong-color);
   }
 
   .contact-card__body {
@@ -100,6 +107,11 @@ const contactChannels = contactPageContent.channels.map((channel) => {
   .contact-card__action {
     align-self: start;
     margin-top: auto;
+  }
+
+  .reply-policy {
+    display: grid;
+    gap: 0.55rem;
   }
 
   .reply-policy__body {
