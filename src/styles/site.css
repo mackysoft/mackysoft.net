@@ -511,6 +511,7 @@ h3,
 
   .site-header__nav {
     justify-self: end;
+    padding-right: 0.75rem;
   }
 
   .site-header-tools {
