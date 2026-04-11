@@ -138,9 +138,9 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
   .asset-card__license {
     width: fit-content;
     padding: 0.35rem 0.6rem;
-    border: 1px solid rgba(30, 27, 24, 0.12);
+    border: 1px solid var(--surface-soft-border-color);
     border-radius: 999px;
-    background: rgba(30, 27, 24, 0.04);
+    background: var(--surface-soft-color);
     color: var(--muted-color);
     font-family: var(--font-mono);
     font-size: 0.82rem;
@@ -148,7 +148,7 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
   }
 
   .asset-card__version {
-    background: rgba(14, 107, 99, 0.1);
+    background: var(--accent-surface-color);
     color: var(--accent-color);
   }
 
@@ -158,7 +158,7 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
     gap: 0.35rem;
     width: fit-content;
     padding: 0.35rem 0.6rem;
-    border: 1px solid rgba(14, 107, 99, 0.16);
+    border: 1px solid var(--accent-border-color);
     border-radius: 999px;
     color: var(--text-color);
     font-family: var(--font-mono);
@@ -170,7 +170,7 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
     flex: none;
     width: 0.85rem;
     height: 0.85rem;
-    fill: #a86a00;
+    fill: var(--star-color);
     opacity: 1;
   }
 
