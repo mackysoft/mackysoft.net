@@ -70,4 +70,19 @@ test.describe("site header", () => {
 
     await context.close();
   });
+
+  test("keeps the theme toggle disabled when JavaScript is unavailable", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+      colorScheme: "dark",
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    await expect(page.locator('[data-site-tool="theme"]')).toBeDisabled();
+
+    await context.close();
+  });
 });

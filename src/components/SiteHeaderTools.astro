@@ -17,6 +17,7 @@
     class="site-header-tool site-header-tool--theme"
     aria-label="テーマを切り替え"
     aria-pressed="false"
+    disabled
     data-site-tool="theme"
     data-theme-toggle
   >
@@ -96,6 +97,7 @@
     };
     const syncButtons = (theme) => {
       for (const button of themeButtons) {
+        button.disabled = false;
         button.setAttribute("aria-pressed", String(theme === "dark"));
         button.dataset.currentTheme = theme;
       }
