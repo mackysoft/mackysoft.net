@@ -1,0 +1,196 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+import GameActionPanel from "../../components/GameActionPanel.astro";
+import GameScreenshotGallery from "../../components/GameScreenshotGallery.astro";
+import { formatArticleNumericDate } from "../../lib/article-dates";
+import { getGamePlatformLabel, getGameStatusLabel, type GameEntry } from "../../lib/games";
+import { formatPageBreadcrumb } from "../../lib/page-header";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const games = await getCollection("games");
+
+  return games.map((game) => ({
+    params: { slug: game.id },
+    props: { game },
+  }));
+}
+
+const { game } = Astro.props as { game: GameEntry };
+const statusLabel = getGameStatusLabel(game.data.status);
+---
+
+<SiteLayout title={game.data.title} description={game.data.description}>
+  <article class="game-page">
+    <p class="eyebrow game-page__eyebrow">{formatPageBreadcrumb("Home", "Games")}</p>
+
+    <header class="game-hero">
+      <div class="game-hero__cover">
+        <Image src={game.data.cover} alt={game.data.coverAlt} widths={[1200, 960, 720]} sizes="(max-width: 56rem) 100vw, 56rem" />
+      </div>
+      <div class="game-hero__copy">
+        <div class="game-hero__meta-row">
+          <p class:list={["game-hero__status", `game-hero__status--${game.data.status}`]}>{statusLabel}</p>
+          {game.data.platforms.map((platform) => (
+            <p class="game-hero__platform">{getGamePlatformLabel(platform)}</p>
+          ))}
+        </div>
+        <h1>{game.data.title}</h1>
+        {game.data.publishedAt && <p class="game-hero__date">公開日: {formatArticleNumericDate(game.data.publishedAt)}</p>}
+        <p class="game-hero__description">{game.data.description}</p>
+      </div>
+    </header>
+
+    <div class="game-detail-layout">
+      <div class="game-detail-main">
+        {game.data.features.length > 0 && (
+          <section class="game-section content-panel" aria-label="ゲームの特徴">
+            <ul class="game-feature-list">
+              {game.data.features.map((feature) => (
+                <li>{feature}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <GameScreenshotGallery screenshots={game.data.screenshots} />
+      </div>
+
+      <GameActionPanel actions={game.data.actions} />
+    </div>
+  </article>
+</SiteLayout>
+
+<style>
+  .game-page {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .game-page__eyebrow {
+    margin-bottom: 0;
+  }
+
+  .game-hero {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .game-hero__copy {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .game-hero__copy h1,
+  .game-hero__description,
+  .game-hero__date,
+  .game-hero__status,
+  .game-hero__platform {
+    margin: 0;
+  }
+
+  .game-hero__meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: center;
+  }
+
+  .game-hero__status,
+  .game-hero__platform {
+    width: fit-content;
+    padding: 0.36rem 0.65rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .game-hero__status {
+    border: 1px solid rgba(30, 27, 24, 0.1);
+    background: rgba(30, 27, 24, 0.05);
+  }
+
+  .game-hero__status--active {
+    border-color: rgba(14, 107, 99, 0.2);
+    background: rgba(14, 107, 99, 0.1);
+    color: var(--accent-color);
+  }
+
+  .game-hero__status--archived {
+    border-color: rgba(99, 91, 82, 0.2);
+    background: rgba(99, 91, 82, 0.1);
+    color: var(--muted-color);
+  }
+
+  .game-hero__status--prototype {
+    border-color: rgba(168, 106, 0, 0.2);
+    background: rgba(168, 106, 0, 0.1);
+    color: #8b5600;
+  }
+
+  .game-hero__platform {
+    background: rgba(255, 255, 255, 0.48);
+    color: var(--muted-color);
+  }
+
+  .game-hero__description {
+    color: var(--muted-color);
+    font-size: 1.02rem;
+  }
+
+  .game-hero__date {
+    color: var(--muted-color);
+    font-size: 0.95rem;
+  }
+
+  .game-hero__cover {
+    width: min(100%, 46rem);
+    justify-self: center;
+    overflow: hidden;
+    border-radius: 1.2rem;
+    border: 1px solid var(--border-color);
+    background: var(--surface-strong-color);
+  }
+
+  .game-hero__cover :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .game-detail-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .game-detail-main {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .game-section {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .game-feature-list {
+    margin: 0;
+  }
+
+  .game-feature-list {
+    display: grid;
+    gap: 0.8rem;
+    padding-left: 1.2rem;
+  }
+
+  @media (min-width: 960px) {
+    .game-detail-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 18rem);
+      align-items: start;
+    }
+  }
+</style>

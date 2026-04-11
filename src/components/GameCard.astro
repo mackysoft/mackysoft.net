@@ -1,0 +1,149 @@
+---
+import { Image } from "astro:assets";
+
+import { formatArticleDate } from "../lib/article-dates";
+import { getGamePlatformLabel, getGameStatusLabel, type GameEntry } from "../lib/games";
+
+type Props = {
+  game: GameEntry;
+};
+
+const { game } = Astro.props;
+const href = `/games/${game.id}/`;
+const statusLabel = getGameStatusLabel(game.data.status);
+const sortDate = game.data.updatedAt ?? game.data.publishedAt;
+const platforms = game.data.platforms;
+---
+
+<article class="game-card activity-card">
+  <a href={href} class="game-card__cover-link activity-card__cover-link">
+    <Image src={game.data.cover} alt={game.data.coverAlt} widths={[480]} sizes="(max-width: 720px) 100vw, 28rem" />
+  </a>
+  <div class="game-card__body activity-card__body">
+    <h3>
+      <a href={href} class="activity-card__title-link">{game.data.title}</a>
+    </h3>
+    <p class="game-card__description">{game.data.description}</p>
+    <div class="game-card__footer">
+      {sortDate && (
+        <p class="game-card__meta activity-card__meta">
+          <span>{formatArticleDate(sortDate)}</span>
+        </p>
+      )}
+      <div class="game-card__metrics">
+        <p class:list={["game-card__status", `game-card__status--${game.data.status}`]}>{statusLabel}</p>
+        {platforms.map((platform) => (
+          <p class="game-card__platform">{getGamePlatformLabel(platform)}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .game-card {
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .game-card__cover-link {
+    aspect-ratio: 1200 / 630;
+  }
+
+  .game-card__cover-link :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .game-card__body {
+    gap: 0.85rem;
+  }
+
+  .game-card__status,
+  .game-card__platform,
+  .game-card__description,
+  .game-card__meta {
+    margin: 0;
+  }
+
+  .game-card__description {
+    color: var(--muted-color);
+  }
+
+  .game-card__footer {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: auto;
+  }
+
+  .game-card__meta {
+    font-size: 0.92rem;
+  }
+
+  .game-card__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .game-card__status {
+    width: fit-content;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1px solid rgba(30, 27, 24, 0.1);
+    background: rgba(30, 27, 24, 0.05);
+    color: var(--text-color);
+  }
+
+  .game-card__platform {
+    width: fit-content;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid rgba(30, 27, 24, 0.12);
+    border-radius: 999px;
+    background: rgba(30, 27, 24, 0.04);
+    color: var(--muted-color);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .game-card__status--prototype {
+    border-color: rgba(168, 106, 0, 0.2);
+    background: rgba(168, 106, 0, 0.1);
+    color: #8b5600;
+  }
+
+  .game-card__date {
+    color: var(--muted-color);
+    background: rgba(255, 255, 255, 0.48);
+  }
+
+  .game-card h3 {
+    margin: 0;
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .game-card__description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  @media (min-width: 760px) {
+    .game-card {
+      grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+</style>

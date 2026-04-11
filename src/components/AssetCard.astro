@@ -1,6 +1,4 @@
 ---
-import { Image } from "astro:assets";
-
 import { formatArticleDate } from "../lib/article-dates";
 import { formatReleaseStargazerCount, getReleaseRepoName, type ReleaseActivity } from "../lib/articles";
 
@@ -15,12 +13,10 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
 
 <article class="asset-card activity-card">
   <a href={release.url} class="asset-card__cover-link activity-card__cover-link" target="_blank" rel="noreferrer">
-    <Image
+    <img
       src={release.coverUrl}
       alt={release.coverAlt}
-      widths={[480]}
-      sizes="(max-width: 720px) 100vw, 28rem"
-      inferSize
+      loading="lazy"
     />
   </a>
   <div class="asset-card__body activity-card__body">
@@ -60,6 +56,8 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
   }
 
   .asset-card__cover-link img {
+    display: block;
+    width: 100%;
     height: 100%;
     object-fit: cover;
   }
