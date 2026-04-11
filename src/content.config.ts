@@ -2,6 +2,8 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
+import { isSupportedGameTrailerUrl } from "./lib/games";
+
 const gameActionKindSchema = z.enum(["play", "store", "press-kit", "streaming-guidelines", "privacy-policy", "repository"]);
 const gameStatusSchema = z.enum(["active", "archived", "prototype"]);
 
@@ -45,17 +47,12 @@ const games = defineCollection({
       status: gameStatusSchema,
       cover: image(),
       coverAlt: z.string().min(1),
+      genre: z.string().min(1).optional(),
       publishedAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
-      trailerUrl: z.string().min(1).refine((value) => {
-        try {
-          new URL(value);
-          return true;
-        } catch {
-          return false;
-        }
-      }, "有効な URL を指定してください。").optional(),
+      trailerUrl: z.string().min(1).refine(isSupportedGameTrailerUrl, "現在は YouTube の URL のみ対応しています。").optional(),
       tags: z.array(z.string().min(1)).default([]),
+      languages: z.array(z.string().min(1)).default([]),
       platforms: z.array(z.string().min(1)).default([]),
       features: z.array(z.string().min(1)).default([]),
       screenshots: z

@@ -4,11 +4,15 @@ description: "拾ったアイテムを駆使して敵を倒しながら突き進
 status: "archived"
 cover: "./cover.png"
 coverAlt: "Treasure Rogue のタイトルロゴと主人公が写ったキービジュアル"
+genre: "ローグライク"
 publishedAt: "2020-04-09"
 updatedAt: "2020-05-21"
 trailerUrl: "https://youtu.be/ICE8Qz0S23o?si=QtxWfkapBZ8KpQU6"
+languages:
+  - "日本語"
+  - "英語"
 platforms:
-  - "Android"
+  - "Android（配信終了）"
   - "Browser"
 features:
   - "プレイするたびにランダムで地形が自動生成されるローグライク要素。奥に進めば新しい世界が待っている！"

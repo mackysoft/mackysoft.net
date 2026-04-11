@@ -22,6 +22,14 @@ const { game } = Astro.props as { game: GameEntry };
 const statusLabel = getGameStatusLabel(game.data.status);
 const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.trailerUrl) : null;
 const hasActions = game.data.actions.length > 0;
+const detailRows = [
+  game.data.genre ? { label: "ジャンル", value: game.data.genre } : null,
+  game.data.publishedAt ? { label: "公開日", value: formatArticleNumericDate(game.data.publishedAt) } : null,
+  game.data.languages.length > 0 ? { label: "対応言語", value: game.data.languages.join(" / ") } : null,
+  game.data.platforms.length > 0
+    ? { label: "プラットフォーム", value: game.data.platforms.map((platform) => getGamePlatformLabel(platform)).join(" / ") }
+    : null,
+].filter((row): row is { label: string; value: string } => row !== null);
 ---
 
 <SiteLayout title={game.data.title} description={game.data.description}>
@@ -33,14 +41,8 @@ const hasActions = game.data.actions.length > 0;
         <Image src={game.data.cover} alt={game.data.coverAlt} widths={[1200, 960, 720]} sizes="(max-width: 56rem) 100vw, 56rem" />
       </div>
       <div class="game-hero__copy">
-        <div class="game-hero__meta-row">
-          <p class:list={["game-hero__status", `game-hero__status--${game.data.status}`]}>{statusLabel}</p>
-          {game.data.platforms.map((platform) => (
-            <p class="game-hero__platform">{getGamePlatformLabel(platform)}</p>
-          ))}
-        </div>
+        <p class:list={["game-hero__status", `game-hero__status--${game.data.status}`]}>{statusLabel}</p>
         <h1>{game.data.title}</h1>
-        {game.data.publishedAt && <p class="game-hero__date">公開日: {formatArticleNumericDate(game.data.publishedAt)}</p>}
         <p class="game-hero__description">{game.data.description}</p>
       </div>
     </header>
@@ -62,6 +64,21 @@ const hasActions = game.data.actions.length > 0;
 
       {hasActions && <GameActionPanel actions={game.data.actions} />}
     </div>
+
+    {detailRows.length > 0 && (
+      <section class="game-detail-table content-panel" aria-label="ゲームの基本情報">
+        <table>
+          <tbody>
+            {detailRows.map((row) => (
+              <tr>
+                <th scope="row">{row.label}</th>
+                <td>{row.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    )}
   </article>
 </SiteLayout>
 
@@ -87,21 +104,11 @@ const hasActions = game.data.actions.length > 0;
 
   .game-hero__copy h1,
   .game-hero__description,
-  .game-hero__date,
-  .game-hero__status,
-  .game-hero__platform {
+  .game-hero__status {
     margin: 0;
   }
 
-  .game-hero__meta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    align-items: center;
-  }
-
-  .game-hero__status,
-  .game-hero__platform {
+  .game-hero__status {
     width: fit-content;
     padding: 0.36rem 0.65rem;
     border-radius: 999px;
@@ -122,9 +129,9 @@ const hasActions = game.data.actions.length > 0;
   }
 
   .game-hero__status--archived {
-    border-color: rgba(99, 91, 82, 0.2);
-    background: rgba(99, 91, 82, 0.1);
-    color: var(--muted-color);
+    border-color: rgba(217, 119, 6, 0.34);
+    background: rgba(249, 115, 22, 0.2);
+    color: #b45309;
   }
 
   .game-hero__status--prototype {
@@ -133,19 +140,9 @@ const hasActions = game.data.actions.length > 0;
     color: #8b5600;
   }
 
-  .game-hero__platform {
-    background: rgba(255, 255, 255, 0.48);
-    color: var(--muted-color);
-  }
-
   .game-hero__description {
     color: var(--muted-color);
     font-size: 1.02rem;
-  }
-
-  .game-hero__date {
-    color: var(--muted-color);
-    font-size: 0.95rem;
   }
 
   .game-hero__cover {
@@ -184,6 +181,25 @@ const hasActions = game.data.actions.length > 0;
     gap: 0.8rem;
     margin: 0;
     padding-left: 1.2rem;
+  }
+
+  .game-detail-table {
+    overflow-x: auto;
+  }
+
+  .game-detail-table table {
+    min-width: min(100%, 28rem);
+  }
+
+  .game-detail-table th {
+    width: 8.5rem;
+    white-space: nowrap;
+    color: var(--muted-color);
+    font-weight: 500;
+  }
+
+  .game-detail-table td {
+    color: var(--text-color);
   }
 
   @media (min-width: 960px) {
