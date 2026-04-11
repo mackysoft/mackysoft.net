@@ -1,12 +1,30 @@
 import { describe, expect, test } from "vitest";
 
-import { getGameDateValue, getGameTrailerEmbedUrl, getGameTrailerVideoId, isExternalGameActionHref, isSupportedGameTrailerUrl } from "../../src/lib/games";
+import {
+  getGameDateValue,
+  getGameTrailerEmbedUrl,
+  getGameTrailerVideoId,
+  isExternalGameActionHref,
+  isInternalGameActionHref,
+  isSupportedGameTrailerUrl,
+  isValidGameActionHref,
+} from "../../src/lib/games";
 
 describe("games helpers", () => {
   test("treats site-relative action links as internal", () => {
+    expect(isInternalGameActionHref("/privacy-policy/")).toBe(true);
     expect(isExternalGameActionHref("/privacy-policy/")).toBe(false);
     expect(isExternalGameActionHref("/games/treasure-rogue/press-kit/")).toBe(false);
     expect(isExternalGameActionHref("https://unityroom.com/games/treasure-rogue")).toBe(true);
+  });
+
+  test("accepts only safe game action hrefs", () => {
+    expect(isValidGameActionHref("/privacy-policy/")).toBe(true);
+    expect(isValidGameActionHref("https://unityroom.com/games/treasure-rogue")).toBe(true);
+    expect(isValidGameActionHref("//example.com")).toBe(false);
+    expect(isValidGameActionHref("javascript:alert(1)")).toBe(false);
+    expect(isValidGameActionHref("data:text/html,hello")).toBe(false);
+    expect(isExternalGameActionHref("//example.com")).toBe(false);
   });
 
   test("sorts games by published date instead of updated date", () => {

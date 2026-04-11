@@ -1,8 +1,9 @@
 ---
 import { Image } from "astro:assets";
 
+import GameStatusBadge from "./GameStatusBadge.astro";
 import { formatArticleDate } from "../lib/article-dates";
-import { getGamePlatformLabel, getGameStatusLabel, type GameEntry } from "../lib/games";
+import { getGamePlatformLabel, type GameEntry } from "../lib/games";
 
 type Props = {
   game: GameEntry;
@@ -10,7 +11,6 @@ type Props = {
 
 const { game } = Astro.props;
 const href = `/games/${game.id}/`;
-const statusLabel = getGameStatusLabel(game.data.status);
 const publishedAt = game.data.publishedAt;
 const platforms = game.data.platforms;
 ---
@@ -34,7 +34,7 @@ const platforms = game.data.platforms;
         </p>
       )}
       <div class="game-card__metrics">
-        <p class:list={["game-card__status", `game-card__status--${game.data.status}`]}>{statusLabel}</p>
+        <GameStatusBadge status={game.data.status} size="card" />
         {platforms.map((platform) => (
           <p class="game-card__platform">{getGamePlatformLabel(platform)}</p>
         ))}
@@ -64,7 +64,6 @@ const platforms = game.data.platforms;
     gap: 0.85rem;
   }
 
-  .game-card__status,
   .game-card__platform,
   .game-card__description,
   .game-card__meta {
@@ -98,18 +97,6 @@ const platforms = game.data.platforms;
     align-items: center;
   }
 
-  .game-card__status {
-    width: fit-content;
-    padding: 0.35rem 0.6rem;
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 500;
-    border: 1px solid rgba(30, 27, 24, 0.1);
-    background: rgba(30, 27, 24, 0.05);
-    color: var(--text-color);
-  }
-
   .game-card__platform {
     width: fit-content;
     padding: 0.35rem 0.6rem;
@@ -120,18 +107,6 @@ const platforms = game.data.platforms;
     font-family: var(--font-mono);
     font-size: 0.82rem;
     font-weight: 500;
-  }
-
-  .game-card__status--archived {
-    border-color: rgba(217, 119, 6, 0.34);
-    background: rgba(249, 115, 22, 0.2);
-    color: #b45309;
-  }
-
-  .game-card__status--prototype {
-    border-color: rgba(168, 106, 0, 0.2);
-    background: rgba(168, 106, 0, 0.1);
-    color: #8b5600;
   }
 
   .game-card__date {

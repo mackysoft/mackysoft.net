@@ -4,8 +4,9 @@ import { getCollection } from "astro:content";
 
 import GameActionPanel from "../../../components/GameActionPanel.astro";
 import GameScreenshotGallery from "../../../components/GameScreenshotGallery.astro";
+import GameStatusBadge from "../../../components/GameStatusBadge.astro";
 import { formatArticleNumericDate } from "../../../lib/article-dates";
-import { getGamePlatformLabel, getGameStatusLabel, getGameTrailerEmbedUrl, type GameEntry } from "../../../lib/games";
+import { getGamePlatformLabel, getGameTrailerEmbedUrl, type GameEntry } from "../../../lib/games";
 import { formatPageBreadcrumb } from "../../../lib/page-header";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
@@ -19,7 +20,6 @@ export async function getStaticPaths() {
 }
 
 const { game } = Astro.props as { game: GameEntry };
-const statusLabel = getGameStatusLabel(game.data.status);
 const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.trailerUrl) : null;
 const hasActions = game.data.actions.length > 0;
 const detailRows = [
@@ -41,7 +41,7 @@ const detailRows = [
         <Image src={game.data.cover} alt={game.data.coverAlt} widths={[1200, 960, 720]} sizes="(max-width: 56rem) 100vw, 56rem" />
       </div>
       <div class="game-hero__copy">
-        <p class:list={["game-hero__status", `game-hero__status--${game.data.status}`]}>{statusLabel}</p>
+        <GameStatusBadge status={game.data.status} size="hero" />
         <h1>{game.data.title}</h1>
         <p class="game-hero__description">{game.data.description}</p>
       </div>
@@ -60,25 +60,25 @@ const detailRows = [
         )}
 
         <GameScreenshotGallery screenshots={game.data.screenshots} trailerEmbedUrl={trailerEmbedUrl} title={game.data.title} />
+
+        {detailRows.length > 0 && (
+          <section class="game-detail-table content-panel" aria-label="ゲームの基本情報">
+            <table>
+              <tbody>
+                {detailRows.map((row) => (
+                  <tr>
+                    <th scope="row">{row.label}</th>
+                    <td>{row.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
       </div>
 
       {hasActions && <GameActionPanel actions={game.data.actions} />}
     </div>
-
-    {detailRows.length > 0 && (
-      <section class="game-detail-table content-panel" aria-label="ゲームの基本情報">
-        <table>
-          <tbody>
-            {detailRows.map((row) => (
-              <tr>
-                <th scope="row">{row.label}</th>
-                <td>{row.value}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-    )}
   </article>
 </SiteLayout>
 
@@ -103,41 +103,8 @@ const detailRows = [
   }
 
   .game-hero__copy h1,
-  .game-hero__description,
-  .game-hero__status {
+  .game-hero__description {
     margin: 0;
-  }
-
-  .game-hero__status {
-    width: fit-content;
-    padding: 0.36rem 0.65rem;
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-
-  .game-hero__status {
-    border: 1px solid rgba(30, 27, 24, 0.1);
-    background: rgba(30, 27, 24, 0.05);
-  }
-
-  .game-hero__status--active {
-    border-color: rgba(14, 107, 99, 0.2);
-    background: rgba(14, 107, 99, 0.1);
-    color: var(--accent-color);
-  }
-
-  .game-hero__status--archived {
-    border-color: rgba(217, 119, 6, 0.34);
-    background: rgba(249, 115, 22, 0.2);
-    color: #b45309;
-  }
-
-  .game-hero__status--prototype {
-    border-color: rgba(168, 106, 0, 0.2);
-    background: rgba(168, 106, 0, 0.1);
-    color: #8b5600;
   }
 
   .game-hero__description {

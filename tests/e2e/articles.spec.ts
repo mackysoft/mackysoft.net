@@ -27,7 +27,7 @@ test.describe("articles page", () => {
   test("shows local and Zenn articles in the same card format", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/articles/");
 
-    await expect(page.getByText("Home / Articles", { exact: true })).toBeVisible();
+    await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
     await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
 
@@ -123,6 +123,32 @@ test.describe("articles page", () => {
     expect(tagsBox.y).toBeGreaterThanOrEqual(proseBox.y);
     expect(shareBox.y).toBeGreaterThan(tagsBox.y);
     expect(tocBox.x).toBeGreaterThan(proseBox.x);
+  });
+
+  test("keeps fragment targets below the sticky header on small screens", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 320, height: 800 } });
+    const page = await context.newPage();
+
+    await page.goto(`/articles/vision-introduction/#${encodeURIComponent("visionとは")}`);
+
+    await page.waitForFunction(() => {
+      const value = document.documentElement.style.getPropertyValue("--site-header-offset");
+      return value.endsWith("px");
+    });
+
+    const header = page.locator(".site-header");
+    const target = page.locator("#visionとは");
+
+    const headerBox = await header.boundingBox();
+    const targetBox = await target.boundingBox();
+
+    if (!headerBox || !targetBox) {
+      throw new Error("header and fragment target must be visible before anchor assertions");
+    }
+
+    expect(targetBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height - 1);
+
+    await context.close();
   });
 
   test("shows share actions for supported environments on article detail pages", { tag: "@size:medium" }, async ({ page }) => {

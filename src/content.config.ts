@@ -2,7 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-import { isSupportedGameTrailerUrl } from "./lib/games";
+import { isSupportedGameTrailerUrl, isValidGameActionHref } from "./lib/games";
 
 const gameActionKindSchema = z.enum(["play", "store", "press-kit", "streaming-guidelines", "privacy-policy", "repository"]);
 const gameStatusSchema = z.enum(["active", "archived", "prototype"]);
@@ -68,18 +68,7 @@ const games = defineCollection({
           z.object({
             kind: gameActionKindSchema,
             label: z.string().min(1),
-            href: z.string().min(1).refine((value) => {
-              if (value.startsWith("/")) {
-                return true;
-              }
-
-              try {
-                new URL(value);
-                return true;
-              } catch {
-                return false;
-              }
-            }, "有効な URL を指定してください。"),
+            href: z.string().min(1).refine(isValidGameActionHref, "有効な http(s) URL またはサイト内パスを指定してください。"),
           }),
         )
         .default([]),

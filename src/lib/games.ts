@@ -43,17 +43,25 @@ export function sortGameActions(actions: GameAction[]) {
   return [...actions].sort((left, right) => gameActionOrder.indexOf(left.kind) - gameActionOrder.indexOf(right.kind));
 }
 
-export function isExternalGameActionHref(href: string) {
-  if (href.startsWith("/")) {
-    return false;
-  }
+export function isInternalGameActionHref(href: string) {
+  return href.startsWith("/") && !href.startsWith("//");
+}
 
+export function isSafeExternalGameActionHref(href: string) {
   try {
-    new URL(href);
-    return true;
+    const parsedUrl = new URL(href);
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
   } catch {
     return false;
   }
+}
+
+export function isValidGameActionHref(href: string) {
+  return isInternalGameActionHref(href) || isSafeExternalGameActionHref(href);
+}
+
+export function isExternalGameActionHref(href: string) {
+  return isSafeExternalGameActionHref(href);
 }
 
 export function getGameTrailerVideoId(url: string) {

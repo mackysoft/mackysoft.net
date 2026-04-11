@@ -26,6 +26,7 @@ html {
   color: var(--text-color);
   font-family: var(--font-body);
   line-height: 1.68;
+  scroll-padding-top: var(--site-anchor-offset);
 }
 
 body {

@@ -1,0 +1,60 @@
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const header = document.querySelector("[data-site-header]");
+
+    if (!(header instanceof HTMLElement)) {
+      return;
+    }
+
+    function syncHeaderOffset() {
+      const nextOffset = `${Math.ceil(header.getBoundingClientRect().height)}px`;
+      root.style.setProperty("--site-header-offset", nextOffset);
+    }
+
+    function getHashTarget() {
+      if (!window.location.hash) {
+        return null;
+      }
+
+      const targetId = decodeURIComponent(window.location.hash.slice(1));
+      return document.getElementById(targetId);
+    }
+
+    function alignHashTarget() {
+      const target = getHashTarget();
+
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ block: "start" });
+      });
+    }
+
+    function syncAndAlignHash() {
+      syncHeaderOffset();
+      alignHashTarget();
+    }
+
+    syncAndAlignHash();
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(() => {
+        syncHeaderOffset();
+      });
+
+      observer.observe(header);
+    }
+
+    window.addEventListener("resize", syncHeaderOffset, { passive: true });
+    window.addEventListener("hashchange", syncAndAlignHash);
+
+    if ("fonts" in document) {
+      document.fonts.ready.then(() => {
+        syncAndAlignHash();
+      });
+    }
+  })();
+</script>
