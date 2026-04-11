@@ -9,35 +9,31 @@ const { actions } = Astro.props;
 const sortedActions = sortGameActions(actions);
 ---
 
-<aside class="game-action-panel" aria-label="リンク">
-  <div class="game-action-panel__inner content-panel">
-    {sortedActions.length > 0 ? (
-      <div class="game-action-panel__actions">
-        {sortedActions.map((action) => (
-          <a
-            href={action.href}
-            class="button-link game-action-panel__button"
-            target={isExternalGameActionHref(action.href) ? "_blank" : undefined}
-            rel={isExternalGameActionHref(action.href) ? "noreferrer" : undefined}
-          >
-            {action.label}
-          </a>
-        ))}
+{
+  sortedActions.length > 0 && (
+    <aside class="game-action-panel sticky-panel" aria-label="リンク">
+      <div class="game-action-panel__inner content-panel">
+        <div class="game-action-panel__actions">
+          {sortedActions.map((action) => (
+            <a
+              href={action.href}
+              class="button-link game-action-panel__button"
+              target={isExternalGameActionHref(action.href) ? "_blank" : undefined}
+              rel={isExternalGameActionHref(action.href) ? "noreferrer" : undefined}
+            >
+              {action.label}
+            </a>
+          ))}
+        </div>
       </div>
-    ) : (
-      <p class="game-action-panel__empty">公開中のリンクはありません。</p>
-    )}
-  </div>
-</aside>
+    </aside>
+  )
+}
 
 <style>
   .game-action-panel__inner {
     display: grid;
     gap: 1rem;
-  }
-
-  .game-action-panel__empty {
-    margin: 0;
   }
 
   .game-action-panel__actions {
@@ -66,16 +62,5 @@ const sortedActions = sortGameActions(actions);
     color: #fffdf9;
     box-shadow: 0 0.95rem 2rem rgba(56, 142, 60, 0.28);
     transform: translateY(-1px);
-  }
-
-  .game-action-panel__empty {
-    color: var(--muted-color);
-  }
-
-  @media (min-width: 960px) {
-    .game-action-panel {
-      position: sticky;
-      top: 1.5rem;
-    }
   }
 </style>

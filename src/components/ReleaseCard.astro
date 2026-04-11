@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+
 import { formatArticleDate } from "../lib/article-dates";
 import { formatReleaseStargazerCount, getReleaseRepoName, type ReleaseActivity } from "../lib/articles";
 
@@ -13,10 +15,12 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
 
 <article class="release-card activity-card activity-card--compact">
   <a href={release.url} class="release-card__cover-link activity-card__cover-link" target="_blank" rel="noreferrer">
-    <img
+    <Image
       src={release.coverUrl}
       alt={release.coverAlt}
-      loading="lazy"
+      width={480}
+      height={252}
+      sizes="(max-width: 720px) 100vw, 20rem"
     />
   </a>
   <div class="release-card__body activity-card__body">
@@ -28,8 +32,10 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
     </div>
     <div class="release-card__footer">
       <p class="release-card__meta activity-card__meta">
-        <span class="release-card__meta-label">{"Latest Release"}</span>
-        <span>{formatArticleDate(new Date(release.publishedAt))}</span>
+        <span class="release-card__meta-date">
+          <span class="release-card__meta-label">最新リリース日</span>
+          <span>{formatArticleDate(new Date(release.publishedAt))}</span>
+        </span>
       </p>
       <div class="release-card__metrics">
         {release.license && <p class="release-card__license">{release.license}</p>}
@@ -83,6 +89,12 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
 
   .release-card__copy {
     min-height: 0;
+  }
+
+  .release-card__meta-date {
+    display: inline-flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
   }
 
   .release-card__description {

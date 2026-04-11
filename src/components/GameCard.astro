@@ -27,7 +27,10 @@ const platforms = game.data.platforms;
     <div class="game-card__footer">
       {publishedAt && (
         <p class="game-card__meta activity-card__meta">
-          <span>{formatArticleDate(publishedAt)}</span>
+          <span class="game-card__meta-date">
+            <span class="game-card__meta-label">公開日</span>
+            <span>{formatArticleDate(publishedAt)}</span>
+          </span>
         </p>
       )}
       <div class="game-card__metrics">
@@ -70,6 +73,12 @@ const platforms = game.data.platforms;
 
   .game-card__description {
     color: var(--muted-color);
+  }
+
+  .game-card__meta-date {
+    display: inline-flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
   }
 
   .game-card__footer {

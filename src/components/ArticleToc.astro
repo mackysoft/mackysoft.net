@@ -12,7 +12,7 @@ type Props = {
 const { headings } = Astro.props as Props;
 ---
 
-<aside class="article-toc" aria-labelledby="article-toc-title">
+<aside class="article-toc sticky-panel" aria-labelledby="article-toc-title">
   <div class="article-toc__inner content-panel">
     <h2 id="article-toc-title" class="article-toc__title">目次</h2>
     <nav aria-label="Article table of contents">
@@ -64,12 +64,5 @@ const { headings } = Astro.props as Props;
   .article-toc__item--nested {
     padding-left: 0.9rem;
     border-left: 1px solid var(--border-color);
-  }
-
-  @media (min-width: 960px) {
-    .article-toc {
-      position: sticky;
-      top: 1.5rem;
-    }
   }
 </style>

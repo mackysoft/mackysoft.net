@@ -21,6 +21,7 @@ export async function getStaticPaths() {
 const { game } = Astro.props as { game: GameEntry };
 const statusLabel = getGameStatusLabel(game.data.status);
 const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.trailerUrl) : null;
+const hasActions = game.data.actions.length > 0;
 ---
 
 <SiteLayout title={game.data.title} description={game.data.description}>
@@ -44,7 +45,7 @@ const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.
       </div>
     </header>
 
-    <div class="game-detail-layout">
+    <div class:list={["game-detail-layout", hasActions && "game-detail-layout--with-actions"]}>
       <div class="game-detail-main">
         {game.data.features.length > 0 && (
           <section class="game-section content-panel" aria-label="ゲームの特徴">
@@ -59,7 +60,7 @@ const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.
         <GameScreenshotGallery screenshots={game.data.screenshots} trailerEmbedUrl={trailerEmbedUrl} title={game.data.title} />
       </div>
 
-      <GameActionPanel actions={game.data.actions} />
+      {hasActions && <GameActionPanel actions={game.data.actions} />}
     </div>
   </article>
 </SiteLayout>
@@ -186,7 +187,7 @@ const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.
   }
 
   @media (min-width: 960px) {
-    .game-detail-layout {
+    .game-detail-layout--with-actions {
       grid-template-columns: minmax(0, 1fr) minmax(16rem, 18rem);
       align-items: start;
     }

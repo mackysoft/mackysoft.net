@@ -14,6 +14,7 @@ test.describe("games page", () => {
     await expect(treasureRogueCard).toContainText("アーカイブ");
     await expect(treasureRogueCard).toContainText("Android");
     await expect(treasureRogueCard).toContainText("ブラウザ");
+    await expect(treasureRogueCard).toContainText("公開日");
     await expect(treasureRogueCard).toContainText("2020年4月9日");
     await expect(treasureRogueCard).not.toContainText("2020年5月21日");
     await expect(

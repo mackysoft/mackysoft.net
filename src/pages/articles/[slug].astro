@@ -169,7 +169,7 @@ const shareUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString()
   .prose :global(h2),
   .prose :global(h3),
   .prose :global(h4) {
-    scroll-margin-top: 1.5rem;
+    scroll-margin-top: var(--site-anchor-offset);
   }
 
   @media (min-width: 960px) {

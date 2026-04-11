@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
+import { formatArticleDate } from "../../src/lib/article-dates";
+
 type SharePayload = {
   title: string;
   url: string;
@@ -17,7 +19,7 @@ type ShareWindow = Window &
 const activityData = JSON.parse(
   readFileSync(path.resolve(import.meta.dirname, "../../src/generated/activity.json"), "utf8"),
 ) as {
-  articles: Array<{ title: string; url: string }>;
+  articles: Array<{ title: string; url: string; publishedAt: string }>;
 };
 const latestZennArticle = activityData.articles[0]!;
 
@@ -31,6 +33,8 @@ test.describe("articles page", () => {
 
     const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticle.title }).first();
     await expect(zennCard).toContainText("Zenn");
+    await expect(zennCard).toContainText("公開日");
+    await expect(zennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt)));
     await expect(zennCard.locator("img")).toHaveCount(1);
     await expect(zennCard.locator(".article-card__tags")).toHaveCount(0);
     await expect(zennCard.getByRole("link", { name: latestZennArticle.title, exact: true })).toHaveAttribute(
