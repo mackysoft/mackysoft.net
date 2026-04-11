@@ -26,7 +26,7 @@ export function getGamePlatformLabel(platform: string) {
 }
 
 export function getGameDateValue(game: GameEntry) {
-  return game.data.updatedAt?.valueOf() ?? game.data.publishedAt?.valueOf() ?? 0;
+  return game.data.publishedAt?.valueOf() ?? 0;
 }
 
 export function sortGames(games: GameEntry[]) {
@@ -40,4 +40,33 @@ export async function getGames() {
 
 export function sortGameActions(actions: GameAction[]) {
   return [...actions].sort((left, right) => gameActionOrder.indexOf(left.kind) - gameActionOrder.indexOf(right.kind));
+}
+
+export function isExternalGameActionHref(href: string) {
+  if (href.startsWith("/")) {
+    return false;
+  }
+
+  try {
+    new URL(href);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getGameTrailerEmbedUrl(url: string) {
+  const parsedUrl = new URL(url);
+
+  if (parsedUrl.hostname === "youtu.be") {
+    const videoId = parsedUrl.pathname.slice(1);
+    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
+  }
+
+  if (parsedUrl.hostname === "www.youtube.com" || parsedUrl.hostname === "youtube.com") {
+    const videoId = parsedUrl.searchParams.get("v");
+    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
+  }
+
+  return null;
 }

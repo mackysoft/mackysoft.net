@@ -6,6 +6,7 @@ cover: "./cover.png"
 coverAlt: "Treasure Rogue のタイトルロゴと主人公が写ったキービジュアル"
 publishedAt: "2020-04-09"
 updatedAt: "2020-05-21"
+trailerUrl: "https://youtu.be/ICE8Qz0S23o?si=QtxWfkapBZ8KpQU6"
 platforms:
   - "Android"
   - "Browser"

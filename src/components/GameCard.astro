@@ -11,7 +11,7 @@ type Props = {
 const { game } = Astro.props;
 const href = `/games/${game.id}/`;
 const statusLabel = getGameStatusLabel(game.data.status);
-const sortDate = game.data.updatedAt ?? game.data.publishedAt;
+const publishedAt = game.data.publishedAt;
 const platforms = game.data.platforms;
 ---
 
@@ -25,9 +25,9 @@ const platforms = game.data.platforms;
     </h3>
     <p class="game-card__description">{game.data.description}</p>
     <div class="game-card__footer">
-      {sortDate && (
+      {publishedAt && (
         <p class="game-card__meta activity-card__meta">
-          <span>{formatArticleDate(sortDate)}</span>
+          <span>{formatArticleDate(publishedAt)}</span>
         </p>
       )}
       <div class="game-card__metrics">

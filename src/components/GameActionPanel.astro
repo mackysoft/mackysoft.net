@@ -1,5 +1,5 @@
 ---
-import { sortGameActions, type GameAction } from "../lib/games";
+import { isExternalGameActionHref, sortGameActions, type GameAction } from "../lib/games";
 
 type Props = {
   actions: GameAction[];
@@ -9,18 +9,23 @@ const { actions } = Astro.props;
 const sortedActions = sortGameActions(actions);
 ---
 
-<aside class="game-action-panel" aria-label="外部リンク">
+<aside class="game-action-panel" aria-label="リンク">
   <div class="game-action-panel__inner content-panel">
     {sortedActions.length > 0 ? (
       <div class="game-action-panel__actions">
         {sortedActions.map((action) => (
-          <a href={action.href} class="button-link game-action-panel__button" target="_blank" rel="noreferrer">
+          <a
+            href={action.href}
+            class="button-link game-action-panel__button"
+            target={isExternalGameActionHref(action.href) ? "_blank" : undefined}
+            rel={isExternalGameActionHref(action.href) ? "noreferrer" : undefined}
+          >
             {action.label}
           </a>
         ))}
       </div>
     ) : (
-      <p class="game-action-panel__empty">公開中の外部導線はありません。</p>
+      <p class="game-action-panel__empty">公開中のリンクはありません。</p>
     )}
   </div>
 </aside>

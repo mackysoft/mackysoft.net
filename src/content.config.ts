@@ -36,7 +36,7 @@ const articles = defineCollection({
 const games = defineCollection({
   loader: glob({
     base: "./src/content/games",
-    pattern: "**/index.md",
+    pattern: "*/index.md",
   }),
   schema: ({ image }) =>
     z.object({
@@ -47,6 +47,14 @@ const games = defineCollection({
       coverAlt: z.string().min(1),
       publishedAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
+      trailerUrl: z.string().min(1).refine((value) => {
+        try {
+          new URL(value);
+          return true;
+        } catch {
+          return false;
+        }
+      }, "有効な URL を指定してください。").optional(),
       tags: z.array(z.string().min(1)).default([]),
       platforms: z.array(z.string().min(1)).default([]),
       features: z.array(z.string().min(1)).default([]),
@@ -64,6 +72,10 @@ const games = defineCollection({
             kind: gameActionKindSchema,
             label: z.string().min(1),
             href: z.string().min(1).refine((value) => {
+              if (value.startsWith("/")) {
+                return true;
+              }
+
               try {
                 new URL(value);
                 return true;

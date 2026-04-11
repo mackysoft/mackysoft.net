@@ -14,6 +14,8 @@ test.describe("games page", () => {
     await expect(treasureRogueCard).toContainText("アーカイブ");
     await expect(treasureRogueCard).toContainText("Android");
     await expect(treasureRogueCard).toContainText("ブラウザ");
+    await expect(treasureRogueCard).toContainText("2020年4月9日");
+    await expect(treasureRogueCard).not.toContainText("2020年5月21日");
     await expect(
       treasureRogueCard.getByRole("img", { name: "Treasure Rogue のタイトルロゴと主人公が写ったキービジュアル" }),
     ).toBeVisible();
@@ -56,6 +58,10 @@ test.describe("games page", () => {
     await expect(main.getByRole("heading", { level: 2, name: "特徴" })).toHaveCount(0);
     await expect(featuresSection.locator(".game-feature-list > li")).toHaveCount(5);
     await expect(featuresSection).toContainText("プレイするたびにランダムで地形が自動生成されるローグライク要素。奥に進めば新しい世界が待っている！");
+    await expect(screenshotSection.locator('iframe[title="Treasure Rogue のトレーラー"]')).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/ICE8Qz0S23o",
+    );
     await expect(main.getByRole("heading", { level: 2, name: "スクリーンショット" })).toHaveCount(0);
     await expect(main.getByRole("img", { name: "宝箱を3つ並べた開始直後のプレイ画面" })).toBeVisible();
     await expect(main.getByRole("img", { name: "雪原エリアで敵と対峙しているプレイ画面" })).toBeVisible();

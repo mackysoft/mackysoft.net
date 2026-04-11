@@ -2,12 +2,12 @@
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 
-import GameActionPanel from "../../components/GameActionPanel.astro";
-import GameScreenshotGallery from "../../components/GameScreenshotGallery.astro";
-import { formatArticleNumericDate } from "../../lib/article-dates";
-import { getGamePlatformLabel, getGameStatusLabel, type GameEntry } from "../../lib/games";
-import { formatPageBreadcrumb } from "../../lib/page-header";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import GameActionPanel from "../../../components/GameActionPanel.astro";
+import GameScreenshotGallery from "../../../components/GameScreenshotGallery.astro";
+import { formatArticleNumericDate } from "../../../lib/article-dates";
+import { getGamePlatformLabel, getGameStatusLabel, getGameTrailerEmbedUrl, type GameEntry } from "../../../lib/games";
+import { formatPageBreadcrumb } from "../../../lib/page-header";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
   const games = await getCollection("games");
@@ -20,6 +20,7 @@ export async function getStaticPaths() {
 
 const { game } = Astro.props as { game: GameEntry };
 const statusLabel = getGameStatusLabel(game.data.status);
+const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.trailerUrl) : null;
 ---
 
 <SiteLayout title={game.data.title} description={game.data.description}>
@@ -55,7 +56,7 @@ const statusLabel = getGameStatusLabel(game.data.status);
           </section>
         )}
 
-        <GameScreenshotGallery screenshots={game.data.screenshots} />
+        <GameScreenshotGallery screenshots={game.data.screenshots} trailerEmbedUrl={trailerEmbedUrl} title={game.data.title} />
       </div>
 
       <GameActionPanel actions={game.data.actions} />
@@ -178,12 +179,9 @@ const statusLabel = getGameStatusLabel(game.data.status);
   }
 
   .game-feature-list {
-    margin: 0;
-  }
-
-  .game-feature-list {
     display: grid;
     gap: 0.8rem;
+    margin: 0;
     padding-left: 1.2rem;
   }
 

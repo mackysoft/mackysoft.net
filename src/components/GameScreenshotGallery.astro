@@ -5,14 +5,28 @@ import type { GameEntry } from "../lib/games";
 
 type Props = {
   screenshots: GameEntry["data"]["screenshots"];
+  trailerEmbedUrl?: string | null;
+  title: string;
 };
 
-const { screenshots } = Astro.props;
+const { screenshots, trailerEmbedUrl = null, title } = Astro.props;
 ---
 
 {
-  screenshots.length > 0 && (
+  (trailerEmbedUrl || screenshots.length > 0) && (
     <section class="game-screenshot-gallery content-panel" aria-label="スクリーンショット">
+      {trailerEmbedUrl && (
+        <div class="game-screenshot-gallery__trailer">
+          <iframe
+            src={trailerEmbedUrl}
+            title={`${title} のトレーラー`}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </div>
+      )}
       <div class="game-screenshot-gallery__grid">
         {screenshots.map((screenshot) => (
           <figure class="game-screenshot-gallery__item">
@@ -40,6 +54,7 @@ const { screenshots } = Astro.props;
     gap: 1rem;
   }
 
+  .game-screenshot-gallery__trailer,
   .game-screenshot-gallery__item {
     margin: 0;
   }
@@ -48,11 +63,27 @@ const { screenshots } = Astro.props;
     gap: 1rem;
   }
 
+  .game-screenshot-gallery__trailer,
   .game-screenshot-gallery__item {
     overflow: hidden;
     border: 1px solid var(--border-color);
     border-radius: 1rem;
+  }
+
+  .game-screenshot-gallery__trailer {
+    background: #000;
+    aspect-ratio: 16 / 9;
+  }
+
+  .game-screenshot-gallery__item {
     background: rgba(255, 255, 255, 0.4);
+  }
+
+  .game-screenshot-gallery__trailer iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   .game-screenshot-gallery__item :global(img) {
