@@ -1,4 +1,5 @@
 ---
+import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
 import { externalLinks, primaryNav, siteMeta } from "../lib/site";
 import "../styles/site.css";
 
@@ -10,6 +11,14 @@ type Props = {
 const { title, description = siteMeta.description } = Astro.props;
 const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
+
+function isCurrentNavItem(itemHref: string, path: string) {
+  if (itemHref === "/") {
+    return path === "/";
+  }
+
+  return path === itemHref || path.startsWith(itemHref);
+}
 ---
 
 <!doctype html>
@@ -28,13 +37,13 @@ const currentPath = Astro.url.pathname;
   </head>
   <body>
     <div class="shell">
-      <header class="site-header">
+      <header class="site-header" data-site-header>
         <a href="/" class="site-brand">{siteMeta.name}</a>
         <nav aria-label="Global">
           <ul class="site-nav">
             {primaryNav.map((item) => (
               <li>
-                <a href={item.href} aria-current={currentPath === item.href ? "page" : undefined}>
+                <a href={item.href} aria-current={isCurrentNavItem(item.href, currentPath) ? "page" : undefined}>
                   {item.label}
                 </a>
               </li>
@@ -54,5 +63,6 @@ const currentPath = Astro.url.pathname;
         </ul>
       </footer>
     </div>
+    <SiteHeaderOffsetSync />
   </body>
 </html>

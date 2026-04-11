@@ -3,10 +3,12 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
+import { formatArticleDate } from "../../src/lib/article-dates";
+
 const activityData = JSON.parse(
   readFileSync(path.resolve(import.meta.dirname, "../../src/generated/activity.json"), "utf8"),
 ) as {
-  articles: Array<{ title: string }>;
+  articles: Array<{ title: string; publishedAt: string }>;
   releases: Array<{
     repo: string;
     version: string;
@@ -32,14 +34,20 @@ test.describe("home page", () => {
     await expect(page.locator("main > h1.visually-hidden")).toHaveText("Home");
     await expect(page.getByRole("heading", { level: 2, name: "最新の記事" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
-    await expect(page.getByRole("main").locator(".article-card").filter({ hasText: "Zenn" }).first()).toBeVisible();
+    const latestArticleCard = page.getByRole("main").locator(".article-card").filter({ hasText: "Zenn" }).first();
+    await expect(latestArticleCard).toBeVisible();
+    await expect(latestArticleCard).toContainText("公開日");
+    await expect(latestArticleCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt)));
     await expect(page.getByRole("main").locator(".article-card__tags")).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 2, name: "最新のリリース" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "View Assets", exact: true })).toHaveAttribute("href", "/assets/");
     await expect(page.getByRole("main").locator(".release-card").first()).toBeVisible();
     await expect(page.getByRole("img", { name: latestRelease.coverAlt }).first()).toBeVisible();
-    await expect(page.getByRole("main").locator(".release-card").first()).toContainText("Latest Release");
+    await expect(page.getByRole("main").locator(".release-card").first()).toContainText("最新リリース日");
+    await expect(page.getByRole("main").locator(".release-card").first()).toContainText(
+      formatArticleDate(new Date(latestRelease.publishedAt)),
+    );
     await expect(page.getByRole("main").locator(".release-card").first()).toContainText(latestRelease.version);
 
     if (latestRelease.description) {
@@ -80,7 +88,8 @@ test.describe("assets page", () => {
     await expect(firstCard).toBeVisible();
     await expect(firstCard.getByRole("link", { name: latestReleaseRepoName, exact: true })).toHaveAttribute("href", latestRelease.url);
     await expect(firstCard.getByRole("img", { name: latestRelease.coverAlt })).toBeVisible();
-    await expect(firstCard).toContainText("Latest Release");
+    await expect(firstCard).toContainText("最新リリース日");
+    await expect(firstCard).toContainText(formatArticleDate(new Date(latestRelease.publishedAt)));
     await expect(firstCard).toContainText(latestRelease.version);
 
     if (latestRelease.description) {

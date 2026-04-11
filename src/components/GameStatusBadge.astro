@@ -1,0 +1,54 @@
+---
+import { getGameStatusLabel, type GameStatus } from "../lib/games";
+
+type Props = {
+  status: GameStatus;
+  size?: "card" | "hero";
+};
+
+const { status, size = "card" } = Astro.props;
+const label = getGameStatusLabel(status);
+---
+
+<span class:list={["game-status-badge", `game-status-badge--${size}`, `game-status-badge--${status}`]}>{label}</span>
+
+<style>
+  .game-status-badge {
+    display: inline-flex;
+    width: fit-content;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid rgba(30, 27, 24, 0.1);
+    border-radius: 999px;
+    background: rgba(30, 27, 24, 0.05);
+    color: var(--text-color);
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+
+  .game-status-badge--card {
+    font-size: 0.82rem;
+  }
+
+  .game-status-badge--hero {
+    padding: 0.36rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .game-status-badge--active {
+    border-color: rgba(14, 107, 99, 0.2);
+    background: rgba(14, 107, 99, 0.1);
+    color: var(--accent-color);
+  }
+
+  .game-status-badge--archived {
+    border-color: rgba(217, 119, 6, 0.34);
+    background: rgba(249, 115, 22, 0.2);
+    color: #b45309;
+  }
+
+  .game-status-badge--prototype {
+    border-color: rgba(168, 106, 0, 0.2);
+    background: rgba(168, 106, 0, 0.1);
+    color: #8b5600;
+  }
+</style>

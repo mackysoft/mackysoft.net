@@ -10,6 +10,9 @@
   --code-text-color: #f5efe2;
   --font-body: "Roboto", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  --site-header-offset: 5rem;
+  --site-sticky-panel-top: calc(var(--site-header-offset) + 0.75rem);
+  --site-anchor-offset: calc(var(--site-header-offset) + 0.9rem);
 }
 
 * {
@@ -23,6 +26,7 @@ html {
   color: var(--text-color);
   font-family: var(--font-body);
   line-height: 1.68;
+  scroll-padding-top: var(--site-anchor-offset);
 }
 
 body {
@@ -72,17 +76,23 @@ blockquote {
 .shell {
   width: min(72rem, calc(100vw - 2rem));
   margin: 0 auto;
-  padding: 1rem 0 4rem;
+  padding: 0.45rem 0 4rem;
 }
 
 .site-header {
   display: grid;
-  gap: 1rem;
-  padding: 1rem 0 1.5rem;
+  gap: 0.3rem;
+  padding: 0.35rem 0 0.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(247, 244, 237, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(30, 27, 24, 0.08);
 }
 
 .site-brand {
-  font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem);
+  font-size: clamp(1.18rem, 1.08rem + 0.45vw, 1.45rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text-color);
@@ -112,7 +122,7 @@ h3,
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem 0.9rem;
+  gap: 0.35rem 0.7rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -121,7 +131,7 @@ h3,
 .site-nav a,
 .footer-links a {
   display: inline-flex;
-  padding: 0.2rem 0;
+  padding: 0.08rem 0;
   color: var(--muted-color);
   text-decoration: none;
   border-bottom: 1px solid transparent;
@@ -251,6 +261,10 @@ h3,
 }
 
 @media (min-width: 900px) {
+  :root {
+    --site-header-offset: 3.5rem;
+  }
+
   .shell {
     width: min(64rem, calc(100vw - 4rem));
   }
@@ -258,9 +272,18 @@ h3,
   .site-header {
     grid-template-columns: auto 1fr;
     align-items: center;
+    gap: 0.8rem;
+    padding: 0.4rem 0 0.55rem;
   }
 
   .site-nav {
     justify-content: flex-end;
+  }
+}
+
+@media (min-width: 960px) {
+  .sticky-panel {
+    position: sticky;
+    top: var(--site-sticky-panel-top);
   }
 }

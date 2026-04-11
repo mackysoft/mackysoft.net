@@ -19,6 +19,7 @@ const coverHeight = typeof cover === "string" ? undefined : cover?.height;
 const coverAspectRatio = coverWidth && coverHeight ? `${coverWidth} / ${coverHeight}` : "1200 / 630";
 const verticalCoverStyle = layout === "vertical" ? `--article-cover-ratio: ${coverAspectRatio};` : undefined;
 const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
+const publishedAtLabel = formatArticleDate(article.publishedAt);
 ---
 
 <article class:list={["article-card", "activity-card", layout === "vertical" && "activity-card--compact", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
@@ -52,7 +53,10 @@ const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "
     </h3>
     {showDescription && <p class="article-card__description">{article.description}</p>}
     <p class="article-card__meta activity-card__meta">
-      <span>{formatArticleDate(article.publishedAt)}</span>
+      <span class="article-card__meta-date">
+        <span class="article-card__meta-label">公開日</span>
+        <span>{publishedAtLabel}</span>
+      </span>
       <span>{article.source}</span>
     </p>
   </div>
@@ -76,6 +80,12 @@ const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "
 
   .article-card__body {
     gap: 0.85rem;
+  }
+
+  .article-card__meta-date {
+    display: inline-flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
   }
 
   .article-card__meta {
