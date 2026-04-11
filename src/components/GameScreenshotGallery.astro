@@ -71,12 +71,12 @@ const { screenshots, trailerEmbedUrl = null, title } = Astro.props;
   }
 
   .game-screenshot-gallery__trailer {
-    background: #000;
+    background: var(--media-frame-bg-color);
     aspect-ratio: 16 / 9;
   }
 
   .game-screenshot-gallery__item {
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--media-surface-color);
   }
 
   .game-screenshot-gallery__trailer iframe {

@@ -45,11 +45,11 @@ const sortedActions = sortGameActions(actions);
     width: 100%;
     justify-content: center;
     padding-block: 0.85rem;
-    border-color: rgba(76, 175, 80, 0.38);
-    background: #4caf50;
-    color: #fffdf9;
+    border-color: var(--action-button-border-color);
+    background: var(--action-button-bg-color);
+    color: var(--action-button-text-color);
     font-weight: 700;
-    box-shadow: 0 0.9rem 1.9rem rgba(76, 175, 80, 0.24);
+    box-shadow: 0 0.9rem 1.9rem var(--action-button-shadow-color);
     transition:
       transform 160ms ease,
       box-shadow 160ms ease,
@@ -58,9 +58,9 @@ const sortedActions = sortGameActions(actions);
 
   .game-action-panel__button:hover,
   .game-action-panel__button:focus-visible {
-    background: #449d48;
-    color: #fffdf9;
-    box-shadow: 0 0.95rem 2rem rgba(56, 142, 60, 0.28);
+    background: var(--action-button-hover-bg-color);
+    color: var(--action-button-text-color);
+    box-shadow: 0 0.95rem 2rem var(--action-button-shadow-hover-color);
     transform: translateY(-1px);
   }
 </style>

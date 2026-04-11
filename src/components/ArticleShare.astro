@@ -182,13 +182,13 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
     z-index: 1;
     padding: 0.45rem 0.7rem;
     border-radius: 999px;
-    background: rgba(30, 27, 24, 0.94);
-    color: #f5efe2;
+    background: var(--overlay-bg-color);
+    color: var(--overlay-text-color);
     font-size: 0.78rem;
     line-height: 1;
     white-space: nowrap;
     transform: translateX(-50%);
-    box-shadow: 0 0.7rem 1.5rem rgba(30, 27, 24, 0.16);
+    box-shadow: 0 0.7rem 1.5rem var(--overlay-shadow-color);
     pointer-events: none;
   }
 
@@ -199,7 +199,7 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
     top: 100%;
     width: 0.6rem;
     height: 0.6rem;
-    background: rgba(30, 27, 24, 0.94);
+    background: var(--overlay-bg-color);
     transform: translate(-50%, -50%) rotate(45deg);
   }
 </style>
