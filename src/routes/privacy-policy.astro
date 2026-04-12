@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader.astro";
 import { formatBreadcrumb } from "../lib/breadcrumb";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
 import { resolveLocalizedPageBySlug } from "../lib/pages";
+import { getUiText } from "../lib/ui-text";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
 
 const { locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
 const page = await resolveLocalizedPageBySlug("privacy-policy", locale);
 
 if (!page) {
@@ -32,18 +34,11 @@ const { Content } = await render(page.entry as never);
   canonicalPath={localizePath("/privacy-policy/", locale)}
   alternateLocales={createAlternateLocaleLinks("/privacy-policy/", page.availableLocales)}
 >
-  <PageHeader title={page.data.title} eyebrow={formatBreadcrumb("Home", "Privacy Policy")} />
+  <PageHeader title={page.data.title} eyebrow={formatBreadcrumb(uiText.common.home, page.data.title)} />
 
-  <section class="content-panel prose privacy-policy-content">
+  <section class="content-panel prose">
     <LocalizedHtmlLinks locale={locale}>
       <Content />
     </LocalizedHtmlLinks>
   </section>
 </SiteLayout>
-
-<style>
-  .privacy-policy-content {
-    display: grid;
-    gap: 1rem;
-  }
-</style>
