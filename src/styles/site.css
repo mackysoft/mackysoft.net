@@ -814,7 +814,6 @@ h3,
   gap: 1rem;
   min-height: 0;
   padding: 1.25rem;
-  transition: none;
 }
 
 .site-search-card__cover {
@@ -843,16 +842,17 @@ h3,
   margin-top: auto;
 }
 
-.site-search-card:hover,
-.site-search-card:focus-within {
-  border-color: var(--border-color);
-  box-shadow: none;
-  transform: none;
-}
-
 .site-search[data-search-mode="inline"] .site-search-card {
   gap: 0.75rem;
   padding: 1rem;
+  transition: none;
+}
+
+.site-search[data-search-mode="inline"] .site-search-card:hover,
+.site-search[data-search-mode="inline"] .site-search-card:focus-within {
+  border-color: var(--border-color);
+  box-shadow: none;
+  transform: none;
 }
 
 .site-search[data-search-mode="inline"] .site-search-card__body {
