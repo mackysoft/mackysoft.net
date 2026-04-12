@@ -1,16 +1,31 @@
 ---
+import {
+  defaultLocale,
+  getBrowserLocaleMatchers,
+  localeStorageKey,
+  localizePath,
+  supportedLocales,
+} from "../../lib/i18n";
+
 type Props = {
   enabled?: boolean;
 };
 
 const { enabled = false } = Astro.props as Props;
+const clientLocales = supportedLocales.map((locale) => ({
+  code: locale,
+  rootPath: localizePath("/", locale),
+}));
+const browserLocaleMatchers = getBrowserLocaleMatchers();
 ---
 
 {
   enabled && (
-    <script is:inline>
+    <script
+      is:inline
+      define:vars={{ storageKey: localeStorageKey, defaultLocaleCode: defaultLocale, localeConfigs: clientLocales, browserLocaleMatchers }}
+    >
       (() => {
-        const storageKey = "mackysoft-locale";
         const currentPath = window.location.pathname;
         const navigationEntry = performance.getEntriesByType("navigation")[0];
 
@@ -26,7 +41,7 @@ const { enabled = false } = Astro.props as Props;
           try {
             const storedLocale = window.localStorage.getItem(storageKey);
 
-            if (storedLocale === "ja" || storedLocale === "en") {
+            if (localeConfigs.some((locale) => locale.code === storedLocale)) {
               return storedLocale;
             }
           } catch {
@@ -34,22 +49,27 @@ const { enabled = false } = Astro.props as Props;
           }
 
           for (const candidate of navigator.languages ?? [navigator.language]) {
-            const normalizedCandidate = candidate.toLowerCase();
+            const normalizedCandidate = candidate.trim().toLowerCase().replaceAll("_", "-");
+            const matchedLocale = browserLocaleMatchers.find((matcher) =>
+              normalizedCandidate === matcher.prefix || normalizedCandidate.startsWith(`${matcher.prefix}-`),
+            );
 
-            if (normalizedCandidate === "en" || normalizedCandidate.startsWith("en-")) {
-              return "en";
-            }
-
-            if (normalizedCandidate === "ja" || normalizedCandidate.startsWith("ja-")) {
-              return "ja";
+            if (matchedLocale) {
+              return matchedLocale.locale;
             }
           }
 
-          return "ja";
+          return defaultLocaleCode;
         };
 
-        if (getPreferredLocale() === "en") {
-          window.location.replace(`/en/${window.location.search}${window.location.hash}`);
+        const preferredLocale = getPreferredLocale();
+
+        if (preferredLocale !== defaultLocaleCode) {
+          const matchedLocale = localeConfigs.find((locale) => locale.code === preferredLocale);
+
+          if (matchedLocale) {
+            window.location.replace(`${matchedLocale.rootPath}${window.location.search}${window.location.hash}`);
+          }
         }
       })();
     </script>

@@ -5,7 +5,7 @@ import ThemeBootstrap from "../components/head/ThemeBootstrap.astro";
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
 import SiteHeaderTools from "../components/SiteHeaderTools.astro";
 import { getUiText } from "../lib/copy";
-import { toLanguageTag, type SiteLocale } from "../lib/i18n";
+import { localizePath, toLanguageTag, type SiteLocale } from "../lib/i18n";
 import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
 import "../styles/site.css";
 
@@ -76,7 +76,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
   <body>
     <header class="site-header" data-site-header>
       <div class="site-header__inner">
-        <a href={locale === "en" ? "/en/" : "/"} class="site-brand">{siteMeta.name}</a>
+        <a href={localizePath("/", locale)} class="site-brand">{siteMeta.name}</a>
         <nav class="site-header__nav" aria-label="Global">
           <ul class="site-nav">
             {primaryNav.map((item) => (
@@ -100,7 +100,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
           {externalLinks.map((link) => (
             <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
           ))}
-          <li><a href={locale === "en" ? "/en/privacy-policy/" : "/privacy-policy/"}>{uiText.common.privacyPolicy}</a></li>
+          <li><a href={localizePath("/privacy-policy/", locale)}>{uiText.common.privacyPolicy}</a></li>
         </ul>
       </footer>
     </div>

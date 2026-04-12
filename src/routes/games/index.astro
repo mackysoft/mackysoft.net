@@ -3,7 +3,7 @@ import GameCard from "../../components/GameCard.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { getGamesPageContent } from "../../features/games/content";
 import { getUiText } from "../../lib/copy";
-import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import { getLocalizedGames } from "../../lib/games";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
@@ -24,10 +24,7 @@ const pageContent = getGamesPageContent(locale, uiText.common.games);
   description={pageContent.description}
   locale={locale}
   canonicalPath={localizePath("/games/", locale)}
-  alternateLocales={[
-    { locale: "ja", path: "/games/" },
-    { locale: "en", path: "/en/games/" },
-  ]}
+  alternateLocales={createAlternateLocaleLinks("/games/")}
 >
   <PageHeader title={uiText.common.games} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.games)} />
 

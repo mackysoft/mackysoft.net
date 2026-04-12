@@ -6,7 +6,7 @@ import { getArticlesArchiveYearPageMeta } from "../../../features/articles/page-
 import { formatArticleCount, getUiText } from "../../../lib/copy";
 import { getArticleYear } from "../../../lib/article-dates";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
-import { getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
 import { formatPageBreadcrumb } from "../../../lib/page-header";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
@@ -43,10 +43,7 @@ const pageMeta = getArticlesArchiveYearPageMeta(locale, year, {
   description={pageMeta.description}
   locale={locale}
   canonicalPath={localizePath(`/archive/${year}/`, locale)}
-  alternateLocales={[
-    { locale: "ja", path: `/archive/${year}/` },
-    { locale: "en", path: `/en/archive/${year}/` },
-  ]}
+  alternateLocales={createAlternateLocaleLinks(`/archive/${year}/`)}
 >
   <PageHeader title={year} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
 

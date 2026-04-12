@@ -8,7 +8,7 @@ import LocalizedContent from "../../components/LocalizedContent.astro";
 import { getUiText } from "../../lib/copy";
 import { formatArticleNumericDate } from "../../lib/article-dates";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
-import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
@@ -40,12 +40,7 @@ const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.d
 const shareUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 const articlePath = `/articles/${slug}/`;
 const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
-const alternateLocales = article.availableLocales.includes("en")
-  ? [
-      { locale: "ja" as const, path: articlePath },
-      { locale: "en" as const, path: localizePath(articlePath, "en") },
-    ]
-  : [];
+const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
 ---
 
 <SiteLayout
@@ -62,7 +57,7 @@ const alternateLocales = article.availableLocales.includes("en")
       <p class="eyebrow">{formatPageBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
     </section>
 
-    {article.isFallback && locale === "en" && (
+    {article.isFallback && locale !== defaultLocale && (
       <section class="content-panel article-fallback-notice">
         <p>{uiText.common.fallbackNotice}</p>
       </section>

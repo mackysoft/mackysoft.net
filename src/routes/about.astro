@@ -3,7 +3,7 @@ import PageHeader from "../components/PageHeader.astro";
 import Stack from "../components/Stack.astro";
 import DescribedLinkList from "../features/about/DescribedLinkList.astro";
 import { getAboutPageContent } from "../features/about/content";
-import { getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
 import { getExternalLink } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
@@ -30,10 +30,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
   description={aboutPageContent.description}
   locale={locale}
   canonicalPath={localizePath("/about/", locale)}
-  alternateLocales={[
-    { locale: "ja", path: "/about/" },
-    { locale: "en", path: "/en/about/" },
-  ]}
+  alternateLocales={createAlternateLocaleLinks("/about/")}
 >
   <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
 

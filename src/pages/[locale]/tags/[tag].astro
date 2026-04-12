@@ -1,8 +1,11 @@
 ---
 import TagRoute, { getStaticPaths as getTagStaticPaths } from "../../../routes/tags/[tag].astro";
+import { mapPrefixedLocaleStaticPaths } from "../../../lib/locale-pages";
 import { getLocalArticles } from "../../../lib/articles";
 
-export const getStaticPaths = getTagStaticPaths;
+export async function getStaticPaths() {
+  return mapPrefixedLocaleStaticPaths(await getTagStaticPaths());
+}
 
 const { tag, articleEntries } = Astro.props as {
   tag: string;
@@ -10,4 +13,4 @@ const { tag, articleEntries } = Astro.props as {
 };
 ---
 
-<TagRoute tag={tag} articleEntries={articleEntries} locale="en" />
+<TagRoute tag={tag} articleEntries={articleEntries} />

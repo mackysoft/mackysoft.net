@@ -1,6 +1,6 @@
 ---
 import { getUiText } from "../../lib/copy";
-import { supportedLocales, switchLocalePath, type SiteLocale } from "../../lib/i18n";
+import { localeStorageKey, supportedLocales, switchLocalePath, type SiteLocale } from "../../lib/i18n";
 
 type Props = {
   locale: SiteLocale;
@@ -77,7 +77,7 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
   </div>
 </details>
 
-<script is:inline>
+<script is:inline define:vars={{ storageKey: localeStorageKey }}>
   (() => {
     for (const link of document.querySelectorAll("[data-locale-switch-link]")) {
       if (!(link instanceof HTMLAnchorElement)) {
@@ -86,7 +86,7 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
 
       link.addEventListener("click", () => {
         try {
-          window.localStorage.setItem("mackysoft-locale", link.dataset.localeSwitchLink ?? "");
+          window.localStorage.setItem(storageKey, link.dataset.localeSwitchLink ?? "");
         } catch {
           // Ignore storage failures and continue navigation.
         }

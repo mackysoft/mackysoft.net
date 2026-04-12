@@ -1,7 +1,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
-import { createTranslationMap, resolveLocalizedEntryBySlug } from "./localized-entry";
+import { createTranslationMap, type TranslationEntryMap, resolveLocalizedEntryBySlug } from "./localized-entry";
 
 export type GameEntry = CollectionEntry<"games">;
 export type GameTranslationEntry = CollectionEntry<"gameTranslations">;
@@ -45,7 +45,7 @@ const gameActionOrder: GameActionKind[] = ["play", "store", "press-kit", "stream
 const supportedYouTubeHosts = new Set(["youtu.be", "youtube.com", "www.youtube.com", "m.youtube.com"]);
 
 let gamesPromise: Promise<GameEntry[]> | undefined;
-let gameTranslationsPromise: Promise<Map<string, GameTranslationEntry>> | undefined;
+let gameTranslationsPromise: Promise<TranslationEntryMap<GameTranslationEntry>> | undefined;
 
 function mergeGameData(baseEntry: GameEntry, translationEntry?: GameTranslationEntry): GameEntry["data"] {
   const translatedScreenshots = translationEntry?.data.screenshots;

@@ -6,7 +6,7 @@ import { getAssetsPageContent } from "../../features/assets/content";
 import { getUiText } from "../../lib/copy";
 import { getReleaseActivities } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
-import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 type Props = {
@@ -25,10 +25,7 @@ const pageContent = getAssetsPageContent(locale, uiText.common.assets);
   description={pageContent.description}
   locale={locale}
   canonicalPath={localizePath("/assets/", locale)}
-  alternateLocales={[
-    { locale: "ja", path: "/assets/" },
-    { locale: "en", path: "/en/assets/" },
-  ]}
+  alternateLocales={createAlternateLocaleLinks("/assets/")}
 >
   <PageHeader title={uiText.common.assets} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.assets)} />
 

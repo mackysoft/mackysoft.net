@@ -1,4 +1,4 @@
-import { defaultLocale, type SiteLocale } from "./i18n";
+import { defaultLocale, isSiteLocale, supportedLocales, type SiteLocale } from "./i18n";
 
 type TranslationMapEntry = {
   id: string;
@@ -13,45 +13,98 @@ type TranslationMapOptions = {
   stripPrefix?: string;
 };
 
+export type TranslationEntryMap<T> = Map<string, Map<SiteLocale, T>>;
+
 export type LocalizedFallbackState = {
   contentLocale: SiteLocale;
   isFallback: boolean;
   availableLocales: SiteLocale[];
 };
 
-export function normalizeTranslationId(id: string, options: TranslationMapOptions = {}) {
-  return id
-    .replace(/\\/g, "/")
-    .replace(options.stripPrefix ?? "", "")
-    .replace(/\/index(?:\.[a-z-]+)?(?:\.(?:md|mdx))?$/, "");
+function normalizeTranslationPath(id: string, options: TranslationMapOptions = {}) {
+  return id.replace(/\\/g, "/").replace(options.stripPrefix ?? "", "");
 }
 
-export function createTranslationMap<T extends TranslationMapEntry>(entries: T[], options: TranslationMapOptions = {}) {
-  return new Map(
-    entries.flatMap((entry) => {
-      const candidateKeys = new Set([
-        normalizeTranslationId(entry.id, options),
-        entry.filePath ? normalizeTranslationId(entry.filePath, options) : null,
-      ]);
+type TranslationIdentifier = {
+  slug: string;
+  locale: SiteLocale;
+};
 
-      return [...candidateKeys]
-        .filter((key): key is string => Boolean(key))
-        .map((key) => [key, entry] as const);
-    }),
-  );
+function extractTranslationIdentifier(id: string, options: TranslationMapOptions = {}): TranslationIdentifier | null {
+  const normalizedId = normalizeTranslationPath(id, options);
+  const matched = normalizedId.match(/^(.*)\/index\.([a-z-]+)(?:\.(?:md|mdx))?$/);
+
+  if (!matched) {
+    return null;
+  }
+
+  const [, slug, locale] = matched;
+
+  if (!slug || !isSiteLocale(locale) || locale === defaultLocale) {
+    return null;
+  }
+
+  return {
+    slug,
+    locale,
+  };
+}
+
+export function normalizeTranslationId(id: string, options: TranslationMapOptions = {}) {
+  const translationIdentifier = extractTranslationIdentifier(id, options);
+
+  if (translationIdentifier) {
+    return translationIdentifier.slug;
+  }
+
+  return normalizeTranslationPath(id, options).replace(/\/index(?:\.(?:md|mdx))?$/, "");
+}
+
+export function createTranslationMap<T extends TranslationMapEntry>(entries: T[], options: TranslationMapOptions = {}): TranslationEntryMap<T> {
+  const translationMap: TranslationEntryMap<T> = new Map();
+
+  for (const entry of entries) {
+    const identifiers = new Map<SiteLocale, string>();
+
+    for (const value of [entry.id, entry.filePath].filter((candidate): candidate is string => Boolean(candidate))) {
+      const identifier = extractTranslationIdentifier(value, options);
+
+      if (!identifier) {
+        continue;
+      }
+
+      identifiers.set(identifier.locale, identifier.slug);
+    }
+
+    for (const [locale, slug] of identifiers) {
+      const localeMap = translationMap.get(slug) ?? new Map<SiteLocale, T>();
+      localeMap.set(locale, entry);
+      translationMap.set(slug, localeMap);
+    }
+  }
+
+  return translationMap;
 }
 
 export function resolveLocalizedFallbackState(
   requestedLocale: SiteLocale,
-  hasTranslation: boolean,
-  translationLocale: SiteLocale = "en",
+  availableLocaleCandidates: Iterable<SiteLocale> = [],
 ): LocalizedFallbackState {
-  const contentLocale = requestedLocale === translationLocale && hasTranslation ? translationLocale : defaultLocale;
+  const availableLocaleSet = new Set<SiteLocale>([defaultLocale]);
+
+  for (const locale of availableLocaleCandidates) {
+    if (isSiteLocale(locale)) {
+      availableLocaleSet.add(locale);
+    }
+  }
+
+  const availableLocales = supportedLocales.filter((locale) => availableLocaleSet.has(locale));
+  const contentLocale = availableLocaleSet.has(requestedLocale) ? requestedLocale : defaultLocale;
 
   return {
     contentLocale,
     isFallback: requestedLocale !== contentLocale,
-  availableLocales: hasTranslation ? [defaultLocale, translationLocale] : [defaultLocale],
+    availableLocales,
   };
 }
 
@@ -70,9 +123,8 @@ type ResolveLocalizedEntryOptions<TBase extends BaseMapEntry, TTranslation exten
   slug: string;
   locale?: SiteLocale;
   getBaseEntries: () => Promise<TBase[]>;
-  getTranslationMap: () => Promise<Map<string, TTranslation>>;
+  getTranslationMap: () => Promise<TranslationEntryMap<TTranslation>>;
   mergeData: (baseEntry: TBase, translationEntry?: TTranslation) => TData;
-  translationLocale?: SiteLocale;
 };
 
 export async function resolveLocalizedEntryBySlug<TBase extends BaseMapEntry, TTranslation extends TranslationMapEntry, TData>({
@@ -81,7 +133,6 @@ export async function resolveLocalizedEntryBySlug<TBase extends BaseMapEntry, TT
   getBaseEntries,
   getTranslationMap,
   mergeData,
-  translationLocale = "en",
 }: ResolveLocalizedEntryOptions<TBase, TTranslation, TData>): Promise<ResolvedLocalizedEntry<TBase, TTranslation, TData> | null> {
   const [baseEntries, translations] = await Promise.all([getBaseEntries(), getTranslationMap()]);
   const baseEntry = baseEntries.find((entry) => entry.id === slug);
@@ -90,9 +141,9 @@ export async function resolveLocalizedEntryBySlug<TBase extends BaseMapEntry, TT
     return null;
   }
 
-  const translationEntry = translations.get(slug);
-  const selectedTranslation = locale === translationLocale ? translationEntry : undefined;
-  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(selectedTranslation), translationLocale);
+  const translationsByLocale = translations.get(slug) ?? new Map<SiteLocale, TTranslation>();
+  const selectedTranslation = locale === defaultLocale ? undefined : translationsByLocale.get(locale);
+  const fallbackState = resolveLocalizedFallbackState(locale, translationsByLocale.keys());
 
   return {
     slug,

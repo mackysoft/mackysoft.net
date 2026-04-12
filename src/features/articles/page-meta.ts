@@ -11,6 +11,21 @@ const articlesIndexDescriptionMap: Record<SiteLocale, string> = {
   en: "Articles published on this site and Zenn.",
 };
 
+const articlesArchiveYearDescriptionMap: Record<SiteLocale, (year: string) => string> = {
+  ja: (year) => `${year} 年の記事一覧です。`,
+  en: (year) => `Articles published in ${year}.`,
+};
+
+const articlesArchiveMonthDescriptionMap: Record<SiteLocale, (year: string, month: string) => string> = {
+  ja: (year, month) => `${year} 年 ${month} 月の記事一覧です。`,
+  en: (year, month) => `Articles published in ${year}/${month}.`,
+};
+
+const articlesTagDescriptionMap: Record<SiteLocale, (tag: string) => string> = {
+  ja: (tag) => `${tag} に紐づく記事一覧です。`,
+  en: (tag) => `Articles tagged with ${tag}.`,
+};
+
 export function getArticlesIndexPageMeta(locale: SiteLocale, labels: Pick<ArticleListLabels, "articles">) {
   return {
     title: labels.articles,
@@ -21,7 +36,7 @@ export function getArticlesIndexPageMeta(locale: SiteLocale, labels: Pick<Articl
 export function getArticlesArchiveYearPageMeta(locale: SiteLocale, year: string, labels: Pick<ArticleListLabels, "archive">) {
   return {
     title: `${labels.archive} ${year}`,
-    description: locale === "en" ? `Articles published in ${year}.` : `${year} 年の記事一覧です。`,
+    description: articlesArchiveYearDescriptionMap[locale](year),
   };
 }
 
@@ -33,13 +48,13 @@ export function getArticlesArchiveMonthPageMeta(
 ) {
   return {
     title: `${labels.archive} ${year}/${month}`,
-    description: locale === "en" ? `Articles published in ${year}/${month}.` : `${year} 年 ${month} 月の記事一覧です。`,
+    description: articlesArchiveMonthDescriptionMap[locale](year, month),
   };
 }
 
 export function getArticlesTagPageMeta(locale: SiteLocale, tag: string, labels: Pick<ArticleListLabels, "tag">) {
   return {
     title: `${labels.tag}: ${tag}`,
-    description: locale === "en" ? `Articles tagged with ${tag}.` : `${tag} に紐づく記事一覧です。`,
+    description: articlesTagDescriptionMap[locale](tag),
   };
 }

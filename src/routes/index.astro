@@ -3,7 +3,7 @@ import ArticleCard from "../components/ArticleCard.astro";
 import ReleaseCard from "../components/ReleaseCard.astro";
 import { getHomePageContent } from "../features/home/content";
 import { getArticleItems, getLatestReleases } from "../lib/articles";
-import { getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 type Props = {
@@ -21,11 +21,8 @@ const localizedHomePath = localizePath("/", locale);
 <SiteLayout
   locale={locale}
   canonicalPath={localizedHomePath}
-  alternateLocales={[
-    { locale: "ja", path: "/" },
-    { locale: "en", path: "/en/" },
-  ]}
-  enableLocaleRedirectOnRoot={locale === "ja"}
+  alternateLocales={createAlternateLocaleLinks("/")}
+  enableLocaleRedirectOnRoot={locale === defaultLocale}
 >
   <h1 class="visually-hidden">{content.homeHeading}</h1>
 

@@ -170,11 +170,11 @@ export function getUiText(locale: SiteLocale) {
   return uiTextMap[locale];
 }
 
+const articleCountFormatterMap: Record<SiteLocale, (count: number) => string> = {
+  ja: (count) => `${count} 件の記事があります。`,
+  en: (count) => `${count} article${count === 1 ? "" : "s"}`,
+};
+
 export function formatArticleCount(count: number, locale: SiteLocale) {
-  if (locale === "en") {
-    return `${count} article${count === 1 ? "" : "s"}`;
-  }
-
-  return `${count} 件の記事があります。`;
+  return articleCountFormatterMap[locale](count);
 }
-

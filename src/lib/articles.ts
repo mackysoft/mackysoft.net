@@ -3,7 +3,12 @@ import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
-import { createTranslationMap, resolveLocalizedEntryBySlug, resolveLocalizedFallbackState } from "./localized-entry";
+import {
+  createTranslationMap,
+  type TranslationEntryMap,
+  resolveLocalizedEntryBySlug,
+  resolveLocalizedFallbackState,
+} from "./localized-entry";
 import { getSiteMeta } from "./site";
 
 export type ArticleEntry = CollectionEntry<"articles">;
@@ -17,14 +22,14 @@ export type LocalizedArticleActivity = {
   coverAlt?: string;
 };
 
+type LocalizedArticleActivityMap = Record<typeof defaultLocale, LocalizedArticleActivity>
+  & Partial<Record<SiteLocale, LocalizedArticleActivity>>;
+
 export type ArticleActivity = {
   id: string;
   source: string;
   publishedAt: string;
-  locales: {
-    ja: LocalizedArticleActivity;
-    en?: LocalizedArticleActivity;
-  };
+  locales: LocalizedArticleActivityMap;
 };
 
 export type ReleaseActivity = {
@@ -90,7 +95,7 @@ const releaseStarCountFormatterMap: Record<SiteLocale, Intl.NumberFormat> = {
 };
 
 let localArticlesPromise: Promise<ArticleEntry[]> | undefined;
-let articleTranslationsPromise: Promise<Map<string, ArticleTranslationEntry>> | undefined;
+let articleTranslationsPromise: Promise<TranslationEntryMap<ArticleTranslationEntry>> | undefined;
 
 function mergeArticleData(baseEntry: ArticleEntry, translationEntry?: ArticleTranslationEntry) {
   return {
@@ -105,8 +110,8 @@ function mergeArticleData(baseEntry: ArticleEntry, translationEntry?: ArticleTra
 }
 
 function getArticleVariant(article: ArticleActivity, locale: SiteLocale) {
-  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(article.locales[locale]));
-  const variant = article.locales[locale] ?? article.locales.ja;
+  const fallbackState = resolveLocalizedFallbackState(locale, Object.keys(article.locales) as SiteLocale[]);
+  const variant = article.locales[fallbackState.contentLocale] ?? article.locales[defaultLocale];
 
   return {
     variant,

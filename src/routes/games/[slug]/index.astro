@@ -7,7 +7,7 @@ import GameScreenshotGallery from "../../../components/GameScreenshotGallery.ast
 import GameStatusBadge from "../../../components/GameStatusBadge.astro";
 import { getUiText } from "../../../lib/copy";
 import { formatArticleNumericDate } from "../../../lib/article-dates";
-import { getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
+import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
 import { getGamePlatformLabel, getGameTrailerEmbedUrl, resolveLocalizedGameBySlug } from "../../../lib/games";
 import { formatPageBreadcrumb } from "../../../lib/page-header";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
@@ -47,12 +47,7 @@ const detailRows = [
 ].filter((row): row is { label: string; value: string } => row !== null);
 const gamePath = `/games/${slug}/`;
 const canonicalPath = game.isFallback ? gamePath : localizePath(gamePath, locale);
-const alternateLocales = game.availableLocales.includes("en")
-  ? [
-      { locale: "ja" as const, path: gamePath },
-      { locale: "en" as const, path: localizePath(gamePath, "en") },
-    ]
-  : [];
+const alternateLocales = createAlternateLocaleLinks(gamePath, game.availableLocales);
 ---
 
 <SiteLayout
@@ -67,7 +62,7 @@ const alternateLocales = game.availableLocales.includes("en")
   <article class="game-page">
     <p class="eyebrow game-page__eyebrow">{formatPageBreadcrumb(uiText.common.home, uiText.common.games)}</p>
 
-    {game.isFallback && locale === "en" && (
+    {game.isFallback && locale !== defaultLocale && (
       <section class="content-panel game-fallback-notice">
         <p>{uiText.common.fallbackNotice}</p>
       </section>

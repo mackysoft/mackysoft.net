@@ -38,7 +38,7 @@ const articles = defineCollection({
 const articleTranslations = defineCollection({
   loader: glob({
     base: "./src/content/articles",
-    pattern: "**/index.en.md",
+    pattern: "**/index.*.md",
   }),
   schema: ({ image }) =>
     z
@@ -103,7 +103,7 @@ const games = defineCollection({
 const gameTranslations = defineCollection({
   loader: glob({
     base: "./src/content/games",
-    pattern: "*/index.en.md",
+    pattern: "*/index.*.md",
   }),
   schema: () =>
     z.object({

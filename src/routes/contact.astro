@@ -1,7 +1,7 @@
 ---
 import PageHeader from "../components/PageHeader.astro";
 import { getContactPageContent } from "../features/contact/content";
-import { getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
 import { getExternalLink } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
@@ -40,10 +40,7 @@ const contactChannels = contactPageContent.channels.map((channel) => {
   description={contactPageContent.description}
   locale={locale}
   canonicalPath={localizePath("/contact/", locale)}
-  alternateLocales={[
-    { locale: "ja", path: "/contact/" },
-    { locale: "en", path: "/en/contact/" },
-  ]}
+  alternateLocales={createAlternateLocaleLinks("/contact/")}
 >
   <PageHeader title={contactPageContent.hero.title} eyebrow={contactPageContent.hero.eyebrow} />
 

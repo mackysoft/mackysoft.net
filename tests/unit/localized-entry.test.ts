@@ -23,16 +23,21 @@ describe("localized entry helpers", () => {
     };
     const translationMap = createTranslationMap([entry], { stripPrefix: "src/content/games/" });
 
-    expect(translationMap.get("treasure-rogue")).toBe(entry);
+    expect(translationMap.get("treasure-rogue")?.get("en")).toBe(entry);
   });
 
-  test("derives fallback state from the requested locale and translation presence", () => {
-    expect(resolveLocalizedFallbackState("en", true)).toEqual({
+  test("derives fallback state from the requested locale and available locales", () => {
+    expect(resolveLocalizedFallbackState("en", ["en"])).toEqual({
       contentLocale: "en",
       isFallback: false,
       availableLocales: ["ja", "en"],
     });
-    expect(resolveLocalizedFallbackState("en", false)).toEqual({
+    expect(resolveLocalizedFallbackState("ja", ["en"])).toEqual({
+      contentLocale: "ja",
+      isFallback: false,
+      availableLocales: ["ja", "en"],
+    });
+    expect(resolveLocalizedFallbackState("en")).toEqual({
       contentLocale: "ja",
       isFallback: true,
       availableLocales: ["ja"],
@@ -82,7 +87,7 @@ describe("localized entry helpers", () => {
         slug: "vision-introduction",
         locale: "en",
         getBaseEntries: async () => [baseEntry],
-        getTranslationMap: async () => new Map(),
+        getTranslationMap: async () => new Map<string, Map<"en" | "ja", typeof translationEntry>>(),
         mergeData: (base, translation) => ({
           title: translation?.data.title ?? base.data.title,
         }),

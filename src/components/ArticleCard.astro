@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 
 import { getUiText } from "../lib/copy";
-import type { SiteLocale } from "../lib/i18n";
+import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import { formatArticleDate } from "../lib/article-dates";
 import type { ArticleItem } from "../lib/articles";
 
@@ -50,7 +50,7 @@ const uiText = getUiText(locale);
   )}
   <div class="article-card__body activity-card__body">
     <h3 class="activity-card__title">{article.title}</h3>
-    {article.isFallback && locale === "en" && (
+    {article.isFallback && locale !== defaultLocale && (
       <div class="activity-card__badges">
         <span class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</span>
       </div>

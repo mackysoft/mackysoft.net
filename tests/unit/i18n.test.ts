@@ -1,10 +1,13 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  createAlternateLocaleLinks,
   getLocalePreference,
   getPathLocale,
+  matchBrowserLocaleCandidate,
   localizeContentHref,
   localizePath,
+  sortBrowserLocaleMatchers,
   stripLocaleFromPath,
   switchLocalePath,
 } from "../../src/lib/i18n";
@@ -28,6 +31,10 @@ describe("i18n helpers", () => {
     expect(localizePath("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
     expect(switchLocalePath("/en/articles/vision-introduction/", "ja")).toBe("/articles/vision-introduction/");
     expect(switchLocalePath("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
+    expect(createAlternateLocaleLinks("/articles/vision-introduction/")).toEqual([
+      { locale: "ja", path: "/articles/vision-introduction/" },
+      { locale: "en", path: "/en/articles/vision-introduction/" },
+    ]);
   });
 
   test("localizes only known site content links", () => {
@@ -44,5 +51,19 @@ describe("i18n helpers", () => {
     expect(getLocalePreference(["de-DE", "ja-JP"])).toBe("ja");
     expect(getLocalePreference(["fr-FR"])).toBe("ja");
     expect(getLocalePreference(null)).toBe("ja");
+  });
+
+  test("prefers the most specific browser locale matcher", () => {
+    const matchers = sortBrowserLocaleMatchers([
+      { locale: "en", prefix: "en" },
+      { locale: "en-gb", prefix: "en-gb" },
+      { locale: "zh", prefix: "zh" },
+      { locale: "zh-cn", prefix: "zh-cn" },
+    ]);
+
+    expect(matchBrowserLocaleCandidate("en-GB", matchers)).toBe("en-gb");
+    expect(matchBrowserLocaleCandidate("zh-CN", matchers)).toBe("zh-cn");
+    expect(matchBrowserLocaleCandidate("en-AU", matchers)).toBe("en");
+    expect(matchBrowserLocaleCandidate("fr-FR", matchers)).toBeNull();
   });
 });

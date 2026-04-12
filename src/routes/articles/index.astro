@@ -6,7 +6,7 @@ import { getArticlesIndexPageMeta } from "../../features/articles/page-meta";
 import { getUiText } from "../../lib/copy";
 import { getArticleItems } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
-import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 type Props = {
@@ -27,10 +27,7 @@ const pageMeta = getArticlesIndexPageMeta(locale, {
   description={pageMeta.description}
   locale={locale}
   canonicalPath={localizePath("/articles/", locale)}
-  alternateLocales={[
-    { locale: "ja", path: "/articles/" },
-    { locale: "en", path: "/en/articles/" },
-  ]}
+  alternateLocales={createAlternateLocaleLinks("/articles/")}
 >
   <PageHeader title={uiText.common.articles} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles)} />
 
