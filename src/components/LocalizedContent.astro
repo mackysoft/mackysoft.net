@@ -1,0 +1,13 @@
+---
+import { defaultLocale, type SiteLocale } from "../lib/i18n";
+import { localizeContentHtml } from "../lib/localized-content";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale = defaultLocale } = Astro.props as Props;
+const localizedHtml = locale === defaultLocale ? null : localizeContentHtml(await Astro.slots.render("default"), locale);
+---
+
+{localizedHtml ? <Fragment set:html={localizedHtml} /> : <slot />}

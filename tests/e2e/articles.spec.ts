@@ -303,4 +303,26 @@ test.describe("articles page", () => {
 
     await expect(relatedArticleLink).toHaveAttribute("href", "/en/articles/roguelike-map-generation-algorithm/");
   });
+
+  test("keeps markdown body images rendered on Japanese and English article pages", { tag: "@size:medium" }, async ({ page }) => {
+    for (const pathname of ["/articles/vision-introduction/", "/en/articles/vision-introduction/"]) {
+      await page.goto(pathname);
+
+      const firstBodyImage = page.locator(".article-content img").first();
+
+      await expect(firstBodyImage).toBeVisible();
+
+      const imageState = await firstBodyImage.evaluate((image) => {
+        const htmlImage = image as HTMLImageElement;
+
+        return {
+          src: htmlImage.getAttribute("src"),
+          currentSrc: htmlImage.currentSrc,
+        };
+      });
+
+      expect(imageState.src || imageState.currentSrc).toBeTruthy();
+      expect(imageState.currentSrc.length).toBeGreaterThan(0);
+    }
+  });
 });
