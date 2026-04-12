@@ -197,39 +197,8 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
     height: auto;
   }
 
-  .prose {
-    display: grid;
-    gap: 1rem;
-    min-width: 0;
-  }
-
   .article-content__tags {
     margin-bottom: 0;
-  }
-
-  .prose :global(h2),
-  .prose :global(h3),
-  .prose :global(h4),
-  .prose :global(p),
-  .prose :global(ul),
-  .prose :global(ol),
-  .prose :global(table),
-  .prose :global(pre),
-  .prose :global(blockquote) {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  .prose :global(hr) {
-    width: 100%;
-    border: 0;
-    border-top: 1px solid var(--border-color);
-  }
-
-  .prose :global(h2),
-  .prose :global(h3),
-  .prose :global(h4) {
-    scroll-margin-top: var(--site-anchor-offset);
   }
 
   @media (min-width: 960px) {

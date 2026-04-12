@@ -69,6 +69,9 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
           role="menuitemradio"
           aria-checked="false"
           data-locale-switch-link={entry.locale}
+          data-analytics-event="locale_switch"
+          data-analytics-label={entry.label}
+          data-analytics-location="site-header"
         >
           {entry.label}
         </a>

@@ -33,6 +33,9 @@ const uiText = getUiText(locale);
     aria-label={article.title}
     target={isExternal ? "_blank" : undefined}
     rel={isExternal ? "noreferrer" : undefined}
+    data-analytics-event={isExternal ? "external_link_click" : undefined}
+    data-analytics-label={isExternal ? article.title : undefined}
+    data-analytics-location={isExternal ? "article-card" : undefined}
   ></a>
   {cover ? (
     <div

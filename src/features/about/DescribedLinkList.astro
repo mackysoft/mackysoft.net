@@ -8,9 +8,10 @@ type DescribedLinkItem = {
 type Props = {
   items: readonly DescribedLinkItem[];
   class?: string;
+  analyticsLocation?: string;
 };
 
-const { items, class: className } = Astro.props as Props;
+const { items, class: className, analyticsLocation = "described-link-list" } = Astro.props as Props;
 const classes = ["described-link-list", className].filter(Boolean).join(" ");
 const isExternalLink = (href: string) => href.startsWith("http://") || href.startsWith("https://");
 ---
@@ -18,7 +19,14 @@ const isExternalLink = (href: string) => href.startsWith("http://") || href.star
 <ul class={classes}>
   {items.map((item) => (
     <li class="described-link-list__item">
-      <a href={item.href} target={isExternalLink(item.href) ? "_blank" : undefined} rel={isExternalLink(item.href) ? "noreferrer" : undefined}>
+      <a
+        href={item.href}
+        target={isExternalLink(item.href) ? "_blank" : undefined}
+        rel={isExternalLink(item.href) ? "noreferrer" : undefined}
+        data-analytics-event={isExternalLink(item.href) ? "external_link_click" : undefined}
+        data-analytics-label={isExternalLink(item.href) ? item.label : undefined}
+        data-analytics-location={isExternalLink(item.href) ? analyticsLocation : undefined}
+      >
         {item.label}
       </a>
       <p>{item.description}</p>

@@ -1,0 +1,74 @@
+---
+import { getAnalyticsMeasurementId } from "../../lib/analytics";
+
+const measurementId = getAnalyticsMeasurementId(import.meta.env.PUBLIC_GA4_MEASUREMENT_ID);
+const analyticsScriptUrl = measurementId
+  ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`
+  : null;
+---
+
+{
+  measurementId && analyticsScriptUrl && (
+    <>
+      <script is:inline async src={analyticsScriptUrl}></script>
+      <script is:inline define:vars={{ measurementId }}>
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function gtag() {
+          window.dataLayer.push(arguments);
+        };
+        const skipInitialPageView = window.__mackysoftSkipInitialPageView === true;
+        window.gtag("js", new Date());
+        window.gtag("config", measurementId, {
+          allow_google_signals: false,
+          allow_ad_personalization_signals: false,
+          send_page_view: !skipInitialPageView,
+        });
+      </script>
+      <script>
+        import { buildAnalyticsEventPayload } from "../../lib/analytics";
+
+        type AnalyticsWindow = Window & typeof globalThis & {
+          __mackysoftSkipInitialPageView?: boolean;
+          gtag?: (...args: unknown[]) => void;
+        };
+
+        const analyticsWindow = window as AnalyticsWindow;
+
+        document.addEventListener(
+          "click",
+          (event) => {
+            const target = event.target;
+
+            if (!(target instanceof Element)) {
+              return;
+            }
+
+            const trackedElement = target.closest<HTMLElement>("[data-analytics-event]");
+
+            if (!trackedElement) {
+              return;
+            }
+
+            const payload = buildAnalyticsEventPayload({
+              eventName: trackedElement.dataset.analyticsEvent,
+              explicitLabel: trackedElement.dataset.analyticsLabel,
+              location: trackedElement.dataset.analyticsLocation,
+              href: trackedElement instanceof HTMLAnchorElement ? trackedElement.href : null,
+              currentTheme: trackedElement.dataset.currentTheme,
+              targetLocale: trackedElement.dataset.localeSwitchLink,
+              textContent: trackedElement.textContent,
+              ariaLabel: trackedElement.getAttribute("aria-label"),
+            });
+
+            if (!payload || typeof analyticsWindow.gtag !== "function") {
+              return;
+            }
+
+            analyticsWindow.gtag("event", payload.eventName, payload.params);
+          },
+          { capture: true },
+        );
+      </script>
+    </>
+  )
+}

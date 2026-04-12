@@ -68,6 +68,7 @@ const browserLocaleMatchers = getBrowserLocaleMatchers();
           const matchedLocale = localeConfigs.find((locale) => locale.code === preferredLocale);
 
           if (matchedLocale) {
+            window.__mackysoftSkipInitialPageView = true;
             window.location.replace(`${matchedLocale.rootPath}${window.location.search}${window.location.hash}`);
           }
         }
