@@ -54,6 +54,8 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "View Assets", exact: true })).toHaveAttribute("href", "/assets/");
     await expect(page.getByRole("main").locator(".release-card").first()).toBeVisible();
+    await expect(page.getByRole("main").locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
+    await expect(page.getByRole("main").locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
     await expect(page.getByRole("img", { name: latestRelease.coverAlt }).first()).toBeVisible();
     await expect(page.getByRole("main").locator(".release-card").first()).toContainText("最新リリース日");
     await expect(page.getByRole("main").locator(".release-card").first()).toContainText(
@@ -101,6 +103,24 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toBeVisible();
     await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgba(255, 252, 246, 0.78)");
     await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(245, 241, 232, 0.9)");
+  });
+
+  test("preserves search and hash when the root page redirects to English", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.removeItem("mackysoft-locale");
+      Object.defineProperty(window.navigator, "languages", {
+        configurable: true,
+        value: ["en-US"],
+      });
+      Object.defineProperty(window.navigator, "language", {
+        configurable: true,
+        value: "en-US",
+      });
+    });
+
+    await page.goto("/?utm=test#top");
+
+    await expect(page).toHaveURL("/en/?utm=test#top");
   });
 
   test("does not auto-redirect deep URLs when English is preferred", async ({ page }) => {
@@ -157,6 +177,8 @@ test.describe("assets page", () => {
 
     await expect(firstCard).toBeVisible();
     await expect(firstCard.getByRole("link", { name: latestReleaseRepoName, exact: true })).toHaveAttribute("href", latestRelease.url);
+    await expect(firstCard.locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
+    await expect(firstCard.locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
     await expect(firstCard.getByRole("img", { name: latestRelease.coverAlt })).toBeVisible();
     await expect(firstCard).toContainText("最新リリース日");
     await expect(firstCard).toContainText(formatArticleDate(new Date(latestRelease.publishedAt)));

@@ -18,7 +18,8 @@ const uiText = getUiText(locale);
 ---
 
 <article class="asset-card activity-card">
-  <a href={release.url} class="asset-card__cover-link activity-card__cover-link" target="_blank" rel="noreferrer">
+  <a href={release.url} class="activity-card__link-layer" aria-label={repoName} target="_blank" rel="noreferrer"></a>
+  <div class="asset-card__cover activity-card__cover">
     <Image
       src={release.coverUrl}
       alt={release.coverAlt}
@@ -26,11 +27,9 @@ const uiText = getUiText(locale);
       height={252}
       sizes="(max-width: 720px) 100vw, 28rem"
     />
-  </a>
+  </div>
   <div class="asset-card__body activity-card__body">
-    <h3>
-      <a href={release.url} class="activity-card__title-link" target="_blank" rel="noreferrer">{repoName}</a>
-    </h3>
+    <h3 class="activity-card__title">{repoName}</h3>
     <div class="asset-card__copy">
       {release.description && <p class="asset-card__description">{release.description}</p>}
     </div>
@@ -61,11 +60,11 @@ const uiText = getUiText(locale);
     padding: 1.25rem;
   }
 
-  .asset-card__cover-link {
+  .asset-card__cover {
     aspect-ratio: 1200 / 630;
   }
 
-  .asset-card__cover-link img {
+  .asset-card__cover img {
     display: block;
     width: 100%;
     height: 100%;

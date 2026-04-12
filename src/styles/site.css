@@ -495,11 +495,24 @@ h3,
 }
 
 .activity-card {
+  position: relative;
   display: grid;
   border: 1px solid var(--border-color);
   border-radius: 1.25rem;
   background: var(--surface-color);
   overflow: hidden;
+  transition:
+    transform 90ms ease-out,
+    border-color 90ms ease-out,
+    box-shadow 110ms ease-out,
+    background-color 90ms ease-out;
+}
+
+.activity-card:hover,
+.activity-card:focus-within {
+  border-color: var(--border-strong-color);
+  box-shadow: 0 1rem 2rem var(--overlay-shadow-color);
+  transform: translateY(-1px);
 }
 
 .activity-card--compact {
@@ -509,14 +522,26 @@ h3,
   padding: 1rem;
 }
 
-.activity-card__cover-link {
+.activity-card__link-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  border-radius: inherit;
+}
+
+.activity-card__link-layer:focus-visible {
+  outline: none;
+}
+
+.activity-card__cover {
   display: block;
   overflow: hidden;
   border-radius: 0.9rem;
   background: var(--surface-strong-color);
 }
 
-.activity-card__cover-link img {
+.activity-card__cover img {
   display: block;
   width: 100%;
   height: auto;
@@ -528,9 +553,8 @@ h3,
   min-height: 0;
 }
 
-.activity-card__title-link {
+.activity-card__title {
   color: var(--text-color);
-  text-decoration: none;
 }
 
 .activity-card__meta {

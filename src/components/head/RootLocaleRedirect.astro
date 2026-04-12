@@ -49,7 +49,7 @@ const { enabled = false } = Astro.props as Props;
         };
 
         if (getPreferredLocale() === "en") {
-          window.location.replace("/en/");
+          window.location.replace(`/en/${window.location.search}${window.location.hash}`);
         }
       })();
     </script>

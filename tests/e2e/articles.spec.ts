@@ -74,6 +74,16 @@ test.describe("articles page", () => {
     ).toHaveAttribute("href", "/en/articles/vision-introduction/");
   });
 
+  test("navigates from anywhere on an article card", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/");
+
+    const fallbackLocalCard = page.locator(".article-card").filter({ hasText: "【Unity】CullingGroupをより簡単に実装する【Vision】" }).first();
+
+    await fallbackLocalCard.click();
+
+    await expect(page).toHaveURL("/en/articles/vision-introduction/");
+  });
+
   test("keeps the article hero layout while separating the breadcrumb", { tag: "@size:medium" }, async ({ page }) => {
     await page.addInitScript(() => {
       const navigatorProxy = new Proxy(window.navigator, {

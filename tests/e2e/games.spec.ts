@@ -50,6 +50,14 @@ test.describe("games page", () => {
     );
   });
 
+  test("navigates from anywhere on a game card", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/games/");
+
+    await page.locator(".game-card").first().click();
+
+    await expect(page).toHaveURL("/games/treasure-rogue/");
+  });
+
   test("renders the game detail page with hero, features, screenshots, and action panel", { tag: "@size:medium" }, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 960 });
     await page.goto("/games/treasure-rogue/");

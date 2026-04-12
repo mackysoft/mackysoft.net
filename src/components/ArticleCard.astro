@@ -27,12 +27,16 @@ const uiText = getUiText(locale);
 ---
 
 <article class:list={["article-card", "activity-card", layout === "vertical" && "activity-card--compact", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
+  <a
+    href={article.href}
+    class="activity-card__link-layer"
+    aria-label={article.title}
+    target={isExternal ? "_blank" : undefined}
+    rel={isExternal ? "noreferrer" : undefined}
+  ></a>
   {cover ? (
-    <a
-      href={article.href}
-      class="article-card__cover-link activity-card__cover-link"
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noreferrer" : undefined}
+    <div
+      class="article-card__cover activity-card__cover"
       style={verticalCoverStyle}
     >
       {isRemoteCover ? (
@@ -40,21 +44,12 @@ const uiText = getUiText(locale);
       ) : (
         <Image src={cover} alt={article.coverAlt ?? ""} widths={[480]} sizes={coverSizes} />
       )}
-    </a>
+    </div>
   ) : (
     <div class="article-card__cover-placeholder" aria-hidden="true" style={verticalCoverStyle}></div>
   )}
   <div class="article-card__body activity-card__body">
-    <h3>
-      <a
-        href={article.href}
-        class="activity-card__title-link"
-        target={isExternal ? "_blank" : undefined}
-        rel={isExternal ? "noreferrer" : undefined}
-    >
-        {article.title}
-      </a>
-    </h3>
+    <h3 class="activity-card__title">{article.title}</h3>
     {article.isFallback && locale === "en" && (
       <div class="activity-card__badges">
         <span class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</span>
@@ -122,7 +117,7 @@ const uiText = getUiText(locale);
     margin-top: auto;
   }
 
-  .article-card--vertical .article-card__cover-link,
+  .article-card--vertical .article-card__cover,
   .article-card--vertical .article-card__cover-placeholder {
     aspect-ratio: var(--article-cover-ratio, 1200 / 630);
   }

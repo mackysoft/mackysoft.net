@@ -20,13 +20,12 @@ const uiText = getUiText(locale);
 ---
 
 <article class="game-card activity-card">
-  <a href={href} class="game-card__cover-link activity-card__cover-link">
+  <a href={href} class="activity-card__link-layer" aria-label={game.data.title}></a>
+  <div class="game-card__cover activity-card__cover">
     <Image src={game.data.cover} alt={game.data.coverAlt} widths={[480]} sizes="(max-width: 720px) 100vw, 28rem" />
-  </a>
+  </div>
   <div class="game-card__body activity-card__body">
-    <h3>
-      <a href={href} class="activity-card__title-link">{game.data.title}</a>
-    </h3>
+    <h3 class="activity-card__title">{game.data.title}</h3>
     <p class="game-card__description">{game.data.description}</p>
     <div class="game-card__footer">
       {publishedAt && (
@@ -54,11 +53,11 @@ const uiText = getUiText(locale);
     padding: 1.25rem;
   }
 
-  .game-card__cover-link {
+  .game-card__cover {
     aspect-ratio: 1200 / 630;
   }
 
-  .game-card__cover-link :global(img) {
+  .game-card__cover :global(img) {
     display: block;
     width: 100%;
     height: 100%;
