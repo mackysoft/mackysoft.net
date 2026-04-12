@@ -59,4 +59,22 @@ test.describe("assets page", () => {
       await expect(page.locator(".asset-card").nth(1).getByRole("link", { name: secondRepoName, exact: true })).toBeVisible();
     }
   });
+
+  test("falls back to a local cover treatment when release images fail", { tag: "@size:medium" }, async ({ page }) => {
+    await page.route("https://opengraph.githubassets.com/**", async (route) => {
+      await route.abort();
+    });
+    await page.route("https://repository-images.githubusercontent.com/**", async (route) => {
+      await route.abort();
+    });
+    await page.goto("/assets/");
+
+    const firstCard = page.locator(".asset-card").first();
+    const firstFallback = firstCard.locator(".asset-card__cover-fallback");
+
+    await expect(firstCard.locator(".asset-card__cover")).toHaveAttribute("data-cover-state", "error");
+    await expect(firstFallback).toBeVisible();
+    await expect(firstFallback).toContainText("GitHub");
+    await expect(firstFallback).toContainText(latestReleaseRepoName);
+  });
 });

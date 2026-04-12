@@ -17,7 +17,7 @@ const uiText = getUiText(locale);
 
 <article class="asset-card activity-card">
   <a href={release.url} class="activity-card__link-layer" aria-label={repoName} target="_blank" rel="noreferrer"></a>
-  <div class="asset-card__cover activity-card__cover">
+  <div class="asset-card__cover activity-card__cover" data-cover-state="ready">
     <img
       src={release.coverUrl}
       alt={release.coverAlt}
@@ -26,7 +26,12 @@ const uiText = getUiText(locale);
       sizes="(max-width: 720px) 100vw, 28rem"
       loading="lazy"
       decoding="async"
+      onerror="this.parentElement?.setAttribute('data-cover-state', 'error')"
     />
+    <div class="asset-card__cover-fallback" aria-hidden="true">
+      <span class="asset-card__cover-kicker">GitHub</span>
+      <strong class="asset-card__cover-title">{repoName}</strong>
+    </div>
   </div>
   <div class="asset-card__body activity-card__body">
     <h3 class="activity-card__title">{repoName}</h3>
@@ -62,6 +67,8 @@ const uiText = getUiText(locale);
 
   .asset-card__cover {
     aspect-ratio: 1200 / 630;
+    position: relative;
+    overflow: hidden;
   }
 
   .asset-card__cover img {
@@ -69,6 +76,44 @@ const uiText = getUiText(locale);
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .asset-card__cover-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: end;
+    gap: 0.35rem;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top right, color-mix(in srgb, var(--accent-color) 22%, transparent) 0, transparent 36%),
+      linear-gradient(160deg, color-mix(in srgb, var(--surface-soft-color) 92%, white) 0%, var(--surface-color) 100%);
+    color: var(--text-color);
+  }
+
+  .asset-card__cover[data-cover-state="ready"] .asset-card__cover-fallback {
+    display: none;
+  }
+
+  .asset-card__cover[data-cover-state="error"] img {
+    display: none;
+  }
+
+  .asset-card__cover-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-color);
+  }
+
+  .asset-card__cover-title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: clamp(1rem, 0.9rem + 0.45vw, 1.25rem);
+    line-height: 1.2;
   }
 
   .asset-card__body {

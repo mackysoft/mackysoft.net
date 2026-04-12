@@ -156,6 +156,24 @@ test.describe("home page", () => {
     await expect(page.getByRole("heading", { level: 1, name: "About" })).toBeVisible();
   });
 
+  test("falls back to a local cover treatment when release images fail", async ({ page }) => {
+    await page.route("https://opengraph.githubassets.com/**", async (route) => {
+      await route.abort();
+    });
+    await page.route("https://repository-images.githubusercontent.com/**", async (route) => {
+      await route.abort();
+    });
+    await page.goto("/");
+
+    const firstReleaseCard = page.locator(".release-card").first();
+    const firstFallback = firstReleaseCard.locator(".release-card__cover-fallback");
+
+    await expect(firstReleaseCard.locator(".release-card__cover")).toHaveAttribute("data-cover-state", "error");
+    await expect(firstFallback).toBeVisible();
+    await expect(firstFallback).toContainText("GitHub");
+    await expect(firstFallback).toContainText(latestReleaseRepoName);
+  });
+
   test("returns 404 for draft article routes", async ({ page }) => {
     const response = await page.goto("/articles/round-floor-ceil/");
 
