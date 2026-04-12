@@ -1,6 +1,7 @@
 ---
 import type { SiteLocale } from "../lib/i18n";
-import { getGameStatusLabel, type GameStatus } from "../lib/games";
+import { getGameStatusLabel } from "../lib/game-presentation";
+import type { GameStatus } from "../lib/game-repository";
 
 type Props = {
   status: GameStatus;

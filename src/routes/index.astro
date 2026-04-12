@@ -2,8 +2,9 @@
 import ArticleCard from "../components/ArticleCard.astro";
 import ReleaseCard from "../components/ReleaseCard.astro";
 import { getHomePageContent } from "../features/home/content";
-import { getArticleItems, getLatestReleases } from "../lib/articles";
+import { getArticleItems } from "../lib/articles";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { getLatestReleases } from "../lib/releases";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 type Props = {

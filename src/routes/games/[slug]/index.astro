@@ -7,8 +7,10 @@ import GameScreenshotGallery from "../../../components/GameScreenshotGallery.ast
 import GameStatusBadge from "../../../components/GameStatusBadge.astro";
 import { getUiText } from "../../../lib/copy";
 import { formatArticleNumericDate } from "../../../lib/article-dates";
+import { getGameTrailerEmbedUrl } from "../../../lib/game-media";
+import { getGamePlatformLabel } from "../../../lib/game-presentation";
+import { resolveLocalizedGameBySlug } from "../../../lib/game-repository";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
-import { getGamePlatformLabel, getGameTrailerEmbedUrl, resolveLocalizedGameBySlug } from "../../../lib/games";
 import { formatPageBreadcrumb } from "../../../lib/page-header";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 

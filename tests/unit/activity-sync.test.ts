@@ -6,13 +6,16 @@ import { describe, expect, test } from "vitest";
 
 import activityData from "../../src/generated/activity.json";
 import {
-  getLatestReleaseActivities,
-  getLatestReleases,
-  getReleaseActivities,
   sortArticleItems,
   toExternalArticleItem,
 } from "../../src/lib/articles";
-import type { ArticleActivity, ReleaseActivity } from "../../src/lib/articles";
+import type { ArticleActivity } from "../../src/lib/articles";
+import {
+  getLatestReleaseActivities,
+  getLatestReleases,
+  getReleaseActivities,
+} from "../../src/lib/releases";
+import type { ReleaseActivity } from "../../src/lib/releases";
 import {
   parseZennArticlePage,
   githubApiBaseUrl,

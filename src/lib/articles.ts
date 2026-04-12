@@ -32,24 +32,8 @@ export type ArticleActivity = {
   locales: LocalizedArticleActivityMap;
 };
 
-export type ReleaseActivity = {
-  groupId: string;
-  source: string;
-  repo: string;
-  description: string;
-  license: string;
-  stargazerCount: number;
-  name: string;
-  version: string;
-  url: string;
-  publishedAt: string;
-  coverUrl: string;
-  coverAlt: string;
-};
-
-export type ActivityData = {
+type ArticleActivityData = {
   articles: ArticleActivity[];
-  releases: ReleaseActivity[];
 };
 
 export type ArticleItem = {
@@ -88,11 +72,7 @@ export type LocalizedArticleEntry = {
   href: string;
 };
 
-const activity = activityData as unknown as ActivityData;
-const releaseStarCountFormatterMap: Record<SiteLocale, Intl.NumberFormat> = {
-  ja: new Intl.NumberFormat("ja-JP"),
-  en: new Intl.NumberFormat("en-US"),
-};
+const activity = activityData as unknown as ArticleActivityData;
 
 let localArticlesPromise: Promise<ArticleEntry[]> | undefined;
 let articleTranslationsPromise: Promise<TranslationEntryMap<ArticleTranslationEntry>> | undefined;
@@ -133,26 +113,6 @@ async function getArticleTranslationMap() {
 
 export function sortArticleItems(articleItems: ArticleItem[]) {
   return articleItems.sort((left, right) => right.publishedAt.valueOf() - left.publishedAt.valueOf());
-}
-
-export function sortReleaseActivities(releases: ReleaseActivity[]) {
-  return releases.sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
-}
-
-export function getLatestReleaseActivities(releases: ReleaseActivity[], limit = 3) {
-  return sortReleaseActivities([...releases]).slice(0, limit);
-}
-
-export function getReleaseActivities() {
-  return sortReleaseActivities([...activity.releases]);
-}
-
-export function getReleaseRepoName(repo: string) {
-  return repo.split("/").at(-1) ?? repo;
-}
-
-export function formatReleaseStargazerCount(stargazerCount: number, locale: SiteLocale = defaultLocale) {
-  return releaseStarCountFormatterMap[locale].format(stargazerCount);
 }
 
 export function toExternalArticleItem(article: ArticleActivity, locale: SiteLocale = defaultLocale): ArticleItem {
@@ -248,8 +208,4 @@ export async function getArticleItems(locale: SiteLocale = defaultLocale) {
   const localItems = await Promise.all(localArticles.map((article) => toLocalArticleItem(article, locale)));
   const externalArticles = activity.articles.map((article) => toExternalArticleItem(article, locale));
   return sortArticleItems([...localItems, ...externalArticles]);
-}
-
-export function getLatestReleases(limit = 3) {
-  return getReleaseActivities().slice(0, limit);
 }

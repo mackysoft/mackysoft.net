@@ -1,7 +1,9 @@
 ---
 import { getUiText } from "../lib/copy";
 import type { SiteLocale } from "../lib/i18n";
-import { isExternalGameActionHref, sortGameActions, type GameAction } from "../lib/games";
+import { isExternalGameActionHref } from "../lib/game-media";
+import { sortGameActions } from "../lib/game-presentation";
+import type { GameAction } from "../lib/game-repository";
 
 type Props = {
   actions: GameAction[];

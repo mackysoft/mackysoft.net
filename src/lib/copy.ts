@@ -1,4 +1,10 @@
+import { getSiteVocabulary, type SiteVocabulary } from "../features/site/vocabulary";
 import type { SiteLocale } from "./i18n";
+
+type CommonUiText = SiteVocabulary & {
+  japaneseOnlyBadge: string;
+  fallbackNotice: string;
+};
 
 type UiText = {
   header: {
@@ -9,19 +15,7 @@ type UiText = {
     languageShortLabel: Record<SiteLocale, string>;
     languageName: Record<SiteLocale, string>;
   };
-  common: {
-    home: string;
-    about: string;
-    games: string;
-    assets: string;
-    articles: string;
-    contact: string;
-    privacyPolicy: string;
-    tag: string;
-    archive: string;
-    japaneseOnlyBadge: string;
-    fallbackNotice: string;
-  };
+  common: CommonUiText;
   article: {
     publishedAt: string;
     updatedAt: string;
@@ -51,7 +45,18 @@ type UiText = {
   };
 };
 
-const uiTextMap: Record<SiteLocale, UiText> = {
+const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnlyBadge" | "fallbackNotice">> = {
+  ja: {
+    japaneseOnlyBadge: "日本語のみ",
+    fallbackNotice: "このページは現在日本語のみです。",
+  },
+  en: {
+    japaneseOnlyBadge: "Japanese only",
+    fallbackNotice: "This page is currently available only in Japanese.",
+  },
+};
+
+const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
   ja: {
     header: {
       toolsLabel: "ヘッダーツール",
@@ -66,19 +71,6 @@ const uiTextMap: Record<SiteLocale, UiText> = {
         ja: "日本語",
         en: "English",
       },
-    },
-    common: {
-      home: "Home",
-      about: "About",
-      games: "Games",
-      assets: "Assets",
-      articles: "Articles",
-      contact: "Contact",
-      privacyPolicy: "Privacy Policy",
-      tag: "Tag",
-      archive: "Archive",
-      japaneseOnlyBadge: "日本語のみ",
-      fallbackNotice: "このページは現在日本語のみです。",
     },
     article: {
       publishedAt: "公開日",
@@ -123,19 +115,6 @@ const uiTextMap: Record<SiteLocale, UiText> = {
         en: "English",
       },
     },
-    common: {
-      home: "Home",
-      about: "About",
-      games: "Games",
-      assets: "Assets",
-      articles: "Articles",
-      contact: "Contact",
-      privacyPolicy: "Privacy Policy",
-      tag: "Tag",
-      archive: "Archive",
-      japaneseOnlyBadge: "Japanese only",
-      fallbackNotice: "This page is currently available only in Japanese.",
-    },
     article: {
       publishedAt: "Published",
       updatedAt: "Updated",
@@ -167,7 +146,13 @@ const uiTextMap: Record<SiteLocale, UiText> = {
 };
 
 export function getUiText(locale: SiteLocale) {
-  return uiTextMap[locale];
+  return {
+    ...uiTextMap[locale],
+    common: {
+      ...getSiteVocabulary(locale),
+      ...commonUiTextOverrides[locale],
+    },
+  };
 }
 
 const articleCountFormatterMap: Record<SiteLocale, (count: number) => string> = {

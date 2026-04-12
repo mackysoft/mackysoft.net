@@ -2,13 +2,15 @@ import { describe, expect, test } from "vitest";
 
 import {
   getGameDateValue,
+} from "../../src/lib/game-repository";
+import {
   getGameTrailerEmbedUrl,
   getGameTrailerVideoId,
   isExternalGameActionHref,
   isInternalGameActionHref,
   isSupportedGameTrailerUrl,
   isValidGameActionHref,
-} from "../../src/lib/games";
+} from "../../src/lib/game-media";
 
 describe("games helpers", () => {
   test("treats site-relative action links as internal", () => {

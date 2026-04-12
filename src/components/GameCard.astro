@@ -5,7 +5,8 @@ import { getUiText } from "../lib/copy";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import GameStatusBadge from "./GameStatusBadge.astro";
 import { formatArticleDate } from "../lib/article-dates";
-import { getGamePlatformLabel, type LocalizedGameEntry } from "../lib/games";
+import { getGamePlatformLabel } from "../lib/game-presentation";
+import type { LocalizedGameEntry } from "../lib/game-repository";
 
 type Props = {
   game: LocalizedGameEntry;

@@ -19,31 +19,6 @@ export type LocalizedGameEntry = {
   href: string;
 };
 
-const gameStatusLabelMap: Record<SiteLocale, Record<GameStatus, string>> = {
-  ja: {
-    active: "公開中",
-    archived: "アーカイブ済み",
-    prototype: "プロトタイプ",
-  },
-  en: {
-    active: "Live",
-    archived: "Archived",
-    prototype: "Prototype",
-  },
-};
-
-const gamePlatformLabelMap: Record<SiteLocale, Record<string, string>> = {
-  ja: {
-    Browser: "ブラウザ",
-  },
-  en: {
-    Browser: "Browser",
-  },
-};
-
-const gameActionOrder: GameActionKind[] = ["play", "store", "press-kit", "streaming-guidelines", "privacy-policy", "repository"];
-const supportedYouTubeHosts = new Set(["youtu.be", "youtube.com", "www.youtube.com", "m.youtube.com"]);
-
 let gamesPromise: Promise<GameEntry[]> | undefined;
 let gameTranslationsPromise: Promise<TranslationEntryMap<GameTranslationEntry>> | undefined;
 
@@ -82,19 +57,11 @@ async function getGameTranslationMap() {
   return gameTranslationsPromise;
 }
 
-export function getGameStatusLabel(status: GameStatus, locale: SiteLocale = defaultLocale) {
-  return gameStatusLabelMap[locale][status];
-}
-
-export function getGamePlatformLabel(platform: string, locale: SiteLocale = defaultLocale) {
-  return gamePlatformLabelMap[locale][platform] ?? platform;
-}
-
 export function getGameDateValue(game: Pick<GameEntry, "data">) {
   return game.data.publishedAt?.valueOf() ?? 0;
 }
 
-export function sortGames<T extends Pick<GameEntry, "data">>(games: T[]) {
+function sortGames<T extends Pick<GameEntry, "data">>(games: T[]) {
   return [...games].sort((left, right) => getGameDateValue(right) - getGameDateValue(left));
 }
 
@@ -133,68 +100,4 @@ export async function resolveLocalizedGameBySlug(slug: string, locale: SiteLocal
 export async function getLocalizedGames(locale: SiteLocale = defaultLocale) {
   const games = await getGames();
   return Promise.all(games.map((game) => resolveLocalizedGameBySlug(game.id, locale))) as Promise<Array<LocalizedGameEntry | null>>;
-}
-
-export function sortGameActions(actions: GameAction[]) {
-  return [...actions].sort((left, right) => gameActionOrder.indexOf(left.kind) - gameActionOrder.indexOf(right.kind));
-}
-
-export function isInternalGameActionHref(href: string) {
-  return href.startsWith("/") && !href.startsWith("//");
-}
-
-export function isSafeExternalGameActionHref(href: string) {
-  try {
-    const parsedUrl = new URL(href);
-    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-export function isValidGameActionHref(href: string) {
-  return isInternalGameActionHref(href) || isSafeExternalGameActionHref(href);
-}
-
-export function isExternalGameActionHref(href: string) {
-  return isSafeExternalGameActionHref(href);
-}
-
-export function getGameTrailerVideoId(url: string) {
-  let parsedUrl: URL;
-
-  try {
-    parsedUrl = new URL(url);
-  } catch {
-    return null;
-  }
-
-  if (!supportedYouTubeHosts.has(parsedUrl.hostname)) {
-    return null;
-  }
-
-  if (parsedUrl.hostname === "youtu.be") {
-    const videoId = parsedUrl.pathname.split("/").filter(Boolean)[0];
-    return videoId || null;
-  }
-
-  if (parsedUrl.pathname === "/watch") {
-    return parsedUrl.searchParams.get("v");
-  }
-
-  if (parsedUrl.pathname.startsWith("/embed/")) {
-    const videoId = parsedUrl.pathname.split("/")[2];
-    return videoId || null;
-  }
-
-  return null;
-}
-
-export function isSupportedGameTrailerUrl(url: string) {
-  return getGameTrailerVideoId(url) !== null;
-}
-
-export function getGameTrailerEmbedUrl(url: string) {
-  const videoId = getGameTrailerVideoId(url);
-  return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
 }

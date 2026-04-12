@@ -3,8 +3,8 @@ import GameCard from "../../components/GameCard.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { getGamesPageContent } from "../../features/games/content";
 import { getUiText } from "../../lib/copy";
+import { getLocalizedGames } from "../../lib/game-repository";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
-import { getLocalizedGames } from "../../lib/games";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 

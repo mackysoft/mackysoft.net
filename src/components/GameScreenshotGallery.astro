@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 
 import { getUiText } from "../lib/copy";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
-import type { GameEntry } from "../lib/games";
+import type { GameEntry } from "../lib/game-repository";
 
 type Props = {
   screenshots: GameEntry["data"]["screenshots"];

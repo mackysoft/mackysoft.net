@@ -2,7 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-import { isSupportedGameTrailerUrl, isValidGameActionHref } from "./lib/games";
+import { isSupportedGameTrailerUrl, isValidGameActionHref } from "./lib/game-media";
 
 const gameActionKindSchema = z.enum(["play", "store", "press-kit", "streaming-guidelines", "privacy-policy", "repository"]);
 const gameStatusSchema = z.enum(["active", "archived", "prototype"]);

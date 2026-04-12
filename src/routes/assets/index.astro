@@ -4,9 +4,9 @@ import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { getAssetsPageContent } from "../../features/assets/content";
 import { getUiText } from "../../lib/copy";
-import { getReleaseActivities } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { getReleaseActivities } from "../../lib/releases";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 type Props = {
