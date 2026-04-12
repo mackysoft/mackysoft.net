@@ -267,11 +267,27 @@ test.describe("articles page", () => {
   test("keeps English local article routes and shows a Japanese fallback notice", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/en/articles/vision-introduction/");
 
+    const breadcrumb = page.locator(".article-page-header .eyebrow");
+    const fallbackNotice = page.locator(".article-fallback-notice");
+    const hero = page.locator(".article-hero");
+
     await expect(page).toHaveURL("/en/articles/vision-introduction/");
-    await expect(page.locator(".article-fallback-notice")).toContainText("This page is currently available only in Japanese.");
+    await expect(fallbackNotice).toContainText("This page is currently available only in Japanese.");
     await expect(page.getByRole("heading", { level: 1, name: "【Unity】CullingGroupをより簡単に実装する【Vision】" })).toBeVisible();
-    await expect(page.locator(".article-page-header .eyebrow")).toHaveText("Home / Articles");
+    await expect(breadcrumb).toHaveText("Home / Articles");
     await expect(page.locator(".article-content")).toContainText("CullingGroup");
+
+    const breadcrumbBox = await breadcrumb.boundingBox();
+    const fallbackBox = await fallbackNotice.boundingBox();
+    const heroBox = await hero.boundingBox();
+
+    if (!breadcrumbBox || !fallbackBox || !heroBox) {
+      throw new Error("fallback article layout must be visible before order assertions");
+    }
+
+    expect(breadcrumbBox.y).toBeLessThan(fallbackBox.y);
+    expect(fallbackBox.y).toBeLessThan(heroBox.y);
+    expect(heroBox.y - (fallbackBox.y + fallbackBox.height)).toBeGreaterThan(12);
   });
 
   test("keeps localized internal links inside English fallback article content", { tag: "@size:medium" }, async ({ page }) => {

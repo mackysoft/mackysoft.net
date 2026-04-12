@@ -63,6 +63,12 @@ const localizedContentHtml = localizeContentHtml(article.entry.rendered?.html ??
       <p class="eyebrow">{formatPageBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
     </section>
 
+    {article.isFallback && locale === "en" && (
+      <section class="content-panel article-fallback-notice">
+        <p>{uiText.common.fallbackNotice}</p>
+      </section>
+    )}
+
     <header class="article-hero">
       {article.data.cover && (
         <div class="cover">
@@ -75,12 +81,6 @@ const localizedContentHtml = localizeContentHtml(article.entry.rendered?.html ??
         {article.data.updatedAt && <span>{uiText.article.updatedAt}: {formatArticleNumericDate(article.data.updatedAt, locale)}</span>}
       </p>
     </header>
-
-    {article.isFallback && locale === "en" && (
-      <section class="content-panel article-fallback-notice">
-        <p>{uiText.common.fallbackNotice}</p>
-      </section>
-    )}
 
     <div class:list={["article-layout", tocHeadings.length > 0 && "article-layout--with-toc"]}>
       {tocHeadings.length > 0 && <ArticleToc headings={tocHeadings} locale={locale} />}
@@ -125,6 +125,10 @@ const localizedContentHtml = localizeContentHtml(article.entry.rendered?.html ??
   .article-layout {
     display: grid;
     gap: 1.5rem;
+  }
+
+  .article-fallback-notice {
+    margin-bottom: 1rem;
   }
 
   .article-fallback-notice p {
