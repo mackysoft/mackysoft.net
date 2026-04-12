@@ -127,6 +127,27 @@ test.describe("site search", () => {
     await expect(pagePanel.locator(".site-search__summary")).toContainText(`${count} 件の検索結果`);
   });
 
+  test("shows the total match count in inline search even when the preview is capped", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.goto("/");
+
+    await page.locator('[data-site-search-trigger]').click();
+    const inlinePanel = page.locator('[data-site-search-inline]');
+    const input = inlinePanel.locator('[data-site-search-input]');
+    await input.fill(overflowSearchQuery);
+
+    await expect.poll(async () => inlinePanel.locator(".site-search-card").count()).toBe(20);
+    const inlineSummaryText = await inlinePanel.locator(".site-search__summary").textContent();
+
+    await page.goto(`/search/?q=${encodeURIComponent(overflowSearchQuery)}`);
+
+    const pagePanel = page.locator('[data-search-mode="page"]').first();
+    await expect.poll(async () => pagePanel.locator(".site-search-card").count()).toBeGreaterThan(20);
+    const totalCount = await pagePanel.locator(".site-search-card").count();
+    expect(inlineSummaryText).toContain(`${totalCount} 件の検索結果`);
+    expect(inlineSummaryText).toContain("上位 20 件を表示");
+  });
+
   test("does not include Japanese-only local pages in English search", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto(`/en/search/?q=${encodeURIComponent("認証の文脈")}`);
 

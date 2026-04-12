@@ -232,10 +232,19 @@ const searchResultCountFormatterMap: Record<SiteLocale, (count: number) => strin
   en: (count) => `${count} search result${count === 1 ? "" : "s"}`,
 };
 
+const searchResultPreviewFormatterMap: Record<SiteLocale, (totalCount: number, visibleCount: number) => string> = {
+  ja: (totalCount, visibleCount) => `${totalCount} 件の検索結果（上位 ${visibleCount} 件を表示）`,
+  en: (totalCount, visibleCount) => `${totalCount} search result${totalCount === 1 ? "" : "s"} (showing top ${visibleCount})`,
+};
+
 export function formatArticleCountLabel(count: number, locale: SiteLocale) {
   return articleCountFormatterMap[locale](count);
 }
 
 export function formatSearchResultCountLabel(count: number, locale: SiteLocale) {
   return searchResultCountFormatterMap[locale](count);
+}
+
+export function formatSearchResultPreviewLabel(totalCount: number, visibleCount: number, locale: SiteLocale) {
+  return searchResultPreviewFormatterMap[locale](totalCount, visibleCount);
 }

@@ -8,7 +8,11 @@ import {
   selectSearchTargetUrl,
   type SearchResultDataLike,
 } from "../lib/search";
-import { formatSearchResultCountLabel, getUiText } from "../lib/ui-text";
+import {
+  formatSearchResultCountLabel,
+  formatSearchResultPreviewLabel,
+  getUiText,
+} from "../lib/ui-text";
 import { isSiteLocale, type SiteLocale } from "../lib/i18n";
 
 type PagefindResult = {
@@ -297,13 +301,19 @@ function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, 
   return card;
 }
 
-function renderResults(elements: SearchPanelElements, results: PagefindSearchResultData[]) {
+function renderResults(
+  elements: SearchPanelElements,
+  results: PagefindSearchResultData[],
+  totalCount = results.length,
+) {
   if (results.length === 0) {
     renderEmptyState(elements);
     return;
   }
 
-  const summaryText = formatSearchResultCountLabel(results.length, elements.locale);
+  const summaryText = totalCount > results.length
+    ? formatSearchResultPreviewLabel(totalCount, results.length, elements.locale)
+    : formatSearchResultCountLabel(totalCount, elements.locale);
 
   const cards = document.createElement("div");
   cards.className = "site-search__results-grid";
@@ -412,6 +422,7 @@ function initSearchPanel(root: HTMLElement) {
         return;
       }
 
+      const totalCount = response.results.length;
       const resultEntries = elements.mode === "inline"
         ? response.results.slice(0, 20)
         : response.results;
@@ -421,7 +432,7 @@ function initSearchPanel(root: HTMLElement) {
         return;
       }
 
-      renderResults(elements, results);
+      renderResults(elements, results, totalCount);
     } catch {
       if (requestId !== currentRequestId) {
         return;
