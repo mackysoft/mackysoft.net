@@ -30,9 +30,13 @@ test.describe("site search", () => {
     await input.fill(localSearchQuery);
 
     const firstCard = panel.locator(".site-search-card").first();
-    await expect(firstCard.locator('.activity-card__link-layer')).toHaveAttribute("href", /vision-introduction/);
+    const localArticleCard = panel.locator(".site-search-card").filter({
+      has: page.locator('.activity-card__link-layer[href*="vision-introduction"]'),
+    }).first();
+
     await expect(firstCard.locator(".site-search-card__cover")).toHaveCount(0);
     await expect(firstCard.locator(".site-search-card__excerpt")).toContainText(localSearchQuery);
+    await expect(localArticleCard).toBeVisible();
 
     await page.keyboard.press("Escape");
 

@@ -35,7 +35,7 @@ export async function buildSearchIndex({ fetchImpl = fetch } = {}) {
 
   const activity = await readActivityData();
   const externalArticleRecords = await createExternalArticleSearchRecords(activity.articles, fetchImpl);
-  const releaseRecords = createReleaseSearchRecords(activity.releases);
+  const releaseRecords = await createReleaseSearchRecords(activity.releases, fetchImpl);
 
   for (const record of [...externalArticleRecords, ...releaseRecords]) {
     const result = await index.addCustomRecord(record);

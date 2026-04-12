@@ -2,13 +2,34 @@ import {
   fetchZennArticleHtml,
   parseZennArticlePage,
 } from "../activity-sync/zenn.mjs";
-import { normalizeWhitespace } from "../activity-sync/shared.mjs";
+import { createGitHubHeaders } from "../activity-sync/github.mjs";
+import {
+  decodeHtmlEntities,
+  githubApiBaseUrl,
+  normalizeWhitespace,
+} from "../activity-sync/shared.mjs";
 import localeDefinitions from "../../src/config/locales.json" with { type: "json" };
 
 const searchRecordLanguages = Object.keys(localeDefinitions);
 
 function createSearchContent(parts) {
   return normalizeWhitespace(parts.filter(Boolean).join("\n\n"));
+}
+
+function stripMarkdownForSearch(value) {
+  const plainText = value
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, " $1 ")
+    .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)]\([^)]+\)/g, " $1 ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s?/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/[|*_~]/g, " ");
+
+  return normalizeWhitespace(decodeHtmlEntities(plainText));
 }
 
 function createSyntheticSearchRecordUrl(kind, id, language) {
@@ -175,7 +196,40 @@ function getReleaseRepoName(repo) {
   return repo.split("/").at(-1) ?? repo;
 }
 
-export function createReleaseSearchRecords(releases) {
+async function fetchRepositoryReadme(repo, fetchImpl = fetch) {
+  const response = await fetchImpl(`${githubApiBaseUrl}/repos/${repo}/readme`, {
+    headers: {
+      ...createGitHubHeaders(),
+      Accept: "application/vnd.github.raw+json",
+    },
+  });
+
+  if (response.status === 404) {
+    return "";
+  }
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch README for ${repo}: ${response.status} ${response.statusText}`);
+  }
+
+  const body = await response.text();
+  return stripMarkdownForSearch(body);
+}
+
+async function resolveReleaseReadme(repo, fetchImpl = fetch) {
+  try {
+    return await fetchRepositoryReadme(repo, fetchImpl);
+  } catch (error) {
+    console.warn(`Failed to fetch GitHub README for ${repo}: ${error instanceof Error ? error.message : String(error)}`);
+    return "";
+  }
+}
+
+export async function createReleaseSearchRecords(releases, fetchImpl = fetch) {
+  const readmeByRepo = new Map(await Promise.all(
+    [...new Set(releases.map((release) => release.repo))].map(async (repo) => [repo, await resolveReleaseReadme(repo, fetchImpl)]),
+  ));
+
   return releases.flatMap((release) => {
     const title = getReleaseRepoName(release.repo);
     const aliasTerms = createSearchAliases(release.repo, title, release.name ?? "", release.version ?? "");
@@ -188,6 +242,7 @@ export function createReleaseSearchRecords(releases) {
       release.description,
       release.license,
       release.source,
+      readmeByRepo.get(release.repo) ?? "",
     ]);
 
     return searchRecordLanguages.map((language) =>

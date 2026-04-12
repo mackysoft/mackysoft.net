@@ -123,8 +123,8 @@ describe("search-index records", () => {
     expect(record?.content).toContain("Stored summary only");
   });
 
-  test("creates release search records for both Japanese and English indexes", () => {
-    const records = createReleaseSearchRecords([
+  test("creates release search records for both Japanese and English indexes", async () => {
+    const records = await createReleaseSearchRecords([
       {
         groupId: "GitHub:mackysoft/example",
         source: "GitHub",
@@ -139,7 +139,7 @@ describe("search-index records", () => {
         coverUrl: "https://example.com/release-cover.png",
         coverAlt: "release cover",
       },
-    ]);
+    ], async () => createHtmlResponse("# Example README\n\nFeature overview with README only keyword."));
 
     expect(records).toHaveLength(2);
     expect(records.map((record: { language: string }) => record.language)).toEqual(["ja", "en"]);
@@ -156,6 +156,32 @@ describe("search-index records", () => {
       },
     });
     expect(records[0]?.content).toContain("1.2.3");
+    expect(records[0]?.content).toContain("Release description");
+    expect(records[0]?.content).toContain("README only keyword");
+  });
+
+  test("keeps release records when the repository README is missing", async () => {
+    const records = await createReleaseSearchRecords([
+      {
+        groupId: "GitHub:mackysoft/missing-readme",
+        source: "GitHub",
+        repo: "mackysoft/missing-readme",
+        description: "Release description",
+        license: "MIT",
+        stargazerCount: 10,
+        name: "Example release",
+        version: "1.2.3",
+        url: "https://github.com/mackysoft/missing-readme/releases/tag/1.2.3",
+        publishedAt: "2026-01-01T00:00:00.000Z",
+        coverUrl: "https://example.com/release-cover.png",
+        coverAlt: "release cover",
+      },
+    ], async () => new Response("Not Found", {
+      status: 404,
+      statusText: "Not Found",
+    }));
+
+    expect(records).toHaveLength(2);
     expect(records[0]?.content).toContain("Release description");
   });
 });
