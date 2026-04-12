@@ -32,6 +32,26 @@ function normalizeAnalyticsValue(value: string | null | undefined) {
   return normalizedValue ? normalizedValue : null;
 }
 
+function normalizeAnalyticsHref(value: string | null | undefined) {
+  const normalizedValue = normalizeAnalyticsValue(value);
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  try {
+    const url = new URL(normalizedValue);
+
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.toString();
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function isImplementedAnalyticsEventName(value: string): value is ImplementedAnalyticsEventName {
   return (implementedAnalyticsEventNames as readonly string[]).includes(value);
 }
@@ -68,7 +88,7 @@ export function buildAnalyticsEventPayload(input: AnalyticsPayloadInput): Analyt
     ?? normalizeAnalyticsValue(input.ariaLabel)
     ?? normalizeAnalyticsValue(input.textContent);
   const location = normalizeAnalyticsValue(input.location);
-  const href = normalizeAnalyticsValue(input.href);
+  const href = normalizeAnalyticsHref(input.href);
   const params: Record<string, string> = {};
 
   if (label) {

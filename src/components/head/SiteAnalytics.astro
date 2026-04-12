@@ -16,16 +16,19 @@ const analyticsScriptUrl = measurementId
         window.gtag = function gtag() {
           window.dataLayer.push(arguments);
         };
+        const skipInitialPageView = window.__mackysoftSkipInitialPageView === true;
         window.gtag("js", new Date());
         window.gtag("config", measurementId, {
           allow_google_signals: false,
           allow_ad_personalization_signals: false,
+          send_page_view: !skipInitialPageView,
         });
       </script>
       <script>
         import { buildAnalyticsEventPayload } from "../../lib/analytics";
 
         type AnalyticsWindow = Window & typeof globalThis & {
+          __mackysoftSkipInitialPageView?: boolean;
           gtag?: (...args: unknown[]) => void;
         };
 

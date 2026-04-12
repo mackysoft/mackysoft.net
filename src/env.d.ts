@@ -10,6 +10,7 @@ interface ImportMeta {
 
 declare global {
   interface Window {
+    __mackysoftSkipInitialPageView?: boolean;
     dataLayer: unknown[];
     gtag?: (...args: unknown[]) => void;
   }

@@ -83,6 +83,23 @@ describe("analytics helpers", () => {
     });
   });
 
+  test("omits unsupported link schemes from analytics payloads", () => {
+    expect(
+      buildAnalyticsEventPayload({
+        eventName: "external_link_click",
+        explicitLabel: "Send email",
+        location: "contact-page",
+        href: "mailto:mackysoft0129@gmail.com",
+      }),
+    ).toEqual({
+      eventName: "external_link_click",
+      params: {
+        target_label: "Send email",
+        ui_location: "contact-page",
+      },
+    });
+  });
+
   test("does not build payloads for unimplemented reserved events", () => {
     expect(
       buildAnalyticsEventPayload({
