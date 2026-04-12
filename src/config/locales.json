@@ -1,0 +1,16 @@
+{
+  "ja": {
+    "code": "ja",
+    "pathPrefix": "",
+    "languageTag": "ja",
+    "intlLocale": "ja-JP",
+    "browserMatchPrefixes": ["ja"]
+  },
+  "en": {
+    "code": "en",
+    "pathPrefix": "en",
+    "languageTag": "en",
+    "intlLocale": "en-US",
+    "browserMatchPrefixes": ["en"]
+  }
+}

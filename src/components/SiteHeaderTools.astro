@@ -1,23 +1,35 @@
 ---
-import SearchPlaceholder from "./header/SearchPlaceholder.astro";
+import SearchTrigger from "./header/SearchTrigger.astro";
+import SearchInlinePanel from "./search/SearchInlinePanel.astro";
 import ThemeToggle from "./header/ThemeToggle.astro";
 import LocaleMenu from "./header/LocaleMenu.astro";
 import { getUiText } from "../lib/ui-text";
-import type { SiteLocale } from "../lib/i18n";
+import { localizePath, type SiteLocale } from "../lib/i18n";
 
 type Props = {
   locale: SiteLocale;
   contentLocale?: SiteLocale;
   isFallback?: boolean;
   currentPath: string;
+  enableSearchPanel?: boolean;
 };
 
-const { locale, contentLocale = locale, isFallback = false, currentPath } = Astro.props as Props;
+const {
+  locale,
+  contentLocale = locale,
+  isFallback = false,
+  currentPath,
+  enableSearchPanel = true,
+} = Astro.props as Props;
 const uiText = getUiText(locale);
+const searchPath = localizePath("/search/", locale);
 ---
 
 <div class="site-header-tools" role="group" aria-label={uiText.header.toolsLabel} data-site-header-tools>
-  <SearchPlaceholder locale={locale} />
   <ThemeToggle locale={locale} />
   <LocaleMenu locale={locale} contentLocale={contentLocale} isFallback={isFallback} currentPath={currentPath} />
+  <div class="site-header-search">
+    <SearchTrigger locale={locale} href={searchPath} enableInline={enableSearchPanel} />
+    {enableSearchPanel && <SearchInlinePanel locale={locale} />}
+  </div>
 </div>

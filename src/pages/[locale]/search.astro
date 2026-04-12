@@ -1,0 +1,8 @@
+---
+import SearchRoute from "../../routes/search.astro";
+import { getNonDefaultLocaleStaticPaths } from "../../lib/locale-pages";
+
+export const getStaticPaths = getNonDefaultLocaleStaticPaths;
+---
+
+<SearchRoute />

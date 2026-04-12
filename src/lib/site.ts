@@ -1,11 +1,13 @@
 import { getSiteContent } from "../features/site/content";
 import { localizePath, type SiteLocale } from "./i18n";
 
+export const siteName = "mackysoft.net";
+
 export function getSiteMeta(locale: SiteLocale) {
   const content = getSiteContent(locale);
 
   return {
-    name: "mackysoft.net",
+    name: siteName,
     description: content.description,
   } as const;
 }

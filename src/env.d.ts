@@ -1,5 +1,6 @@
 /// <reference types="astro/client" />
 
+declare module "/pagefind/pagefind.js";
 interface ImportMetaEnv {
   readonly PUBLIC_GA4_MEASUREMENT_ID?: string;
 }

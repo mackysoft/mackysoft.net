@@ -375,6 +375,7 @@ describe("sync-activity", () => {
     expect(parseZennArticlePage(html)).toEqual({
       title: "Localized title",
       description: "Localized summary text.",
+      content: "Localized summary text.",
       url: "https://zenn.dev/makihiro_dev/articles/localized?locale=en",
       locale: "en",
       isTranslated: true,

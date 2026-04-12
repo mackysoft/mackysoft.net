@@ -1,5 +1,6 @@
 ---
 import PageHeader from "../components/PageHeader.astro";
+import SearchMetadata from "../components/search/SearchMetadata.astro";
 import Stack from "../components/Stack.astro";
 import DescribedLinkList from "../features/about/DescribedLinkList.astro";
 import { getAboutPageContent } from "../features/about/content";
@@ -32,10 +33,18 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
   canonicalPath={localizePath("/about/", locale)}
   alternateLocales={createAlternateLocaleLinks("/about/")}
 >
-  <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
+  <div class="about-page" data-pagefind-body>
+    <SearchMetadata
+      type="page"
+      description={aboutPageContent.description}
+      source="mackysoft.net"
+      image={aboutPageContent.profile.avatar.src}
+      imageAlt={aboutPageContent.profile.avatar.alt}
+    />
+    <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
 
-  <Stack as="section" class="content-panel about-main" gap="1.1rem">
-    <Stack class="profile-intro">
+    <Stack as="section" class="content-panel about-main" gap="1.1rem">
+      <Stack class="profile-intro">
         <a
           href={profilePrimaryExternalLink.href}
           target="_blank"
@@ -46,62 +55,68 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
           data-analytics-label={profilePrimaryExternalLink.label}
           data-analytics-location="about-profile"
         >
-        <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
-      </a>
-      <Stack class="profile-copy" gap="0.35rem">
-        <p class="profile-name">{aboutPageContent.profile.name}</p>
-        <p>{aboutPageContent.profile.summary}</p>
+          <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
+        </a>
+        <Stack class="profile-copy" gap="0.35rem">
+          <p class="profile-name">{aboutPageContent.profile.name}</p>
+          <p>{aboutPageContent.profile.summary}</p>
+        </Stack>
+      </Stack>
+
+      <Stack as="section" class="about-section" gap="0.55rem">
+        <h2>{aboutPageContent.whatIDo.heading}</h2>
+        <div class="content-grid compact-copy">
+          {aboutPageContent.whatIDo.paragraphs.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+      </Stack>
+
+      <Stack as="section" class="about-section" gap="0.55rem">
+        <h2>{aboutPageContent.domainsAndInterests.heading}</h2>
+        <ul class="interest-list">
+          {aboutPageContent.domainsAndInterests.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </Stack>
+
+      <Stack as="section" class="about-section" gap="0.55rem">
+        <h2>{aboutPageContent.siteGuide.heading}</h2>
+        <div class="content-grid compact-copy">
+          {aboutPageContent.siteGuide.paragraphs.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+        <DescribedLinkList items={localizedSiteGuideItems} />
       </Stack>
     </Stack>
 
-    <Stack as="section" class="about-section" gap="0.55rem">
-      <h2>{aboutPageContent.whatIDo.heading}</h2>
-      <div class="content-grid compact-copy">
-        {aboutPageContent.whatIDo.paragraphs.map((paragraph) => (
-          <p>{paragraph}</p>
-        ))}
-      </div>
-    </Stack>
+    <section class="content-grid section-grid">
+      <section class="content-panel">
+        <h2>{aboutPageContent.externalLinksHeading}</h2>
+        <DescribedLinkList items={aboutExternalLinks} analyticsLocation="about-links" />
+      </section>
 
-    <Stack as="section" class="about-section" gap="0.55rem">
-      <h2>{aboutPageContent.domainsAndInterests.heading}</h2>
-      <ul class="interest-list">
-        {aboutPageContent.domainsAndInterests.items.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-    </Stack>
-
-    <Stack as="section" class="about-section" gap="0.55rem">
-      <h2>{aboutPageContent.siteGuide.heading}</h2>
-      <div class="content-grid compact-copy">
-        {aboutPageContent.siteGuide.paragraphs.map((paragraph) => (
-          <p>{paragraph}</p>
-        ))}
-      </div>
-      <DescribedLinkList items={localizedSiteGuideItems} />
-    </Stack>
-  </Stack>
-
-  <section class="content-grid section-grid">
-    <section class="content-panel">
-      <h2>{aboutPageContent.externalLinksHeading}</h2>
-      <DescribedLinkList items={aboutExternalLinks} analyticsLocation="about-links" />
+      <section class="content-panel">
+        <h2>{aboutPageContent.contact.heading}</h2>
+        <div class="content-grid compact-copy">
+          {aboutPageContent.contact.paragraphs.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+        <a href={localizePath(aboutPageContent.contact.href, locale)} class="button-link">{aboutPageContent.contact.ctaLabel}</a>
+      </section>
     </section>
-
-    <section class="content-panel">
-      <h2>{aboutPageContent.contact.heading}</h2>
-      <div class="content-grid compact-copy">
-        {aboutPageContent.contact.paragraphs.map((paragraph) => (
-          <p>{paragraph}</p>
-        ))}
-      </div>
-      <a href={localizePath(aboutPageContent.contact.href, locale)} class="button-link">{aboutPageContent.contact.ctaLabel}</a>
-    </section>
-  </section>
+  </div>
 </SiteLayout>
 
 <style>
+  .about-page {
+    display: grid;
+    gap: 2rem;
+  }
+
   h2 {
     margin-top: 0;
   }

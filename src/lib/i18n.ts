@@ -1,17 +1,14 @@
-const localeDefinitions = {
-  ja: {
-    code: "ja",
-    pathPrefix: "",
-    languageTag: "ja",
-    browserMatchPrefixes: ["ja"],
-  },
-  en: {
-    code: "en",
-    pathPrefix: "en",
-    languageTag: "en",
-    browserMatchPrefixes: ["en"],
-  },
-} as const;
+import localeDefinitionsData from "../config/locales.json";
+
+type LocaleDefinition = {
+  code: string;
+  pathPrefix: string;
+  languageTag: string;
+  intlLocale: string;
+  browserMatchPrefixes: readonly string[];
+};
+
+const localeDefinitions = localeDefinitionsData satisfies Record<string, LocaleDefinition>;
 
 export type SiteLocale = keyof typeof localeDefinitions;
 export const defaultLocale = "ja" as const;
@@ -210,4 +207,8 @@ export function getLocalePreference(candidates: readonly string[] | null | undef
 
 export function toLanguageTag(locale: SiteLocale) {
   return getLocaleDefinition(locale).languageTag;
+}
+
+export function getIntlLocale(locale: SiteLocale) {
+  return getLocaleDefinition(locale).intlLocale;
 }

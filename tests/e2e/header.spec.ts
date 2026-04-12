@@ -24,7 +24,8 @@ test.describe("site header", () => {
     await expect(tools).toBeVisible();
     await expect(nav).toBeVisible();
     await expect(searchTool).toBeVisible();
-    await expect(searchTool).toBeDisabled();
+    await expect(searchTool).toHaveAttribute("href", "/search/");
+    await expect(searchTool).toHaveAttribute("aria-label", "検索を開く");
     await expect(themeTool.locator("svg")).toHaveCount(2);
     await expect(themeTool).toBeEnabled();
     await expect(themeTool).toHaveAttribute("aria-label", "テーマを切り替え");
@@ -68,6 +69,7 @@ test.describe("site header", () => {
     await expect(brand).toBeVisible();
     await expect(tools).toBeVisible();
     await expect(nav).toBeVisible();
+    await expect(tools.locator('[data-site-tool="search"]')).toHaveAttribute("href", "/search/");
     await expect(tools.locator('[data-site-tool="theme"]')).toBeEnabled();
 
     const headerBox = await header.boundingBox();

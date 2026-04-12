@@ -9,7 +9,7 @@ type CommonUiText = SiteVocabulary & {
 type UiText = {
   header: {
     toolsLabel: string;
-    searchPlaceholder: string;
+    searchOpen: string;
     themeToggle: string;
     languageMenu: string;
     languageShortLabel: Record<SiteLocale, string>;
@@ -43,6 +43,25 @@ type UiText = {
     languages: string;
     platforms: string;
   };
+  search: {
+    pageDescription: string;
+    lead: string;
+    modalTitle: string;
+    inputLabel: string;
+    inputPlaceholder: string;
+    submit: string;
+    close: string;
+    openPage: string;
+    noQueryTitle: string;
+    noQueryBody: string;
+    loading: string;
+    emptyTitle: string;
+    emptyBody: string;
+    errorTitle: string;
+    errorBody: string;
+    externalBadge: string;
+    typeLabel: Record<"article" | "game" | "asset" | "page", string>;
+  };
 };
 
 const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnlyBadge" | "fallbackNotice">> = {
@@ -60,7 +79,7 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
   ja: {
     header: {
       toolsLabel: "ヘッダーツール",
-      searchPlaceholder: "検索プレースホルダー",
+      searchOpen: "検索を開く",
       themeToggle: "テーマを切り替え",
       languageMenu: "表示言語を切り替え",
       languageShortLabel: {
@@ -99,11 +118,35 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
       languages: "対応言語",
       platforms: "プラットフォーム",
     },
+    search: {
+      pageDescription: "サイト内の記事、ゲーム、外部記事、公開アセットを検索できます。",
+      lead: "記事本文や作品詳細、外部記事、公開中アセットを横断して検索できます。",
+      modalTitle: "検索",
+      inputLabel: "検索キーワード",
+      inputPlaceholder: "キーワードを入力",
+      submit: "検索",
+      close: "閉じる",
+      openPage: "検索ページを開く",
+      noQueryTitle: "検索キーワードを入力してください",
+      noQueryBody: "記事本文、ゲーム詳細、外部記事、公開アセットを対象に検索できます。",
+      loading: "検索中...",
+      emptyTitle: "一致する結果がありません",
+      emptyBody: "別のキーワードで試してください。",
+      errorTitle: "検索を読み込めませんでした",
+      errorBody: "時間を置いてもう一度試してください。",
+      externalBadge: "外部",
+      typeLabel: {
+        article: "記事",
+        game: "ゲーム",
+        asset: "アセット",
+        page: "ページ",
+      },
+    },
   },
   en: {
     header: {
       toolsLabel: "Header tools",
-      searchPlaceholder: "Search placeholder",
+      searchOpen: "Open search",
       themeToggle: "Toggle theme",
       languageMenu: "Switch language",
       languageShortLabel: {
@@ -142,6 +185,30 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
       languages: "Languages",
       platforms: "Platforms",
     },
+    search: {
+      pageDescription: "Search across local articles, games, external articles, and published assets.",
+      lead: "Search across article bodies, game details, external writing, and published assets.",
+      modalTitle: "Search",
+      inputLabel: "Search query",
+      inputPlaceholder: "Enter keywords",
+      submit: "Search",
+      close: "Close",
+      openPage: "Open search page",
+      noQueryTitle: "Enter a search query",
+      noQueryBody: "Search across article bodies, game details, external articles, and published assets.",
+      loading: "Searching...",
+      emptyTitle: "No results found",
+      emptyBody: "Try another keyword.",
+      errorTitle: "Search is unavailable",
+      errorBody: "Please try again later.",
+      externalBadge: "External",
+      typeLabel: {
+        article: "Article",
+        game: "Game",
+        asset: "Asset",
+        page: "Page",
+      },
+    },
   },
 };
 
@@ -160,6 +227,24 @@ const articleCountFormatterMap: Record<SiteLocale, (count: number) => string> = 
   en: (count) => `${count} article${count === 1 ? "" : "s"}`,
 };
 
+const searchResultCountFormatterMap: Record<SiteLocale, (count: number) => string> = {
+  ja: (count) => `${count} 件の検索結果`,
+  en: (count) => `${count} search result${count === 1 ? "" : "s"}`,
+};
+
+const searchResultPreviewFormatterMap: Record<SiteLocale, (totalCount: number, visibleCount: number) => string> = {
+  ja: (totalCount, visibleCount) => `${totalCount} 件の検索結果（上位 ${visibleCount} 件を表示）`,
+  en: (totalCount, visibleCount) => `${totalCount} search result${totalCount === 1 ? "" : "s"} (showing top ${visibleCount})`,
+};
+
 export function formatArticleCountLabel(count: number, locale: SiteLocale) {
   return articleCountFormatterMap[locale](count);
+}
+
+export function formatSearchResultCountLabel(count: number, locale: SiteLocale) {
+  return searchResultCountFormatterMap[locale](count);
+}
+
+export function formatSearchResultPreviewLabel(totalCount: number, visibleCount: number, locale: SiteLocale) {
+  return searchResultPreviewFormatterMap[locale](totalCount, visibleCount);
 }

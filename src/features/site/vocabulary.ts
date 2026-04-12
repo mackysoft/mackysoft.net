@@ -6,6 +6,7 @@ export type SiteVocabulary = {
   games: string;
   assets: string;
   articles: string;
+  search: string;
   contact: string;
   privacyPolicy: string;
   tag: string;
@@ -19,6 +20,7 @@ export const siteVocabularyMap: Record<SiteLocale, SiteVocabulary> = {
     games: "Games",
     assets: "Assets",
     articles: "Articles",
+    search: "Search",
     contact: "Contact",
     privacyPolicy: "Privacy Policy",
     tag: "Tag",
@@ -30,6 +32,7 @@ export const siteVocabularyMap: Record<SiteLocale, SiteVocabulary> = {
     games: "Games",
     assets: "Assets",
     articles: "Articles",
+    search: "Search",
     contact: "Contact",
     privacyPolicy: "Privacy Policy",
     tag: "Tag",
