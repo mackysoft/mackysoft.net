@@ -26,6 +26,30 @@ test.describe("games page", () => {
     );
   });
 
+  test("shows translated metadata on the English games index page", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/games/");
+
+    const main = page.getByRole("main");
+    const treasureRogueCard = main.locator(".game-card").filter({ hasText: "Treasure Rogue" }).first();
+
+    await expect(main.locator(".page-header .eyebrow")).toHaveText("Home / Games");
+    await expect(main.getByRole("heading", { level: 1, name: "Games" })).toBeVisible();
+    await expect(treasureRogueCard).toContainText("Archived");
+    await expect(treasureRogueCard).toContainText("Android (discontinued)");
+    await expect(treasureRogueCard).toContainText("Browser");
+    await expect(treasureRogueCard).toContainText("Published");
+    await expect(treasureRogueCard).toContainText("2020/04/09");
+    await expect(treasureRogueCard).toContainText("Defeat enemies with the items you find and keep pushing deeper. How far can you make it?");
+    await expect(treasureRogueCard).not.toContainText("Japanese only");
+    await expect(
+      treasureRogueCard.getByRole("img", { name: "Key visual featuring the Treasure Rogue logo and the main cube hero" }),
+    ).toBeVisible();
+    await expect(treasureRogueCard.getByRole("link", { name: "Treasure Rogue", exact: true })).toHaveAttribute(
+      "href",
+      "/en/games/treasure-rogue/",
+    );
+  });
+
   test("renders the game detail page with hero, features, screenshots, and action panel", { tag: "@size:medium" }, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 960 });
     await page.goto("/games/treasure-rogue/");
@@ -108,5 +132,43 @@ test.describe("games page", () => {
     expect(featuresBox.y).toBeLessThan(screenshotsBox.y);
     expect(screenshotsBox.y).toBeLessThan(detailTableBox.y);
     expect(actionBox.x).toBeGreaterThan(mainColumnBox.x);
+  });
+
+  test("renders the translated English game detail page without fallback UI", { tag: "@size:medium" }, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 960 });
+    await page.goto("/en/games/treasure-rogue/");
+
+    const main = page.getByRole("main");
+    const hero = main.locator(".game-hero");
+    const detailTable = main.locator('.game-detail-table[aria-label="Game details"]');
+    const actionPanel = main.locator(".game-action-panel");
+    const featuresSection = main.locator('.game-section[aria-label="Game features"]');
+    const screenshotSection = main.locator('.game-screenshot-gallery[aria-label="Screenshots"]');
+
+    await expect(page.locator(".game-fallback-notice")).toHaveCount(0);
+    await expect(main.locator(".game-page__eyebrow")).toHaveText("Home / Games");
+    await expect(hero.getByRole("heading", { level: 1, name: "Treasure Rogue" })).toBeVisible();
+    await expect(hero).toContainText("Defeat enemies with the items you find and keep pushing deeper. How far can you make it?");
+    await expect(hero).toContainText("Archived");
+    await expect(hero.getByRole("img", { name: "Key visual featuring the Treasure Rogue logo and the main cube hero" })).toBeVisible();
+    await expect(featuresSection).toContainText("A roguelike adventure where the terrain is generated every time you play.");
+    await expect(screenshotSection.locator('iframe[title="Treasure Rogue trailer"]')).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/ICE8Qz0S23o",
+    );
+    await expect(main.getByRole("img", { name: "Opening gameplay scene with three treasure chests lined up" })).toBeVisible();
+    await expect(main.getByRole("img", { name: "Gameplay scene facing an enemy in the snow biome" })).toBeVisible();
+    await expect(detailTable).toContainText("Genre");
+    await expect(detailTable).toContainText("Roguelike");
+    await expect(detailTable).toContainText("Published");
+    await expect(detailTable).toContainText("2020/04/09");
+    await expect(detailTable).toContainText("Languages");
+    await expect(detailTable).toContainText("Japanese / English");
+    await expect(detailTable).toContainText("Platforms");
+    await expect(detailTable).toContainText("Android (discontinued) / Browser");
+    await expect(actionPanel.getByRole("link", { name: "Play on unityroom", exact: true })).toHaveAttribute(
+      "href",
+      "https://unityroom.com/games/treasure-rogue",
+    );
   });
 });

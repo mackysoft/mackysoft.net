@@ -47,7 +47,10 @@ let gamesPromise: Promise<GameEntry[]> | undefined;
 let gameTranslationsPromise: Promise<Map<string, GameTranslationEntry>> | undefined;
 
 function normalizeTranslationId(id: string) {
-  return id.replace(/\/index\.[a-z-]+$/, "");
+  return id
+    .replace(/\\/g, "/")
+    .replace(/^src\/content\/games\//, "")
+    .replace(/\/index(?:\.[a-z-]+)?(?:\.(?:md|mdx))?$/, "");
 }
 
 function mergeGameData(baseEntry: GameEntry, translationEntry?: GameTranslationEntry): GameEntry["data"] {
@@ -78,7 +81,18 @@ async function getGameTranslationMap() {
     gameTranslationsPromise = (async () => {
       const { getCollection } = await import("astro:content");
       const entries = await getCollection("gameTranslations", ({ data }) => !data.draft);
-      return new Map(entries.map((entry) => [normalizeTranslationId(entry.id), entry]));
+      return new Map(
+        entries.flatMap((entry) => {
+          const candidateKeys = new Set([
+            normalizeTranslationId(entry.id),
+            entry.filePath ? normalizeTranslationId(entry.filePath) : null,
+          ]);
+
+          return [...candidateKeys]
+            .filter((key): key is string => Boolean(key))
+            .map((key) => [key, entry] as const);
+        }),
+      );
     })();
   }
 
