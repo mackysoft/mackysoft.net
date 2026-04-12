@@ -1,4 +1,4 @@
-import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
 import type { ExternalLinkId } from "../../lib/site";
 import type { SiteLocale } from "../../lib/i18n";
 
@@ -8,7 +8,7 @@ const aboutPageContentMap = {
     description:
       "Hiroya Aramaki（荒牧裕也）/ Makihiro のプロフィール、ゲーム開発を軸にした活動領域、このサイトの役割、外部リンク、連絡導線をまとめたページです。",
     hero: {
-      eyebrow: formatPageBreadcrumb("Home", "About"),
+      eyebrow: formatBreadcrumb("Home", "About"),
       title: "About",
     },
     profile: {
@@ -94,7 +94,7 @@ const aboutPageContentMap = {
     description:
       "A profile page for Hiroya Aramaki / Makihiro, covering game development, interests, site purpose, external links, and contact paths.",
     hero: {
-      eyebrow: formatPageBreadcrumb("Home", "About"),
+      eyebrow: formatBreadcrumb("Home", "About"),
       title: "About",
     },
     profile: {

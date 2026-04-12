@@ -1,10 +1,10 @@
 ---
 import { Image } from "astro:assets";
 
-import { getUiText } from "../lib/copy";
+import { getUiText } from "../lib/ui-text";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import GameStatusBadge from "./GameStatusBadge.astro";
-import { formatArticleDate } from "../lib/article-dates";
+import { formatContentDate } from "../lib/content-date";
 import { getGamePlatformLabel } from "../lib/game-presentation";
 import type { LocalizedGameEntry } from "../lib/game-repository";
 
@@ -33,7 +33,7 @@ const uiText = getUiText(locale);
         <p class="game-card__meta activity-card__meta">
           <span class="game-card__meta-date">
             <span class="game-card__meta-label">{uiText.game.publishedAt}</span>
-            <span>{formatArticleDate(publishedAt, locale)}</span>
+            <span>{formatContentDate(publishedAt, locale)}</span>
           </span>
         </p>
       )}

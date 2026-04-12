@@ -3,9 +3,9 @@ import ArticleCard from "../../components/ArticleCard.astro";
 import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { getArticlesIndexPageMeta } from "../../features/articles/page-meta";
-import { getUiText } from "../../lib/copy";
+import { getUiText } from "../../lib/ui-text";
 import { getArticleItems } from "../../lib/articles";
-import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
@@ -29,7 +29,7 @@ const pageMeta = getArticlesIndexPageMeta(locale, {
   canonicalPath={localizePath("/articles/", locale)}
   alternateLocales={createAlternateLocaleLinks("/articles/")}
 >
-  <PageHeader title={uiText.common.articles} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles)} />
+  <PageHeader title={uiText.common.articles} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles)} />
 
   <PageLead class="articles-list">
     {articleItems.map((article) => (

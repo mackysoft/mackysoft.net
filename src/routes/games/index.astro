@@ -2,10 +2,10 @@
 import GameCard from "../../components/GameCard.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { getGamesPageContent } from "../../features/games/content";
-import { getUiText } from "../../lib/copy";
+import { getUiText } from "../../lib/ui-text";
 import { getLocalizedGames } from "../../lib/game-repository";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
-import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 type Props = {
@@ -26,7 +26,7 @@ const pageContent = getGamesPageContent(locale, uiText.common.games);
   canonicalPath={localizePath("/games/", locale)}
   alternateLocales={createAlternateLocaleLinks("/games/")}
 >
-  <PageHeader title={uiText.common.games} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.games)} />
+  <PageHeader title={uiText.common.games} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.games)} />
 
   <section class="games-list" aria-label="Games list">
     {games.map((game) => (

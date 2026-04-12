@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
-import { formatArticleDate } from "../../src/lib/article-dates";
+import { formatContentDate } from "../../src/lib/content-date";
 
 type SharePayload = {
   title: string;
@@ -44,7 +44,7 @@ test.describe("articles page", () => {
     const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticleJa.title }).first();
     await expect(zennCard).toContainText("Zenn");
     await expect(zennCard).toContainText("公開日");
-    await expect(zennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt), "ja"));
+    await expect(zennCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "ja"));
     await expect(zennCard.locator("img")).toHaveCount(1);
     await expect(zennCard.locator(".article-card__tags")).toHaveCount(0);
     await expect(zennCard.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toHaveAttribute(
@@ -62,7 +62,7 @@ test.describe("articles page", () => {
 
     const translatedZennCard = page.locator(".article-card").filter({ hasText: latestZennArticleEn.title }).first();
     await expect(translatedZennCard).toContainText("Published");
-    await expect(translatedZennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt), "en"));
+    await expect(translatedZennCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "en"));
     await expect(translatedZennCard.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toHaveAttribute(
       "href",
       latestZennArticleEn.url,

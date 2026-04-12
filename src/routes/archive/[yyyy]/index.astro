@@ -3,22 +3,22 @@ import ArticleCard from "../../../components/ArticleCard.astro";
 import PageLead from "../../../components/PageLead.astro";
 import PageHeader from "../../../components/PageHeader.astro";
 import { getArticlesArchiveYearPageMeta } from "../../../features/articles/page-meta";
-import { formatArticleCount, getUiText } from "../../../lib/copy";
-import { getArticleYear } from "../../../lib/article-dates";
+import { formatArticleCountLabel, getUiText } from "../../../lib/ui-text";
+import { getContentYear } from "../../../lib/content-date";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
-import { formatPageBreadcrumb } from "../../../lib/page-header";
+import { formatBreadcrumb } from "../../../lib/breadcrumb";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
   const articles = await getLocalArticles();
-  const years = new Set(articles.map((article) => getArticleYear(article.data.publishedAt)));
+  const years = new Set(articles.map((article) => getContentYear(article.data.publishedAt)));
 
   return Array.from(years).sort().map((year) => ({
     params: { yyyy: year },
     props: {
       year,
-      articleEntries: articles.filter((article) => getArticleYear(article.data.publishedAt) === year),
+      articleEntries: articles.filter((article) => getContentYear(article.data.publishedAt) === year),
     },
   }));
 }
@@ -45,9 +45,9 @@ const pageMeta = getArticlesArchiveYearPageMeta(locale, year, {
   canonicalPath={localizePath(`/archive/${year}/`, locale)}
   alternateLocales={createAlternateLocaleLinks(`/archive/${year}/`)}
 >
-  <PageHeader title={year} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
+  <PageHeader title={year} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
 
-  <PageLead summary={formatArticleCount(articles.length, locale)}>
+  <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
     {articles.map((article) => (
       <ArticleCard article={article} locale={locale} />
     ))}

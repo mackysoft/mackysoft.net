@@ -4,12 +4,12 @@ import { getCollection, render } from "astro:content";
 
 import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
-import LocalizedContent from "../../components/LocalizedContent.astro";
-import { getUiText } from "../../lib/copy";
-import { formatArticleNumericDate } from "../../lib/article-dates";
+import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
+import { getUiText } from "../../lib/ui-text";
+import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
-import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -54,7 +54,7 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
 >
   <article class="article-page">
     <section class="page-header article-page-header">
-      <p class="eyebrow">{formatPageBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
+      <p class="eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
     </section>
 
     {article.isFallback && locale !== defaultLocale && (
@@ -71,8 +71,8 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
       )}
       <h1>{article.data.title}</h1>
       <p class="meta">
-        <span>{uiText.article.publishedAt}: {formatArticleNumericDate(article.data.publishedAt, locale)}</span>
-        {article.data.updatedAt && <span>{uiText.article.updatedAt}: {formatArticleNumericDate(article.data.updatedAt, locale)}</span>}
+        <span>{uiText.article.publishedAt}: {formatNumericDate(article.data.publishedAt, locale)}</span>
+        {article.data.updatedAt && <span>{uiText.article.updatedAt}: {formatNumericDate(article.data.updatedAt, locale)}</span>}
       </p>
     </header>
 
@@ -87,9 +87,9 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
             ))}
           </ul>
         )}
-        <LocalizedContent locale={locale}>
+        <LocalizedHtmlLinks locale={locale}>
           <Content />
-        </LocalizedContent>
+        </LocalizedHtmlLinks>
         <ArticleShare title={article.data.title} shareUrl={shareUrl} locale={locale} />
       </section>
     </div>

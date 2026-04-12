@@ -160,6 +160,6 @@ const articleCountFormatterMap: Record<SiteLocale, (count: number) => string> = 
   en: (count) => `${count} article${count === 1 ? "" : "s"}`,
 };
 
-export function formatArticleCount(count: number, locale: SiteLocale) {
+export function formatArticleCountLabel(count: number, locale: SiteLocale) {
   return articleCountFormatterMap[locale](count);
 }

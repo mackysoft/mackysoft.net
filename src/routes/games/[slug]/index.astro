@@ -5,13 +5,13 @@ import { getCollection } from "astro:content";
 import GameActionPanel from "../../../components/GameActionPanel.astro";
 import GameScreenshotGallery from "../../../components/GameScreenshotGallery.astro";
 import GameStatusBadge from "../../../components/GameStatusBadge.astro";
-import { getUiText } from "../../../lib/copy";
-import { formatArticleNumericDate } from "../../../lib/article-dates";
-import { getGameTrailerEmbedUrl } from "../../../lib/game-media";
+import { getUiText } from "../../../lib/ui-text";
+import { formatNumericDate } from "../../../lib/content-date";
 import { getGamePlatformLabel } from "../../../lib/game-presentation";
 import { resolveLocalizedGameBySlug } from "../../../lib/game-repository";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
-import { formatPageBreadcrumb } from "../../../lib/page-header";
+import { formatBreadcrumb } from "../../../lib/breadcrumb";
+import { getYouTubeEmbedUrl } from "../../../lib/youtube";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -37,11 +37,11 @@ if (!game) {
   throw new Error(`Unknown game slug: ${slug}`);
 }
 
-const trailerEmbedUrl = game.data.trailerUrl ? getGameTrailerEmbedUrl(game.data.trailerUrl) : null;
+const trailerEmbedUrl = game.data.trailerUrl ? getYouTubeEmbedUrl(game.data.trailerUrl) : null;
 const hasActions = game.data.actions.length > 0;
 const detailRows = [
   game.data.genre ? { label: uiText.game.genre, value: game.data.genre } : null,
-  game.data.publishedAt ? { label: uiText.game.publishedAt, value: formatArticleNumericDate(game.data.publishedAt, locale) } : null,
+  game.data.publishedAt ? { label: uiText.game.publishedAt, value: formatNumericDate(game.data.publishedAt, locale) } : null,
   game.data.languages.length > 0 ? { label: uiText.game.languages, value: game.data.languages.join(" / ") } : null,
   game.data.platforms.length > 0
     ? { label: uiText.game.platforms, value: game.data.platforms.map((platform) => getGamePlatformLabel(platform, locale)).join(" / ") }
@@ -62,7 +62,7 @@ const alternateLocales = createAlternateLocaleLinks(gamePath, game.availableLoca
   alternateLocales={alternateLocales}
 >
   <article class="game-page">
-    <p class="eyebrow game-page__eyebrow">{formatPageBreadcrumb(uiText.common.home, uiText.common.games)}</p>
+    <p class="eyebrow game-page__eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.games)}</p>
 
     {game.isFallback && locale !== defaultLocale && (
       <section class="content-panel game-fallback-notice">

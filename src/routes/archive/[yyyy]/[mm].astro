@@ -3,11 +3,11 @@ import ArticleCard from "../../../components/ArticleCard.astro";
 import PageLead from "../../../components/PageLead.astro";
 import PageHeader from "../../../components/PageHeader.astro";
 import { getArticlesArchiveMonthPageMeta } from "../../../features/articles/page-meta";
-import { formatArticleCount, getUiText } from "../../../lib/copy";
-import { getArticleYearMonth } from "../../../lib/article-dates";
+import { formatArticleCountLabel, getUiText } from "../../../lib/ui-text";
+import { getContentYearMonth } from "../../../lib/content-date";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
-import { formatPageBreadcrumb } from "../../../lib/page-header";
+import { formatBreadcrumb } from "../../../lib/breadcrumb";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
   const yearMonths = new Map();
 
   for (const article of articles) {
-    const { year, month } = getArticleYearMonth(article.data.publishedAt);
+    const { year, month } = getContentYearMonth(article.data.publishedAt);
     const key = `${year}-${month}`;
     const current = yearMonths.get(key) ?? [];
     current.push(article);
@@ -53,9 +53,9 @@ const pageMeta = getArticlesArchiveMonthPageMeta(locale, year, month, {
   canonicalPath={localizePath(`/archive/${year}/${month}/`, locale)}
   alternateLocales={createAlternateLocaleLinks(`/archive/${year}/${month}/`)}
 >
-  <PageHeader title={`${year}/${month}`} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
+  <PageHeader title={`${year}/${month}`} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
 
-  <PageLead summary={formatArticleCount(articles.length, locale)}>
+  <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
     {articles.map((article) => (
       <ArticleCard article={article} locale={locale} />
     ))}

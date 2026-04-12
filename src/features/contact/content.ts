@@ -1,4 +1,4 @@
-import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
 import type { ExternalLinkId } from "../../lib/site";
 import type { SiteLocale } from "../../lib/i18n";
 
@@ -7,7 +7,7 @@ const contactPageContentMap = {
     title: "Contact",
     description: "仕事・相談と OSS 関連の連絡窓口、返信方針をまとめたページです。",
     hero: {
-      eyebrow: formatPageBreadcrumb("Home", "Contact"),
+      eyebrow: formatBreadcrumb("Home", "Contact"),
       title: "Contact",
     },
     lead: "連絡は以下からどうぞ。用途に近い窓口から送ってください。",
@@ -43,7 +43,7 @@ const contactPageContentMap = {
     title: "Contact",
     description: "Contact paths for work, inquiries, and OSS-related communication, including the current reply policy.",
     hero: {
-      eyebrow: formatPageBreadcrumb("Home", "Contact"),
+      eyebrow: formatBreadcrumb("Home", "Contact"),
       title: "Contact",
     },
     lead: "Use the channel that best matches your message.",

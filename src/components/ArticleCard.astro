@@ -1,9 +1,9 @@
 ---
 import { Image } from "astro:assets";
 
-import { getUiText } from "../lib/copy";
+import { getUiText } from "../lib/ui-text";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
-import { formatArticleDate } from "../lib/article-dates";
+import { formatContentDate } from "../lib/content-date";
 import type { ArticleItem } from "../lib/articles";
 
 type Props = {
@@ -22,7 +22,7 @@ const coverHeight = typeof cover === "string" ? undefined : cover?.height;
 const coverAspectRatio = coverWidth && coverHeight ? `${coverWidth} / ${coverHeight}` : "1200 / 630";
 const verticalCoverStyle = layout === "vertical" ? `--article-cover-ratio: ${coverAspectRatio};` : undefined;
 const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
-const publishedAtLabel = formatArticleDate(article.publishedAt, locale);
+const publishedAtLabel = formatContentDate(article.publishedAt, locale);
 const uiText = getUiText(locale);
 ---
 

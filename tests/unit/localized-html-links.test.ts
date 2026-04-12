@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
-import { localizeContentHtml } from "../../src/lib/localized-content";
+import { localizeHtmlLinks } from "../../src/lib/localized-html-links";
 
-describe("localized content html", () => {
+describe("localized html links", () => {
   test("localizes internal site links for English pages and preserves other hrefs", () => {
     const html = [
       '<p><a href="/articles/vision-introduction/?ref=top#intro">Article</a></p>',
@@ -12,7 +12,7 @@ describe("localized content html", () => {
       '<p><a href="#section">Fragment</a></p>',
     ].join("");
 
-    const result = localizeContentHtml(html, "en");
+    const result = localizeHtmlLinks(html, "en");
 
     expect(result).toContain('href="/en/articles/vision-introduction/?ref=top#intro"');
     expect(result).toContain('href="/en/games/treasure-rogue/"');
@@ -24,6 +24,6 @@ describe("localized content html", () => {
   test("keeps Japanese pages untouched", () => {
     const html = '<p><a href="/articles/vision-introduction/">Article</a></p>';
 
-    expect(localizeContentHtml(html, "ja")).toBe(html);
+    expect(localizeHtmlLinks(html, "ja")).toBe(html);
   });
 });

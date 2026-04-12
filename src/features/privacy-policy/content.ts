@@ -1,4 +1,4 @@
-import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
 import type { SiteLocale } from "../../lib/i18n";
 
 const privacyPolicyContentMap = {
@@ -6,7 +6,7 @@ const privacyPolicyContentMap = {
     title: "Privacy Policy",
     description: "現時点のプライバシーポリシーです。",
     hero: {
-      eyebrow: formatPageBreadcrumb("Home", "Privacy Policy"),
+      eyebrow: formatBreadcrumb("Home", "Privacy Policy"),
       title: "Privacy Policy",
     },
     paragraphs: [
@@ -17,7 +17,7 @@ const privacyPolicyContentMap = {
     title: "Privacy Policy",
     description: "The current privacy policy for this site.",
     hero: {
-      eyebrow: formatPageBreadcrumb("Home", "Privacy Policy"),
+      eyebrow: formatBreadcrumb("Home", "Privacy Policy"),
       title: "Privacy Policy",
     },
     paragraphs: [
