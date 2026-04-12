@@ -35,4 +35,16 @@ describe("article date formatting", () => {
     });
     expect(formatArticleNumericDate(publishedAt)).toBe("2020/05/01");
   });
+
+  test("formats English article dates with an en-US presentation", () => {
+    const publishedAt = new Date("2021-03-16T00:00:00+09:00");
+
+    expect(getArticleDateParts(publishedAt, "en")).toEqual({
+      year: "2021",
+      month: "03",
+      day: "16",
+    });
+    expect(formatArticleNumericDate(publishedAt, "en")).toBe("03/16/2021");
+    expect(formatArticleDate(publishedAt, "en")).toBe("Mar 16, 2021");
+  });
 });

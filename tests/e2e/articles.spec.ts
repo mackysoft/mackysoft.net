@@ -19,9 +19,17 @@ type ShareWindow = Window &
 const activityData = JSON.parse(
   readFileSync(path.resolve(import.meta.dirname, "../../src/generated/activity.json"), "utf8"),
 ) as {
-  articles: Array<{ title: string; url: string; publishedAt: string }>;
+  articles: Array<{
+    publishedAt: string;
+    locales: {
+      ja: { title: string; url: string };
+      en?: { title: string; url: string };
+    };
+  }>;
 };
 const latestZennArticle = activityData.articles[0]!;
+const latestZennArticleJa = latestZennArticle.locales.ja;
+const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.locales.ja;
 
 test.describe("articles page", () => {
   test("shows local and Zenn articles in the same card format", { tag: "@size:medium" }, async ({ page }) => {
@@ -29,18 +37,38 @@ test.describe("articles page", () => {
 
     await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
     await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
-    await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
 
-    const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticle.title }).first();
+    const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticleJa.title }).first();
     await expect(zennCard).toContainText("Zenn");
     await expect(zennCard).toContainText("公開日");
-    await expect(zennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt)));
+    await expect(zennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt), "ja"));
     await expect(zennCard.locator("img")).toHaveCount(1);
     await expect(zennCard.locator(".article-card__tags")).toHaveCount(0);
-    await expect(zennCard.getByRole("link", { name: latestZennArticle.title, exact: true })).toHaveAttribute(
+    await expect(zennCard.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toHaveAttribute(
       "href",
-      latestZennArticle.url,
+      latestZennArticleJa.url,
     );
+  });
+
+  test("shows translated external metadata and Japanese-only local fallbacks on the English index page", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/");
+
+    await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
+    await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
+
+    const translatedZennCard = page.locator(".article-card").filter({ hasText: latestZennArticleEn.title }).first();
+    await expect(translatedZennCard).toContainText("Published");
+    await expect(translatedZennCard.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toHaveAttribute(
+      "href",
+      latestZennArticleEn.url,
+    );
+
+    const fallbackLocalCard = page.locator(".article-card").filter({ hasText: "【Unity】CullingGroupをより簡単に実装する【Vision】" }).first();
+    await expect(fallbackLocalCard).toContainText("Japanese only");
+    await expect(
+      fallbackLocalCard.getByRole("link", { name: "【Unity】CullingGroupをより簡単に実装する【Vision】", exact: true }),
+    ).toHaveAttribute("href", "/en/articles/vision-introduction/");
   });
 
   test("keeps the article hero layout while separating the breadcrumb", { tag: "@size:medium" }, async ({ page }) => {
@@ -231,5 +259,15 @@ test.describe("articles page", () => {
     expect(twitterHref).toContain(encodeURIComponent("https://mackysoft.net/articles/vision-introduction/"));
 
     await context.close();
+  });
+
+  test("keeps English local article routes and shows a Japanese fallback notice", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/vision-introduction/");
+
+    await expect(page).toHaveURL("/en/articles/vision-introduction/");
+    await expect(page.locator(".article-fallback-notice")).toContainText("This page is currently available only in Japanese.");
+    await expect(page.getByRole("heading", { level: 1, name: "【Unity】CullingGroupをより簡単に実装する【Vision】" })).toBeVisible();
+    await expect(page.locator(".article-page-header .eyebrow")).toHaveText("Home / Articles");
+    await expect(page.locator(".article-content")).toContainText("CullingGroup");
   });
 });

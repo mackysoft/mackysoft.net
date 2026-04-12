@@ -4,6 +4,9 @@ test.describe("site header", () => {
   test("shows static header tools after navigation on desktop", { tag: "@size:medium" }, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.emulateMedia({ colorScheme: "light" });
+    await page.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
     await page.goto("/");
 
     const header = page.locator(".site-header");
@@ -13,6 +16,7 @@ test.describe("site header", () => {
     const searchTool = tools.locator('[data-site-tool="search"]');
     const themeTool = tools.locator('[data-site-tool="theme"]');
     const languageTool = tools.locator('[data-site-tool="language"]');
+    const languageToggle = tools.locator("[data-site-language-toggle]");
 
     await expect(brand).toBeVisible();
     await expect(tools).toBeVisible();
@@ -24,7 +28,14 @@ test.describe("site header", () => {
     await expect(themeTool).toHaveAttribute("aria-label", "テーマを切り替え");
     await expect(themeTool).toHaveAttribute("aria-pressed", "false");
     await expect(languageTool).toContainText("JP");
-    await expect(languageTool).toBeDisabled();
+    await expect(languageToggle).toHaveAttribute("aria-label", "表示言語を切り替え");
+
+    await languageToggle.click();
+
+    await expect(languageTool).toHaveAttribute("open", "");
+    await expect(languageTool.getByRole("menuitemradio", { name: "日本語" })).toBeVisible();
+    await expect(languageTool.getByRole("menuitemradio", { name: "English" })).toBeVisible();
+    await expect(languageTool.locator(".site-language-menu__popover")).toHaveCSS("background-color", "rgb(236, 229, 216)");
 
     const brandBox = await brand.boundingBox();
     const toolsBox = await tools.boundingBox();
@@ -40,6 +51,9 @@ test.describe("site header", () => {
 
   test("stacks header tools after navigation on narrow screens", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 375, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
     const page = await context.newPage();
 
     await page.goto("/");
@@ -84,5 +98,40 @@ test.describe("site header", () => {
     await expect(page.locator('[data-site-tool="theme"]')).toBeDisabled();
 
     await context.close();
+  });
+
+  test("switches article detail routes through the language menu and stores the choice", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/articles/vision-introduction/");
+
+    const languageToggle = page.locator("[data-site-language-toggle]");
+
+    await languageToggle.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator('[data-site-tool="language"]')).toHaveAttribute("open", "");
+
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL("/en/articles/vision-introduction/");
+    await expect(page.locator(".article-fallback-notice")).toContainText("This page is currently available only in Japanese.");
+    expect(await page.evaluate(() => window.localStorage.getItem("mackysoft-locale"))).toBe("en");
+  });
+
+  test("separates selected locale and content locale in the fallback dropdown state", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/vision-introduction/");
+
+    await page.locator("[data-site-language-toggle]").click();
+
+    const japaneseItem = page.locator(".site-language-menu__item--current-content");
+    const selectedItem = page.locator('.site-language-menu__item[aria-checked="true"]');
+
+    await expect(japaneseItem).toHaveText("Japanese");
+    await expect(selectedItem).toHaveText("English");
+    await expect(japaneseItem).toHaveCSS("background-color", "rgba(14, 107, 99, 0.1)");
+    await expect(japaneseItem).toHaveCSS("color", "rgb(14, 107, 99)");
+    await expect(selectedItem).toHaveCSS("background-color", "rgba(255, 255, 255, 0.52)");
+    await expect(selectedItem).toHaveCSS("border-color", "rgba(30, 27, 24, 0.24)");
+    await expect(selectedItem).toHaveCSS("color", "rgb(30, 27, 24)");
+    expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").content)).toBe('"✓"');
+    expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").color)).toBe("rgb(14, 107, 99)");
   });
 });

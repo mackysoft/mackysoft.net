@@ -1,0 +1,38 @@
+import { describe, expect, test } from "vitest";
+
+import {
+  getLocalePreference,
+  getPathLocale,
+  localizePath,
+  stripLocaleFromPath,
+  switchLocalePath,
+} from "../../src/lib/i18n";
+
+describe("i18n helpers", () => {
+  test("detects the locale from the pathname prefix", () => {
+    expect(getPathLocale("/")).toBe("ja");
+    expect(getPathLocale("/articles/vision-introduction/")).toBe("ja");
+    expect(getPathLocale("/en/")).toBe("en");
+    expect(getPathLocale("/en/articles/vision-introduction/")).toBe("en");
+  });
+
+  test("adds and removes locale prefixes consistently", () => {
+    expect(stripLocaleFromPath("/")).toBe("/");
+    expect(stripLocaleFromPath("/en/")).toBe("/");
+    expect(stripLocaleFromPath("/en/articles/vision-introduction/")).toBe("/articles/vision-introduction/");
+
+    expect(localizePath("/", "ja")).toBe("/");
+    expect(localizePath("/", "en")).toBe("/en/");
+    expect(localizePath("/articles/vision-introduction/", "ja")).toBe("/articles/vision-introduction/");
+    expect(localizePath("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
+    expect(switchLocalePath("/en/articles/vision-introduction/", "ja")).toBe("/articles/vision-introduction/");
+    expect(switchLocalePath("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
+  });
+
+  test("prefers supported browser languages in order and falls back to Japanese", () => {
+    expect(getLocalePreference(["fr-FR", "en-US", "ja-JP"])).toBe("en");
+    expect(getLocalePreference(["de-DE", "ja-JP"])).toBe("ja");
+    expect(getLocalePreference(["fr-FR"])).toBe("ja");
+    expect(getLocalePreference(null)).toBe("ja");
+  });
+});
