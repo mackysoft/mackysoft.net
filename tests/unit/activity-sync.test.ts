@@ -6,14 +6,18 @@ import { describe, expect, test } from "vitest";
 
 import activityData from "../../src/generated/activity.json";
 import {
-  getLatestReleaseActivities,
-  getLatestReleases,
-  getReleaseActivities,
   sortArticleItems,
   toExternalArticleItem,
 } from "../../src/lib/articles";
-import type { ReleaseActivity } from "../../src/lib/articles";
+import type { ArticleActivity } from "../../src/lib/articles";
 import {
+  getLatestReleaseActivities,
+  getLatestReleases,
+  getReleaseActivities,
+} from "../../src/lib/releases";
+import type { ReleaseActivity } from "../../src/lib/releases";
+import {
+  parseZennArticlePage,
   githubApiBaseUrl,
   githubGraphqlUrl,
   parseZennFeed,
@@ -45,6 +49,58 @@ function createTextResponse(payload: string, init: ResponseInit = {}) {
   });
 }
 
+function createHtmlResponse(payload: string, init: ResponseInit = {}) {
+  return new Response(payload, {
+    status: init.status ?? 200,
+    statusText: init.statusText,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+    },
+  });
+}
+
+function createZennArticlePageHtml({
+  locale,
+  title,
+  canonicalUrl,
+  bodyHtml,
+  ogImageUrl,
+  isTranslated,
+}: {
+  locale: string;
+  title: string;
+  canonicalUrl: string;
+  bodyHtml: string;
+  ogImageUrl?: string;
+  isTranslated: boolean;
+}) {
+  return `<!DOCTYPE html>
+<html lang="${locale}">
+  <head>
+    <title>${title}</title>
+    <link rel="canonical" href="${canonicalUrl}" />
+    <meta property="og:url" content="${canonicalUrl}" />
+    ${ogImageUrl ? `<meta property="og:image" content="${ogImageUrl}" />` : ""}
+  </head>
+  <body>
+    <script id="__NEXT_DATA__" type="application/json">${JSON.stringify({
+      props: {
+        pageProps: {
+          locale,
+          article: {
+            title,
+            bodyHtml,
+            ogImageUrl,
+            isTranslated,
+            locale,
+          },
+        },
+      },
+    })}</script>
+  </body>
+</html>`;
+}
+
 async function createSuccessfulFetchMock(): Promise<(input: string | URL | Request, init?: RequestInit) => Promise<Response>> {
   const xml = await readFile(zennFeedFixturePath, "utf8");
   const alphaPageOne = [
@@ -69,8 +125,29 @@ async function createSuccessfulFetchMock(): Promise<(input: string | URL | Reque
   return async (input) => {
     const url = input instanceof Request ? input.url : String(input);
 
-    if (url === zennFeedUrl) {
+    if (url === `${zennFeedUrl}`) {
       return createTextResponse(xml);
+    }
+
+    if (url === "https://zenn.dev/makihiro_dev/articles/first-article?locale=en") {
+      return createHtmlResponse(createZennArticlePageHtml({
+        locale: "en",
+        title: "First article in English",
+        canonicalUrl: url,
+        bodyHtml: "<p>English summary for the first article.</p>",
+        ogImageUrl: "https://res.cloudinary.com/zenn/image/upload/sample-cover-en.png",
+        isTranslated: true,
+      }));
+    }
+
+    if (url === "https://zenn.dev/makihiro_dev/articles/second-article?locale=en") {
+      return createHtmlResponse(createZennArticlePageHtml({
+        locale: "en",
+        title: "Second article",
+        canonicalUrl: url,
+        bodyHtml: "<p>Japanese only article.</p>",
+        isTranslated: false,
+      }));
     }
 
     if (url === githubGraphqlUrl) {
@@ -259,26 +336,57 @@ describe("sync-activity", () => {
       {
         id: "zenn:first-article",
         source: "Zenn",
-        title: "First article",
-        description: "Summary with line breaks.",
-        url: "https://zenn.dev/makihiro_dev/articles/first-article",
         publishedAt: "2026-01-06T03:05:01.000Z",
-        coverUrl: "https://res.cloudinary.com/zenn/image/upload/sample-cover.png",
-        coverAlt: "First article のカバー画像",
+        locales: {
+          ja: {
+            title: "First article",
+            description: "Summary with line breaks.",
+            url: "https://zenn.dev/makihiro_dev/articles/first-article",
+            coverUrl: "https://res.cloudinary.com/zenn/image/upload/sample-cover.png",
+            coverAlt: "First article のカバー画像",
+          },
+        },
       },
       {
         id: "zenn:second-article",
         source: "Zenn",
-        title: "Second article",
-        description: "HTML entity & spaces",
-        url: "https://zenn.dev/makihiro_dev/articles/second-article",
         publishedAt: "2024-09-24T03:00:05.000Z",
+        locales: {
+          ja: {
+            title: "Second article",
+            description: "HTML entity & spaces",
+            url: "https://zenn.dev/makihiro_dev/articles/second-article",
+          },
+        },
       },
     ]);
   });
 
+  test("extracts localized Zenn article data from the detail page", () => {
+    const html = createZennArticlePageHtml({
+      locale: "en",
+      title: "Localized title",
+      canonicalUrl: "https://zenn.dev/makihiro_dev/articles/localized?locale=en",
+      bodyHtml: "<p>Localized summary text.</p>",
+      ogImageUrl: "https://example.com/cover.png",
+      isTranslated: true,
+    });
+
+    expect(parseZennArticlePage(html)).toEqual({
+      title: "Localized title",
+      description: "Localized summary text.",
+      url: "https://zenn.dev/makihiro_dev/articles/localized?locale=en",
+      locale: "en",
+      isTranslated: true,
+      coverUrl: "https://example.com/cover.png",
+      coverAlt: "Localized title cover image",
+    });
+  });
+
   test("converts external articles into ArticleItem entries with covers and descending dates", () => {
-    const articleItems = sortArticleItems(activityData.articles.map(toExternalArticleItem));
+    const articleItems = sortArticleItems(
+      (activityData as unknown as { articles: ArticleActivity[] }).articles.map((article) => toExternalArticleItem(article)),
+    );
 
     expect(articleItems.length).toBeGreaterThan(0);
     expect(articleItems[0]?.source).toBe("Zenn");
@@ -289,6 +397,27 @@ describe("sync-activity", () => {
     for (let index = 1; index < articleItems.length; index += 1) {
       expect(articleItems[index - 1]!.publishedAt.valueOf()).toBeGreaterThanOrEqual(articleItems[index]!.publishedAt.valueOf());
     }
+  });
+
+  test("falls back to Japanese external metadata when the requested locale is unavailable", () => {
+    const articleItem = toExternalArticleItem({
+      id: "zenn:fallback",
+      source: "Zenn",
+      publishedAt: "2024-01-01T00:00:00.000Z",
+      locales: {
+        ja: {
+          title: "日本語タイトル",
+          description: "日本語の概要",
+          url: "https://zenn.dev/makihiro_dev/articles/fallback",
+        },
+      },
+    }, "en");
+
+    expect(articleItem.title).toBe("日本語タイトル");
+    expect(articleItem.description).toBe("日本語の概要");
+    expect(articleItem.href).toBe("https://zenn.dev/makihiro_dev/articles/fallback");
+    expect(articleItem.contentLocale).toBe("ja");
+    expect(articleItem.isFallback).toBe(true);
   });
 
   test("formats summary text for article cards", () => {
@@ -354,6 +483,55 @@ describe("sync-activity", () => {
     expect(activity.releases.some((release) => release.repo === "mackysoft/ArchivedRepo")).toBe(false);
 
     await expect(readFile(outputPath, "utf8")).resolves.toContain("\"coverUrl\": \"https://opengraph.githubassets.com/mock/alpha\"");
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
+  test("adds English article metadata when translation is available and keeps Japanese-only articles as fallback", async () => {
+    const fetchImpl = await createSuccessfulFetchMock();
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
+    const outputPath = path.join(tempDir, "activity.json");
+
+    const activity = await syncActivity({
+      fetchImpl,
+      outputPath,
+    });
+
+    expect(activity.articles).toEqual([
+      {
+        id: "zenn:first-article",
+        source: "Zenn",
+        publishedAt: "2026-01-06T03:05:01.000Z",
+        locales: {
+          ja: {
+            title: "First article",
+            description: "Summary with line breaks.",
+            url: "https://zenn.dev/makihiro_dev/articles/first-article",
+            coverUrl: "https://res.cloudinary.com/zenn/image/upload/sample-cover.png",
+            coverAlt: "First article のカバー画像",
+          },
+          en: {
+            title: "First article in English",
+            description: "English summary for the first article.",
+            url: "https://zenn.dev/makihiro_dev/articles/first-article?locale=en",
+            coverUrl: "https://res.cloudinary.com/zenn/image/upload/sample-cover-en.png",
+            coverAlt: "First article in English cover image",
+          },
+        },
+      },
+      {
+        id: "zenn:second-article",
+        source: "Zenn",
+        publishedAt: "2024-09-24T03:00:05.000Z",
+        locales: {
+          ja: {
+            title: "Second article",
+            description: "HTML entity & spaces",
+            url: "https://zenn.dev/makihiro_dev/articles/second-article",
+          },
+        },
+      },
+    ]);
+
     await rm(tempDir, { recursive: true, force: true });
   });
 
@@ -449,10 +627,14 @@ describe("sync-activity", () => {
         {
           id: "zenn:existing",
           source: "Zenn",
-          title: "Existing article",
-          description: "Existing data",
-          url: "https://zenn.dev/makihiro_dev/articles/existing",
           publishedAt: "2024-01-01T00:00:00.000Z",
+          locales: {
+            ja: {
+              title: "Existing article",
+              description: "Existing data",
+              url: "https://zenn.dev/makihiro_dev/articles/existing",
+            },
+          },
         },
       ],
       releases: [

@@ -1,0 +1,43 @@
+---
+import GameCard from "../../components/GameCard.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getGamesPageContent } from "../../features/games/content";
+import { getUiText } from "../../lib/ui-text";
+import { getLocalizedGames } from "../../lib/game-repository";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const games = (await getLocalizedGames(locale)).filter((game): game is NonNullable<typeof game> => game !== null);
+const pageContent = getGamesPageContent(locale, uiText.common.games);
+---
+
+<SiteLayout
+  title={pageContent.title}
+  description={pageContent.description}
+  locale={locale}
+  canonicalPath={localizePath("/games/", locale)}
+  alternateLocales={createAlternateLocaleLinks("/games/")}
+>
+  <PageHeader title={uiText.common.games} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.games)} />
+
+  <section class="games-list" aria-label="Games list">
+    {games.map((game) => (
+      <GameCard game={game} locale={locale} />
+    ))}
+  </section>
+</SiteLayout>
+
+<style>
+  .games-list {
+    display: grid;
+    gap: 1rem;
+  }
+</style>

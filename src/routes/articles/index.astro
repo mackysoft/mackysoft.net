@@ -1,0 +1,45 @@
+---
+import ArticleCard from "../../components/ArticleCard.astro";
+import PageLead from "../../components/PageLead.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getArticlesIndexPageMeta } from "../../features/articles/page-meta";
+import { getUiText } from "../../lib/ui-text";
+import { getArticleItems } from "../../lib/articles";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const articleItems = await getArticleItems(locale);
+const pageMeta = getArticlesIndexPageMeta(locale, {
+  articles: uiText.common.articles,
+});
+---
+
+<SiteLayout
+  title={pageMeta.title}
+  description={pageMeta.description}
+  locale={locale}
+  canonicalPath={localizePath("/articles/", locale)}
+  alternateLocales={createAlternateLocaleLinks("/articles/")}
+>
+  <PageHeader title={uiText.common.articles} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles)} />
+
+  <PageLead class="articles-list">
+    {articleItems.map((article) => (
+      <ArticleCard article={article} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>
+
+<style>
+  .articles-list {
+    grid-template-columns: 1fr;
+  }
+</style>

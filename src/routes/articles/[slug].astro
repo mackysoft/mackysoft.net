@@ -1,0 +1,232 @@
+---
+import { Image } from "astro:assets";
+import { getCollection, render } from "astro:content";
+
+import ArticleShare from "../../components/ArticleShare.astro";
+import ArticleToc from "../../components/ArticleToc.astro";
+import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
+import { getUiText } from "../../lib/ui-text";
+import { formatNumericDate } from "../../lib/content-date";
+import { resolveLocalizedArticleBySlug } from "../../lib/articles";
+import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("articles", ({ data }) => !data.draft);
+
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { slug: article.id },
+  }));
+}
+
+type Props = {
+  slug?: string;
+  locale?: SiteLocale;
+};
+
+const { slug = Astro.params.slug ?? "", locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const article = await resolveLocalizedArticleBySlug(slug, locale);
+
+if (!article) {
+  throw new Error(`Unknown article slug: ${slug}`);
+}
+
+const { Content, headings } = await render(article.entry as never);
+const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
+const shareUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
+const articlePath = `/articles/${slug}/`;
+const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
+const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
+---
+
+<SiteLayout
+  title={article.data.title}
+  description={article.data.description}
+  locale={locale}
+  contentLocale={article.contentLocale}
+  isFallback={article.isFallback}
+  canonicalPath={canonicalPath}
+  alternateLocales={alternateLocales}
+>
+  <article class="article-page">
+    <section class="page-header article-page-header">
+      <p class="eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
+    </section>
+
+    {article.isFallback && locale !== defaultLocale && (
+      <section class="content-panel article-fallback-notice">
+        <p>{uiText.common.fallbackNotice}</p>
+      </section>
+    )}
+
+    <header class="article-hero">
+      {article.data.cover && (
+        <div class="cover">
+          <Image src={article.data.cover} alt={article.data.coverAlt ?? ""} widths={[960, 720]} sizes="(max-width: 48rem) 100vw, 46rem" />
+        </div>
+      )}
+      <h1>{article.data.title}</h1>
+      <p class="meta">
+        <span>{uiText.article.publishedAt}: {formatNumericDate(article.data.publishedAt, locale)}</span>
+        {article.data.updatedAt && <span>{uiText.article.updatedAt}: {formatNumericDate(article.data.updatedAt, locale)}</span>}
+      </p>
+    </header>
+
+    <div class:list={["article-layout", tocHeadings.length > 0 && "article-layout--with-toc"]}>
+      {tocHeadings.length > 0 && <ArticleToc headings={tocHeadings} locale={locale} />}
+
+      <section class="content-panel prose article-content">
+        {article.data.tags.length > 0 && (
+          <ul class="tags article-content__tags" aria-label={uiText.article.tagsAriaLabel}>
+            {article.data.tags.map((tag) => (
+              <li><a href={localizePath(`/tags/${tag}/`, locale)}>{tag}</a></li>
+            ))}
+          </ul>
+        )}
+        <LocalizedHtmlLinks locale={locale}>
+          <Content />
+        </LocalizedHtmlLinks>
+        <ArticleShare title={article.data.title} shareUrl={shareUrl} locale={locale} />
+      </section>
+    </div>
+  </article>
+</SiteLayout>
+
+<style>
+  .article-page {
+    display: grid;
+    gap: 0;
+  }
+
+  .article-page-header {
+    margin-bottom: 0.85rem;
+  }
+
+  .article-page-header > .eyebrow {
+    margin-bottom: 0;
+  }
+
+  .article-hero {
+    display: grid;
+    gap: 0.85rem;
+    width: min(100%, 46rem);
+    margin: 0 auto 1.5rem;
+    justify-items: center;
+  }
+
+  .article-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .article-fallback-notice {
+    margin-bottom: 1rem;
+  }
+
+  .article-fallback-notice p {
+    margin: 0;
+  }
+
+  .meta {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
+    color: var(--muted-color);
+  }
+
+  .article-hero h1 {
+    margin: 0;
+    line-height: 1.2;
+    width: fit-content;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tags a {
+    display: inline-flex;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--muted-color);
+    text-decoration: none;
+  }
+
+  .cover {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 1.1rem;
+  }
+
+  .cover :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .prose {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .article-content__tags {
+    margin-bottom: 0;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3),
+  .prose :global(h4),
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol),
+  .prose :global(table),
+  .prose :global(pre),
+  .prose :global(blockquote) {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .prose :global(hr) {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .prose :global(h2),
+  .prose :global(h3),
+  .prose :global(h4) {
+    scroll-margin-top: var(--site-anchor-offset);
+  }
+
+  @media (min-width: 960px) {
+    .article-layout--with-toc {
+      grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+      align-items: start;
+    }
+
+    .article-content {
+      order: 0;
+    }
+
+    :global(.article-toc) {
+      order: 1;
+    }
+  }
+</style>

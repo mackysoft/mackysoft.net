@@ -1,36 +1,13 @@
 ---
-import ArticleCard from "../../components/ArticleCard.astro";
-import PageLead from "../../components/PageLead.astro";
-import PageHeader from "../../components/PageHeader.astro";
-import type { ArticleItem } from "../../lib/articles";
-import { getLocalArticles, toLocalArticleItem } from "../../lib/articles";
-import { formatPageBreadcrumb } from "../../lib/page-header";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import TagRoute, { getStaticPaths as getTagStaticPaths } from "../../routes/tags/[tag].astro";
+import { getLocalArticles } from "../../lib/articles";
 
-export async function getStaticPaths() {
-  const articles = await getLocalArticles();
-  const tags = new Set(articles.flatMap((article) => article.data.tags));
+export const getStaticPaths = getTagStaticPaths;
 
-  return Array.from(tags).sort((left, right) => left.localeCompare(right, "ja")).map((tag) => ({
-    params: { tag },
-    props: {
-      tag,
-      articles: articles
-        .filter((article) => article.data.tags.includes(tag))
-        .map(toLocalArticleItem),
-    },
-  }));
-}
-
-const { tag, articles } = Astro.props as { tag: string; articles: ArticleItem[] };
+const { tag = Astro.params.tag ?? "", articleEntries } = Astro.props as {
+  tag?: string;
+  articleEntries: Awaited<ReturnType<typeof getLocalArticles>>;
+};
 ---
 
-<SiteLayout title={`Tag: ${tag}`} description={`${tag} に紐づく記事一覧です。`}>
-  <PageHeader title={tag} eyebrow={formatPageBreadcrumb("Home", "Articles", "Tag")} />
-
-  <PageLead summary={`${articles.length} 件の記事があります。`}>
-    {articles.map((article) => (
-      <ArticleCard article={article} />
-    ))}
-  </PageLead>
-</SiteLayout>
+<TagRoute tag={tag} articleEntries={articleEntries} />

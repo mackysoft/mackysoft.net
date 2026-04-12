@@ -1,0 +1,12 @@
+---
+import ArticleRoute, { getStaticPaths as getArticleStaticPaths } from "../../../routes/articles/[slug].astro";
+import { mapPrefixedLocaleStaticPaths } from "../../../lib/locale-pages";
+
+export async function getStaticPaths() {
+  return mapPrefixedLocaleStaticPaths(await getArticleStaticPaths());
+}
+
+const { slug } = Astro.props as { slug: string };
+---
+
+<ArticleRoute slug={slug} />

@@ -1,0 +1,177 @@
+---
+import PageHeader from "../components/PageHeader.astro";
+import Stack from "../components/Stack.astro";
+import DescribedLinkList from "../features/about/DescribedLinkList.astro";
+import { getAboutPageContent } from "../features/about/content";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { getExternalLink } from "../lib/site";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const aboutPageContent = getAboutPageContent(locale);
+const aboutExternalLinks = aboutPageContent.externalLinks.map((link) => {
+  const externalLink = getExternalLink(link.id);
+  return { ...link, href: externalLink.href, label: externalLink.label };
+});
+const localizedSiteGuideItems = aboutPageContent.siteGuide.items.map((item) => ({
+  ...item,
+  href: localizePath(item.href, locale),
+}));
+const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.primaryExternalLinkId);
+---
+
+<SiteLayout
+  title={aboutPageContent.title}
+  description={aboutPageContent.description}
+  locale={locale}
+  canonicalPath={localizePath("/about/", locale)}
+  alternateLocales={createAlternateLocaleLinks("/about/")}
+>
+  <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
+
+  <Stack as="section" class="content-panel about-main" gap="1.1rem">
+    <Stack class="profile-intro">
+        <a
+          href={profilePrimaryExternalLink.href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={aboutPageContent.profile.avatarLinkAriaLabel}
+          class="avatar-link"
+        >
+        <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
+      </a>
+      <Stack class="profile-copy" gap="0.35rem">
+        <p class="profile-name">{aboutPageContent.profile.name}</p>
+        <p>{aboutPageContent.profile.summary}</p>
+      </Stack>
+    </Stack>
+
+    <Stack as="section" class="about-section" gap="0.55rem">
+      <h2>{aboutPageContent.whatIDo.heading}</h2>
+      <div class="content-grid compact-copy">
+        {aboutPageContent.whatIDo.paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+    </Stack>
+
+    <Stack as="section" class="about-section" gap="0.55rem">
+      <h2>{aboutPageContent.domainsAndInterests.heading}</h2>
+      <ul class="interest-list">
+        {aboutPageContent.domainsAndInterests.items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    </Stack>
+
+    <Stack as="section" class="about-section" gap="0.55rem">
+      <h2>{aboutPageContent.siteGuide.heading}</h2>
+      <div class="content-grid compact-copy">
+        {aboutPageContent.siteGuide.paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+      <DescribedLinkList items={localizedSiteGuideItems} />
+    </Stack>
+  </Stack>
+
+  <section class="content-grid section-grid">
+    <section class="content-panel">
+      <h2>{aboutPageContent.externalLinksHeading}</h2>
+      <DescribedLinkList items={aboutExternalLinks} />
+    </section>
+
+    <section class="content-panel">
+      <h2>{aboutPageContent.contact.heading}</h2>
+      <div class="content-grid compact-copy">
+        {aboutPageContent.contact.paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+      <a href={localizePath(aboutPageContent.contact.href, locale)} class="button-link">{aboutPageContent.contact.ctaLabel}</a>
+    </section>
+  </section>
+</SiteLayout>
+
+<style>
+  h2 {
+    margin-top: 0;
+  }
+
+  h2 {
+    margin-bottom: 0.65rem;
+  }
+
+  .profile-intro {
+    align-items: start;
+  }
+
+  .profile-copy {
+    align-content: center;
+  }
+
+  .profile-name {
+    margin: 0;
+    font-size: clamp(1.3rem, 1.05rem + 1vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .avatar-link {
+    display: block;
+    justify-self: start;
+    width: clamp(6rem, 12vw, 9rem);
+    height: clamp(6rem, 12vw, 9rem);
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: var(--surface-raised-strong-color);
+  }
+
+  .avatar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .about-section h2 {
+    margin-bottom: 0;
+  }
+
+  .about-main p,
+  .content-panel p {
+    margin: 0;
+  }
+
+  .compact-copy {
+    gap: 0.55rem;
+  }
+
+  .section-grid {
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  }
+
+  .interest-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .button-link {
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 720px) {
+    .profile-intro {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+  }
+</style>

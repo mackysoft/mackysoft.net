@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
-import { formatArticleDate } from "../../src/lib/article-dates";
+import { formatContentDate } from "../../src/lib/content-date";
 
 type SharePayload = {
   title: string;
@@ -19,9 +19,18 @@ type ShareWindow = Window &
 const activityData = JSON.parse(
   readFileSync(path.resolve(import.meta.dirname, "../../src/generated/activity.json"), "utf8"),
 ) as {
-  articles: Array<{ title: string; url: string; publishedAt: string }>;
+  articles: Array<{
+    publishedAt: string;
+    locales: {
+      ja: { title: string; url: string };
+      en?: { title: string; url: string };
+    };
+  }>;
 };
 const latestZennArticle = activityData.articles[0]!;
+const latestZennArticleJa = latestZennArticle.locales.ja;
+const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.locales.ja;
+const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
 
 test.describe("articles page", () => {
   test("shows local and Zenn articles in the same card format", { tag: "@size:medium" }, async ({ page }) => {
@@ -29,18 +38,52 @@ test.describe("articles page", () => {
 
     await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
     await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
-    await expect(page.getByRole("link", { name: latestZennArticle.title, exact: true })).toBeVisible();
+    await expect(page.locator(".page-lead__summary")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
 
-    const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticle.title }).first();
+    const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticleJa.title }).first();
     await expect(zennCard).toContainText("Zenn");
     await expect(zennCard).toContainText("公開日");
-    await expect(zennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt)));
+    await expect(zennCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "ja"));
     await expect(zennCard.locator("img")).toHaveCount(1);
     await expect(zennCard.locator(".article-card__tags")).toHaveCount(0);
-    await expect(zennCard.getByRole("link", { name: latestZennArticle.title, exact: true })).toHaveAttribute(
+    await expect(zennCard.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toHaveAttribute(
       "href",
-      latestZennArticle.url,
+      latestZennArticleJa.url,
     );
+  });
+
+  test("shows translated external metadata and localized local articles on the English index page", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/");
+
+    await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
+    await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
+    await expect(page.locator(".page-lead__summary")).toHaveCount(0);
+
+    const translatedZennCard = page.locator(".article-card").filter({ hasText: latestZennArticleEn.title }).first();
+    await expect(translatedZennCard).toContainText("Published");
+    await expect(translatedZennCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "en"));
+    await expect(translatedZennCard.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toHaveAttribute(
+      "href",
+      latestZennArticleEn.url,
+    );
+
+    const localizedLocalCard = page.locator(".article-card").filter({ hasText: translatedVisionTitle }).first();
+    await expect(localizedLocalCard).not.toContainText("Japanese only");
+    await expect(localizedLocalCard.getByRole("link", { name: translatedVisionTitle, exact: true })).toHaveAttribute(
+      "href",
+      "/en/articles/vision-introduction/",
+    );
+  });
+
+  test("navigates from anywhere on an article card", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/");
+
+    const localizedLocalCard = page.locator(".article-card").filter({ hasText: translatedVisionTitle }).first();
+
+    await localizedLocalCard.click();
+
+    await expect(page).toHaveURL("/en/articles/vision-introduction/");
   });
 
   test("keeps the article hero layout while separating the breadcrumb", { tag: "@size:medium" }, async ({ page }) => {
@@ -231,5 +274,53 @@ test.describe("articles page", () => {
     expect(twitterHref).toContain(encodeURIComponent("https://mackysoft.net/articles/vision-introduction/"));
 
     await context.close();
+  });
+
+  test("renders translated English local article routes without fallback notice", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/vision-introduction/");
+
+    const breadcrumb = page.locator(".article-page-header .eyebrow");
+
+    await expect(page).toHaveURL("/en/articles/vision-introduction/");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1, name: translatedVisionTitle })).toBeVisible();
+    await expect(breadcrumb).toHaveText("Home / Articles");
+    await expect(page.locator(".article-content")).toContainText("What is the CullingGroup API?");
+  });
+
+  test("keeps localized internal links inside English article content", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/roguelike-map-generation-algorithm/");
+
+    const internalGameLink = page.locator('.article-content a[href="/en/games/treasure-rogue/"]').first();
+
+    await expect(internalGameLink).toHaveAttribute("href", "/en/games/treasure-rogue/");
+
+    await page.goto("/en/articles/roguelike-random-enemy-select/");
+
+    const relatedArticleLink = page.locator('.article-content a[href="/en/articles/roguelike-map-generation-algorithm/"]').first();
+
+    await expect(relatedArticleLink).toHaveAttribute("href", "/en/articles/roguelike-map-generation-algorithm/");
+  });
+
+  test("keeps markdown body images rendered on Japanese and English article pages", { tag: "@size:medium" }, async ({ page }) => {
+    for (const pathname of ["/articles/vision-introduction/", "/en/articles/vision-introduction/"]) {
+      await page.goto(pathname);
+
+      const firstBodyImage = page.locator(".article-content img").first();
+
+      await expect(firstBodyImage).toBeVisible();
+
+      const imageState = await firstBodyImage.evaluate((image) => {
+        const htmlImage = image as HTMLImageElement;
+
+        return {
+          src: htmlImage.getAttribute("src"),
+          currentSrc: htmlImage.currentSrc,
+        };
+      });
+
+      expect(imageState.src || imageState.currentSrc).toBeTruthy();
+      expect(imageState.currentSrc.length).toBeGreaterThan(0);
+    }
   });
 });

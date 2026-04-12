@@ -1,144 +1,23 @@
-<div class="site-header-tools" role="group" aria-label="Header tools" data-site-header-tools>
-  <button
-    type="button"
-    class="site-header-tool site-header-tool--icon"
-    aria-label="Search placeholder"
-    disabled
-    data-site-tool="search"
-  >
-    <svg class="site-header-tool__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
-      <path d="M16 16L21 21" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-    </svg>
-  </button>
+---
+import SearchPlaceholder from "./header/SearchPlaceholder.astro";
+import ThemeToggle from "./header/ThemeToggle.astro";
+import LocaleMenu from "./header/LocaleMenu.astro";
+import { getUiText } from "../lib/ui-text";
+import type { SiteLocale } from "../lib/i18n";
 
-  <button
-    type="button"
-    class="site-header-tool site-header-tool--theme"
-    aria-label="テーマを切り替え"
-    aria-pressed="false"
-    disabled
-    data-site-tool="theme"
-    data-theme-toggle
-  >
-    <span class="site-header-tool__theme-option" aria-hidden="true" data-theme-value="light">
-      <svg class="site-header-tool__symbol" viewBox="0 0 24 24" focusable="false">
-        <circle cx="12" cy="12" r="4.4" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
-        <path d="M12 2.5V5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M12 19V21.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M2.5 12H5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M19 12H21.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M5.2 5.2L7 7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M17 17L18.8 18.8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M17 7L18.8 5.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-        <path d="M5.2 18.8L7 17" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
-      </svg>
-    </span>
-    <span class="site-header-tool__theme-option" aria-hidden="true" data-theme-value="dark">
-      <svg class="site-header-tool__symbol" viewBox="0 0 24 24" focusable="false">
-        <path
-          d="M15.8 3.7C13 4.4 11 7 11 10.1C11 13.5 13.6 16.3 17 16.8C15.7 18.8 13.5 20.1 11 20.1C7 20.1 3.8 16.9 3.8 12.9C3.8 8.9 7 5.7 11 5.7C12.8 5.7 14.5 6.4 15.8 7.5"
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.8"
-        ></path>
-      </svg>
-    </span>
-  </button>
+type Props = {
+  locale: SiteLocale;
+  contentLocale?: SiteLocale;
+  isFallback?: boolean;
+  currentPath: string;
+};
 
-  <button
-    type="button"
-    class="site-header-tool site-header-tool--language"
-    aria-label="Language dropdown placeholder"
-    disabled
-    data-site-tool="language"
-  >
-    <svg class="site-header-tool__symbol" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
-      <path d="M3.5 12H20.5" fill="none" stroke="currentColor" stroke-width="1.8"></path>
-      <path
-        d="M12 3.5C14.4 5.8 15.8 8.8 15.8 12C15.8 15.2 14.4 18.2 12 20.5C9.6 18.2 8.2 15.2 8.2 12C8.2 8.8 9.6 5.8 12 3.5Z"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.8"
-      ></path>
-    </svg>
-    <span class="site-header-tool__label">JP</span>
-    <svg class="site-header-tool__caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M7 10L12 15L17 10"
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="1.8"
-      ></path>
-    </svg>
-  </button>
+const { locale, contentLocale = locale, isFallback = false, currentPath } = Astro.props as Props;
+const uiText = getUiText(locale);
+---
+
+<div class="site-header-tools" role="group" aria-label={uiText.header.toolsLabel} data-site-header-tools>
+  <SearchPlaceholder locale={locale} />
+  <ThemeToggle locale={locale} />
+  <LocaleMenu locale={locale} contentLocale={contentLocale} isFallback={isFallback} currentPath={currentPath} />
 </div>
-
-<script is:inline>
-  (() => {
-    const storageKey = "mackysoft-theme";
-    const root = document.documentElement;
-    const themeButtons = Array.from(document.querySelectorAll("[data-theme-toggle]")).filter((button) => {
-      return button instanceof HTMLButtonElement;
-    });
-
-    if (themeButtons.length === 0) {
-      return;
-    }
-
-    const isValidTheme = (value) => value === "light" || value === "dark";
-    const getCurrentTheme = () => {
-      return isValidTheme(root.dataset.theme) ? root.dataset.theme : "light";
-    };
-    const syncButtons = (theme) => {
-      for (const button of themeButtons) {
-        button.disabled = false;
-        button.setAttribute("aria-pressed", String(theme === "dark"));
-        button.dataset.currentTheme = theme;
-      }
-    };
-    const applyTheme = (theme) => {
-      root.dataset.theme = theme;
-      root.style.colorScheme = theme;
-      syncButtons(theme);
-    };
-    const withoutThemeTransitions = (callback) => {
-      root.dataset.themeSwitching = "true";
-      callback();
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          delete root.dataset.themeSwitching;
-        });
-      });
-    };
-    const persistTheme = (theme) => {
-      try {
-        window.localStorage.setItem(storageKey, theme);
-      } catch {
-        // Ignore storage failures and keep the in-memory theme selection.
-      }
-    };
-
-    applyTheme(getCurrentTheme());
-
-    for (const button of themeButtons) {
-      if (button.dataset.themeReady === "true") {
-        continue;
-      }
-
-      button.dataset.themeReady = "true";
-      button.addEventListener("click", () => {
-        const nextTheme = getCurrentTheme() === "dark" ? "light" : "dark";
-        withoutThemeTransitions(() => {
-          applyTheme(nextTheme);
-        });
-        persistTheme(nextTheme);
-      });
-    }
-  })();
-</script>

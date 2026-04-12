@@ -1,0 +1,20 @@
+<script is:inline>
+  (() => {
+    const storageKey = "mackysoft-theme";
+    const root = document.documentElement;
+    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const isValidTheme = (value) => value === "light" || value === "dark";
+    const readStoredTheme = () => {
+      try {
+        const value = window.localStorage.getItem(storageKey);
+        return isValidTheme(value) ? value : null;
+      } catch {
+        return null;
+      }
+    };
+    const nextTheme = readStoredTheme() ?? (darkQuery.matches ? "dark" : "light");
+
+    root.dataset.theme = nextTheme;
+    root.style.colorScheme = nextTheme;
+  })();
+</script>

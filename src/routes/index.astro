@@ -1,0 +1,104 @@
+---
+import ArticleCard from "../components/ArticleCard.astro";
+import ReleaseCard from "../components/ReleaseCard.astro";
+import { getHomePageContent } from "../features/home/content";
+import { getArticleItems } from "../lib/articles";
+import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { getLatestReleases } from "../lib/releases";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const content = getHomePageContent(locale);
+const latestArticles = (await getArticleItems(locale)).slice(0, 3);
+const latestReleases = getLatestReleases();
+const localizedHomePath = localizePath("/", locale);
+---
+
+<SiteLayout
+  locale={locale}
+  canonicalPath={localizedHomePath}
+  alternateLocales={createAlternateLocaleLinks("/")}
+  enableLocaleRedirectOnRoot={locale === defaultLocale}
+>
+  <h1 class="visually-hidden">{content.homeHeading}</h1>
+
+  <section class="content-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">{content.latestArticlesEyebrow}</p>
+        <h2>{content.latestArticlesHeading}</h2>
+      </div>
+      <a href={localizePath("/articles/", locale)} class="button-link">{content.latestArticlesCta}</a>
+    </div>
+    <div class="content-grid latest-articles-grid">
+      {latestArticles.map((article) => (
+        <ArticleCard article={article} layout="vertical" locale={locale} />
+      ))}
+    </div>
+  </section>
+
+  {latestReleases.length > 0 && (
+    <section class="content-panel">
+      <div class="section-head">
+      <div>
+          <p class="eyebrow">{content.latestReleasesEyebrow}</p>
+          <h2>{content.latestReleasesHeading}</h2>
+        </div>
+        <a href={localizePath("/assets/", locale)} class="button-link">{content.latestReleasesCta}</a>
+      </div>
+      <div class="content-grid latest-releases-grid">
+        {latestReleases.map((release) => (
+          <ReleaseCard release={release} locale={locale} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="content-grid feature-grid">
+    <section class="content-panel">
+      <p class="eyebrow">{content.aboutEyebrow}</p>
+      <h2>{content.aboutHeading}</h2>
+      <p>{content.aboutBody}</p>
+      <a href={localizePath("/about/", locale)} class="button-link">{content.aboutCta}</a>
+    </section>
+    <section class="content-panel">
+      <p class="eyebrow">{content.contactEyebrow}</p>
+      <h2>{content.contactHeading}</h2>
+      <p>{content.contactBody}</p>
+      <a href={localizePath("/contact/", locale)} class="button-link">{content.contactCta}</a>
+    </section>
+  </section>
+</SiteLayout>
+
+<style>
+  h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  }
+
+  .latest-articles-grid {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .latest-releases-grid {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+</style>

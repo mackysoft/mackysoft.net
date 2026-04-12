@@ -314,6 +314,102 @@ html[data-theme="dark"] [data-site-tool="theme"] [data-theme-value="dark"] {
   height: 0.82rem;
 }
 
+.site-language-menu {
+  position: relative;
+}
+
+.site-language-menu > summary {
+  list-style: none;
+}
+
+.site-language-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-language-menu__popover {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  z-index: 10;
+  display: grid;
+  min-width: 10rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border-strong-color);
+  border-radius: 1rem;
+  background: var(--surface-strong-color);
+  box-shadow: 0 1rem 2rem var(--overlay-shadow-color);
+}
+
+.site-language-menu:not([open]) .site-language-menu__popover {
+  display: none;
+}
+
+.site-language-menu__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.8rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.site-language-menu__item:hover,
+.site-language-menu__item:focus-visible {
+  background: var(--surface-raised-color);
+  border-color: var(--surface-soft-border-color);
+}
+
+.site-language-menu__item--current {
+  background: var(--accent-surface-color);
+  border-color: var(--accent-border-color);
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.site-language-menu__item--selected {
+  background: var(--surface-raised-strong-color);
+  border-color: var(--border-strong-color);
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.site-language-menu__item--current-content {
+  background: var(--accent-surface-color);
+  border-color: var(--accent-border-color);
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.site-language-menu__item--selected.site-language-menu__item--current {
+  background: var(--accent-surface-color);
+  border-color: var(--accent-border-color);
+  color: var(--accent-color);
+}
+
+.site-language-menu__item--selected::after {
+  content: "✓";
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+.site-language-menu__item--current-content:not(.site-language-menu__item--selected)::after {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
 h1,
 h2,
 h3,
@@ -399,11 +495,24 @@ h3,
 }
 
 .activity-card {
+  position: relative;
   display: grid;
   border: 1px solid var(--border-color);
   border-radius: 1.25rem;
   background: var(--surface-color);
   overflow: hidden;
+  transition:
+    transform 90ms ease-out,
+    border-color 90ms ease-out,
+    box-shadow 110ms ease-out,
+    background-color 90ms ease-out;
+}
+
+.activity-card:hover,
+.activity-card:focus-within {
+  border-color: var(--border-strong-color);
+  box-shadow: 0 1rem 2rem var(--overlay-shadow-color);
+  transform: translateY(-1px);
 }
 
 .activity-card--compact {
@@ -413,14 +522,26 @@ h3,
   padding: 1rem;
 }
 
-.activity-card__cover-link {
+.activity-card__link-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  border-radius: inherit;
+}
+
+.activity-card__link-layer:focus-visible {
+  outline: none;
+}
+
+.activity-card__cover {
   display: block;
   overflow: hidden;
   border-radius: 0.9rem;
   background: var(--surface-strong-color);
 }
 
-.activity-card__cover-link img {
+.activity-card__cover img {
   display: block;
   width: 100%;
   height: auto;
@@ -432,9 +553,8 @@ h3,
   min-height: 0;
 }
 
-.activity-card__title-link {
+.activity-card__title {
   color: var(--text-color);
-  text-decoration: none;
 }
 
 .activity-card__meta {
@@ -443,6 +563,26 @@ h3,
   gap: 0.75rem;
   margin: 0;
   color: var(--muted-color);
+}
+
+.activity-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.activity-card__badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.28rem 0.55rem;
+  border: 1px solid var(--surface-soft-border-color);
+  border-radius: 999px;
+  background: var(--surface-soft-color);
+  color: var(--muted-color);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
 }
 
 .visually-hidden {

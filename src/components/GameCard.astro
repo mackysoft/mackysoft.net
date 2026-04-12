@@ -1,42 +1,47 @@
 ---
 import { Image } from "astro:assets";
 
+import { getUiText } from "../lib/ui-text";
+import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import GameStatusBadge from "./GameStatusBadge.astro";
-import { formatArticleDate } from "../lib/article-dates";
-import { getGamePlatformLabel, type GameEntry } from "../lib/games";
+import { formatContentDate } from "../lib/content-date";
+import { getGamePlatformLabel } from "../lib/game-presentation";
+import type { LocalizedGameEntry } from "../lib/game-repository";
 
 type Props = {
-  game: GameEntry;
+  game: LocalizedGameEntry;
+  locale?: SiteLocale;
 };
 
-const { game } = Astro.props;
-const href = `/games/${game.id}/`;
+const { game, locale = "ja" } = Astro.props as Props;
+const href = game.href;
 const publishedAt = game.data.publishedAt;
 const platforms = game.data.platforms;
+const uiText = getUiText(locale);
 ---
 
 <article class="game-card activity-card">
-  <a href={href} class="game-card__cover-link activity-card__cover-link">
+  <a href={href} class="activity-card__link-layer" aria-label={game.data.title}></a>
+  <div class="game-card__cover activity-card__cover">
     <Image src={game.data.cover} alt={game.data.coverAlt} widths={[480]} sizes="(max-width: 720px) 100vw, 28rem" />
-  </a>
+  </div>
   <div class="game-card__body activity-card__body">
-    <h3>
-      <a href={href} class="activity-card__title-link">{game.data.title}</a>
-    </h3>
+    <h3 class="activity-card__title">{game.data.title}</h3>
     <p class="game-card__description">{game.data.description}</p>
     <div class="game-card__footer">
       {publishedAt && (
         <p class="game-card__meta activity-card__meta">
           <span class="game-card__meta-date">
-            <span class="game-card__meta-label">公開日</span>
-            <span>{formatArticleDate(publishedAt)}</span>
+            <span class="game-card__meta-label">{uiText.game.publishedAt}</span>
+            <span>{formatContentDate(publishedAt, locale)}</span>
           </span>
         </p>
       )}
       <div class="game-card__metrics">
-        <GameStatusBadge status={game.data.status} size="card" />
+        <GameStatusBadge status={game.data.status} size="card" locale={locale} />
+        {game.isFallback && locale !== defaultLocale && <p class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</p>}
         {platforms.map((platform) => (
-          <p class="game-card__platform">{getGamePlatformLabel(platform)}</p>
+          <p class="game-card__platform">{getGamePlatformLabel(platform, locale)}</p>
         ))}
       </div>
     </div>
@@ -49,11 +54,11 @@ const platforms = game.data.platforms;
     padding: 1.25rem;
   }
 
-  .game-card__cover-link {
+  .game-card__cover {
     aspect-ratio: 1200 / 630;
   }
 
-  .game-card__cover-link :global(img) {
+  .game-card__cover :global(img) {
     display: block;
     width: 100%;
     height: 100%;

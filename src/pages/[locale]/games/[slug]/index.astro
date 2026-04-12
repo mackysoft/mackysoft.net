@@ -1,0 +1,12 @@
+---
+import GameRoute, { getStaticPaths as getGameStaticPaths } from "../../../../routes/games/[slug]/index.astro";
+import { mapPrefixedLocaleStaticPaths } from "../../../../lib/locale-pages";
+
+export async function getStaticPaths() {
+  return mapPrefixedLocaleStaticPaths(await getGameStaticPaths());
+}
+
+const { slug } = Astro.props as { slug: string };
+---
+
+<GameRoute slug={slug} />

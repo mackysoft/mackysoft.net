@@ -1,0 +1,54 @@
+---
+import ArticleCard from "../../components/ArticleCard.astro";
+import PageLead from "../../components/PageLead.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getArticlesTagPageMeta } from "../../features/articles/page-meta";
+import { formatArticleCountLabel, getUiText } from "../../lib/ui-text";
+import { getLocalArticles, toLocalArticleItem } from "../../lib/articles";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getLocalArticles();
+  const tags = new Set(articles.flatMap((article) => article.data.tags));
+
+  return Array.from(tags).sort((left, right) => left.localeCompare(right, "ja")).map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      articleEntries: articles.filter((article) => article.data.tags.includes(tag)),
+    },
+  }));
+}
+
+type Props = {
+  tag: string;
+  articleEntries: Awaited<ReturnType<typeof getLocalArticles>>;
+  locale?: SiteLocale;
+};
+
+const { tag, articleEntries, locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const articles = await Promise.all(articleEntries.map((article) => toLocalArticleItem(article, locale)));
+const pageMeta = getArticlesTagPageMeta(locale, tag, {
+  tag: uiText.common.tag,
+});
+---
+
+<SiteLayout
+  title={pageMeta.title}
+  description={pageMeta.description}
+  locale={locale}
+  canonicalPath={localizePath(`/tags/${tag}/`, locale)}
+  alternateLocales={createAlternateLocaleLinks(`/tags/${tag}/`)}
+>
+  <PageHeader title={tag} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.tag)} />
+
+  <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
+    {articles.map((article) => (
+      <ArticleCard article={article} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>

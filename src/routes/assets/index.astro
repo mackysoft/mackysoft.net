@@ -1,0 +1,43 @@
+---
+import AssetCard from "../../components/AssetCard.astro";
+import PageLead from "../../components/PageLead.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getAssetsPageContent } from "../../features/assets/content";
+import { getUiText } from "../../lib/ui-text";
+import { formatBreadcrumb } from "../../lib/breadcrumb";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { getReleaseActivities } from "../../lib/releases";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const releases = getReleaseActivities();
+const pageContent = getAssetsPageContent(locale, uiText.common.assets);
+---
+
+<SiteLayout
+  title={pageContent.title}
+  description={pageContent.description}
+  locale={locale}
+  canonicalPath={localizePath("/assets/", locale)}
+  alternateLocales={createAlternateLocaleLinks("/assets/")}
+>
+  <PageHeader title={uiText.common.assets} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.assets)} />
+
+  <PageLead class="assets-list">
+    {releases.map((release) => (
+      <AssetCard release={release} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>
+
+<style>
+  .assets-list {
+    grid-template-columns: 1fr;
+  }
+</style>

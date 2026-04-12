@@ -1,0 +1,20 @@
+---
+import { toLanguageTag, type SiteLocale } from "../../lib/i18n";
+
+type AlternateLocaleLink = {
+  locale: SiteLocale;
+  href: string;
+};
+
+type Props = {
+  canonicalUrl: string;
+  alternateLocaleUrls?: AlternateLocaleLink[];
+};
+
+const { canonicalUrl, alternateLocaleUrls = [] } = Astro.props as Props;
+---
+
+<link rel="canonical" href={canonicalUrl} />
+{alternateLocaleUrls.map((entry) => (
+  <link rel="alternate" hreflang={toLanguageTag(entry.locale)} href={entry.href} />
+))}

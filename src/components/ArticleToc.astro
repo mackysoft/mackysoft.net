@@ -1,4 +1,7 @@
 ---
+import { getUiText } from "../lib/ui-text";
+import type { SiteLocale } from "../lib/i18n";
+
 type TocHeading = {
   depth: number;
   slug: string;
@@ -7,15 +10,17 @@ type TocHeading = {
 
 type Props = {
   headings: TocHeading[];
+  locale?: SiteLocale;
 };
 
-const { headings } = Astro.props as Props;
+const { headings, locale = "ja" } = Astro.props as Props;
+const uiText = getUiText(locale);
 ---
 
 <aside class="article-toc sticky-panel" aria-labelledby="article-toc-title">
   <div class="article-toc__inner content-panel">
-    <h2 id="article-toc-title" class="article-toc__title">目次</h2>
-    <nav aria-label="Article table of contents">
+    <h2 id="article-toc-title" class="article-toc__title">{uiText.article.tocTitle}</h2>
+    <nav aria-label={uiText.article.tocNavLabel}>
       <ol class="article-toc__list">
         {headings.map((heading) => (
           <li class:list={["article-toc__item", heading.depth > 2 && "article-toc__item--nested"]}>

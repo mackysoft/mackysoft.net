@@ -1,0 +1,8 @@
+---
+import AssetsRoute from "../../../routes/assets/index.astro";
+import { getNonDefaultLocaleStaticPaths } from "../../../lib/locale-pages";
+
+export const getStaticPaths = getNonDefaultLocaleStaticPaths;
+---
+
+<AssetsRoute />

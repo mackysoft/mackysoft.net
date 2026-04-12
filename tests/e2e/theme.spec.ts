@@ -3,6 +3,9 @@ import { expect, test } from "@playwright/test";
 test.describe("theme toggle", () => {
   test("uses the OS preference on first visit and applies dark surfaces across representative pages", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ colorScheme: "dark", viewport: { width: 1280, height: 960 } });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
     const page = await context.newPage();
 
     await page.goto("/");
@@ -32,6 +35,9 @@ test.describe("theme toggle", () => {
 
   test("persists the explicit theme choice across reloads", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ colorScheme: "dark", viewport: { width: 1280, height: 900 } });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
     const page = await context.newPage();
 
     await page.goto("/");

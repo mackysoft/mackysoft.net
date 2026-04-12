@@ -1,0 +1,216 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+import GameActionPanel from "../../../components/GameActionPanel.astro";
+import GameScreenshotGallery from "../../../components/GameScreenshotGallery.astro";
+import GameStatusBadge from "../../../components/GameStatusBadge.astro";
+import { getUiText } from "../../../lib/ui-text";
+import { formatNumericDate } from "../../../lib/content-date";
+import { getGamePlatformLabel } from "../../../lib/game-presentation";
+import { resolveLocalizedGameBySlug } from "../../../lib/game-repository";
+import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
+import { formatBreadcrumb } from "../../../lib/breadcrumb";
+import { getYouTubeEmbedUrl } from "../../../lib/youtube";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const games = await getCollection("games");
+
+  return games.map((game) => ({
+    params: { slug: game.id },
+    props: { slug: game.id },
+  }));
+}
+
+type Props = {
+  slug?: string;
+  locale?: SiteLocale;
+};
+
+const { slug = Astro.params.slug ?? "", locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const game = await resolveLocalizedGameBySlug(slug, locale);
+
+if (!game) {
+  throw new Error(`Unknown game slug: ${slug}`);
+}
+
+const trailerEmbedUrl = game.data.trailerUrl ? getYouTubeEmbedUrl(game.data.trailerUrl) : null;
+const hasActions = game.data.actions.length > 0;
+const detailRows = [
+  game.data.genre ? { label: uiText.game.genre, value: game.data.genre } : null,
+  game.data.publishedAt ? { label: uiText.game.publishedAt, value: formatNumericDate(game.data.publishedAt, locale) } : null,
+  game.data.languages.length > 0 ? { label: uiText.game.languages, value: game.data.languages.join(" / ") } : null,
+  game.data.platforms.length > 0
+    ? { label: uiText.game.platforms, value: game.data.platforms.map((platform) => getGamePlatformLabel(platform, locale)).join(" / ") }
+    : null,
+].filter((row): row is { label: string; value: string } => row !== null);
+const gamePath = `/games/${slug}/`;
+const canonicalPath = game.isFallback ? gamePath : localizePath(gamePath, locale);
+const alternateLocales = createAlternateLocaleLinks(gamePath, game.availableLocales);
+---
+
+<SiteLayout
+  title={game.data.title}
+  description={game.data.description}
+  locale={locale}
+  contentLocale={game.contentLocale}
+  isFallback={game.isFallback}
+  canonicalPath={canonicalPath}
+  alternateLocales={alternateLocales}
+>
+  <article class="game-page">
+    <p class="eyebrow game-page__eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.games)}</p>
+
+    {game.isFallback && locale !== defaultLocale && (
+      <section class="content-panel game-fallback-notice">
+        <p>{uiText.common.fallbackNotice}</p>
+      </section>
+    )}
+
+    <header class="game-hero">
+      <div class="game-hero__cover">
+        <Image src={game.data.cover} alt={game.data.coverAlt} widths={[1200, 960, 720]} sizes="(max-width: 56rem) 100vw, 56rem" />
+      </div>
+      <div class="game-hero__copy">
+        <GameStatusBadge status={game.data.status} size="hero" locale={locale} />
+        <h1>{game.data.title}</h1>
+        <p class="game-hero__description">{game.data.description}</p>
+      </div>
+    </header>
+
+    <div class:list={["game-detail-layout", hasActions && "game-detail-layout--with-actions"]}>
+      <div class="game-detail-main">
+        {game.data.features.length > 0 && (
+          <section class="game-section content-panel" aria-label={uiText.game.featuresAriaLabel}>
+            <ul class="game-feature-list">
+              {game.data.features.map((feature) => (
+                <li>{feature}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <GameScreenshotGallery screenshots={game.data.screenshots} trailerEmbedUrl={trailerEmbedUrl} title={game.data.title} locale={locale} />
+
+        {detailRows.length > 0 && (
+          <section class="game-detail-table content-panel" aria-label={uiText.game.basicInfoAriaLabel}>
+            <table>
+              <tbody>
+                {detailRows.map((row) => (
+                  <tr>
+                    <th scope="row">{row.label}</th>
+                    <td>{row.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+      </div>
+
+      {hasActions && <GameActionPanel actions={game.data.actions} locale={locale} />}
+    </div>
+  </article>
+</SiteLayout>
+
+<style>
+  .game-page {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .game-page__eyebrow {
+    margin-bottom: 0;
+  }
+
+  .game-hero {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .game-hero__copy {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .game-fallback-notice p {
+    margin: 0;
+  }
+
+  .game-hero__copy h1,
+  .game-hero__description {
+    margin: 0;
+  }
+
+  .game-hero__description {
+    color: var(--muted-color);
+    font-size: 1.02rem;
+  }
+
+  .game-hero__cover {
+    width: min(100%, 46rem);
+    justify-self: center;
+    overflow: hidden;
+    border-radius: 1.2rem;
+    border: 1px solid var(--border-color);
+    background: var(--surface-strong-color);
+  }
+
+  .game-hero__cover :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .game-detail-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .game-detail-main {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .game-section {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .game-feature-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .game-detail-table {
+    overflow-x: auto;
+  }
+
+  .game-detail-table table {
+    min-width: min(100%, 28rem);
+  }
+
+  .game-detail-table th {
+    width: 8.5rem;
+    white-space: nowrap;
+    color: var(--muted-color);
+    font-weight: 500;
+  }
+
+  .game-detail-table td {
+    color: var(--text-color);
+  }
+
+  @media (min-width: 960px) {
+    .game-detail-layout--with-actions {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 18rem);
+      align-items: start;
+    }
+  }
+</style>

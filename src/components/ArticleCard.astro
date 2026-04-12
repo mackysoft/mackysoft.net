@@ -1,15 +1,18 @@
 ---
 import { Image } from "astro:assets";
 
-import { formatArticleDate } from "../lib/article-dates";
+import { getUiText } from "../lib/ui-text";
+import { defaultLocale, type SiteLocale } from "../lib/i18n";
+import { formatContentDate } from "../lib/content-date";
 import type { ArticleItem } from "../lib/articles";
 
 type Props = {
   article: ArticleItem;
   layout?: "horizontal" | "vertical";
+  locale?: SiteLocale;
 };
 
-const { article, layout = "horizontal" } = Astro.props;
+const { article, layout = "horizontal", locale = "ja" } = Astro.props as Props;
 const isExternal = article.kind === "external";
 const cover = article.cover;
 const isRemoteCover = typeof cover === "string";
@@ -19,16 +22,21 @@ const coverHeight = typeof cover === "string" ? undefined : cover?.height;
 const coverAspectRatio = coverWidth && coverHeight ? `${coverWidth} / ${coverHeight}` : "1200 / 630";
 const verticalCoverStyle = layout === "vertical" ? `--article-cover-ratio: ${coverAspectRatio};` : undefined;
 const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
-const publishedAtLabel = formatArticleDate(article.publishedAt);
+const publishedAtLabel = formatContentDate(article.publishedAt, locale);
+const uiText = getUiText(locale);
 ---
 
 <article class:list={["article-card", "activity-card", layout === "vertical" && "activity-card--compact", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
+  <a
+    href={article.href}
+    class="activity-card__link-layer"
+    aria-label={article.title}
+    target={isExternal ? "_blank" : undefined}
+    rel={isExternal ? "noreferrer" : undefined}
+  ></a>
   {cover ? (
-    <a
-      href={article.href}
-      class="article-card__cover-link activity-card__cover-link"
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noreferrer" : undefined}
+    <div
+      class="article-card__cover activity-card__cover"
       style={verticalCoverStyle}
     >
       {isRemoteCover ? (
@@ -36,25 +44,21 @@ const publishedAtLabel = formatArticleDate(article.publishedAt);
       ) : (
         <Image src={cover} alt={article.coverAlt ?? ""} widths={[480]} sizes={coverSizes} />
       )}
-    </a>
+    </div>
   ) : (
     <div class="article-card__cover-placeholder" aria-hidden="true" style={verticalCoverStyle}></div>
   )}
   <div class="article-card__body activity-card__body">
-    <h3>
-      <a
-        href={article.href}
-        class="activity-card__title-link"
-        target={isExternal ? "_blank" : undefined}
-        rel={isExternal ? "noreferrer" : undefined}
-      >
-        {article.title}
-      </a>
-    </h3>
+    <h3 class="activity-card__title">{article.title}</h3>
+    {article.isFallback && locale !== defaultLocale && (
+      <div class="activity-card__badges">
+        <span class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</span>
+      </div>
+    )}
     {showDescription && <p class="article-card__description">{article.description}</p>}
     <p class="article-card__meta activity-card__meta">
       <span class="article-card__meta-date">
-        <span class="article-card__meta-label">公開日</span>
+        <span class="article-card__meta-label">{uiText.article.publishedAt}</span>
         <span>{publishedAtLabel}</span>
       </span>
       <span>{article.source}</span>
@@ -113,7 +117,7 @@ const publishedAtLabel = formatArticleDate(article.publishedAt);
     margin-top: auto;
   }
 
-  .article-card--vertical .article-card__cover-link,
+  .article-card--vertical .article-card__cover,
   .article-card--vertical .article-card__cover-placeholder {
     aspect-ratio: var(--article-cover-ratio, 1200 / 630);
   }

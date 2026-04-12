@@ -1,0 +1,31 @@
+---
+import PageLead from "../components/PageLead.astro";
+import PageHeader from "../components/PageHeader.astro";
+import { getPrivacyPolicyContent } from "../features/privacy-policy/content";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const content = getPrivacyPolicyContent(locale);
+---
+
+<SiteLayout
+  title={content.title}
+  description={content.description}
+  locale={locale}
+  canonicalPath={localizePath("/privacy-policy/", locale)}
+  alternateLocales={createAlternateLocaleLinks("/privacy-policy/")}
+>
+  <PageHeader title={content.hero.title} eyebrow={content.hero.eyebrow} />
+
+  <PageLead panel>
+    {content.paragraphs.map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+  </PageLead>
+</SiteLayout>

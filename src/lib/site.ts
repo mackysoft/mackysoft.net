@@ -1,15 +1,21 @@
-export const siteMeta = {
-  name: "mackysoft.net",
-  description: "ゲーム、アセット、技術記事を整理して残すための活動ハブ。",
-} as const;
+import { getSiteContent } from "../features/site/content";
+import { localizePath, type SiteLocale } from "./i18n";
 
-export const primaryNav = [
-  { href: "/about/", label: "About" },
-  { href: "/games/", label: "Games" },
-  { href: "/assets/", label: "Assets" },
-  { href: "/articles/", label: "Articles" },
-  { href: "/contact/", label: "Contact" },
-] as const;
+export function getSiteMeta(locale: SiteLocale) {
+  const content = getSiteContent(locale);
+
+  return {
+    name: "mackysoft.net",
+    description: content.description,
+  } as const;
+}
+
+export function getPrimaryNav(locale: SiteLocale) {
+  return getSiteContent(locale).primaryNav.map((item) => ({
+    href: localizePath(item.path, locale),
+    label: item.label,
+  }));
+}
 
 export const externalLinks = [
   { id: "github", href: "https://github.com/mackysoft", label: "GitHub" },

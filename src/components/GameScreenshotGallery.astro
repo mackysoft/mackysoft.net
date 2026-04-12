@@ -1,25 +1,29 @@
 ---
 import { Image } from "astro:assets";
 
-import type { GameEntry } from "../lib/games";
+import { getUiText } from "../lib/ui-text";
+import { defaultLocale, type SiteLocale } from "../lib/i18n";
+import type { GameEntry } from "../lib/game-repository";
 
 type Props = {
   screenshots: GameEntry["data"]["screenshots"];
   trailerEmbedUrl?: string | null;
   title: string;
+  locale?: SiteLocale;
 };
 
-const { screenshots, trailerEmbedUrl = null, title } = Astro.props;
+const { screenshots, trailerEmbedUrl = null, title, locale = "ja" } = Astro.props as Props;
+const uiText = getUiText(locale);
 ---
 
 {
   (trailerEmbedUrl || screenshots.length > 0) && (
-    <section class="game-screenshot-gallery content-panel" aria-label="スクリーンショット">
+    <section class="game-screenshot-gallery content-panel" aria-label={uiText.game.screenshotsAriaLabel}>
       {trailerEmbedUrl && (
         <div class="game-screenshot-gallery__trailer">
           <iframe
             src={trailerEmbedUrl}
-            title={`${title} のトレーラー`}
+            title={locale === defaultLocale ? `${title} ${uiText.game.screenshotTrailerTitle}` : `${title}${uiText.game.screenshotTrailerTitle}`}
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"

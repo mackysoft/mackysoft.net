@@ -1,17 +1,50 @@
 ---
+import RootLocaleRedirect from "../components/head/RootLocaleRedirect.astro";
+import SiteSeo from "../components/head/SiteSeo.astro";
+import ThemeBootstrap from "../components/head/ThemeBootstrap.astro";
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
 import SiteHeaderTools from "../components/SiteHeaderTools.astro";
-import { externalLinks, primaryNav, siteMeta } from "../lib/site";
+import { getUiText } from "../lib/ui-text";
+import { localizePath, toLanguageTag, type SiteLocale } from "../lib/i18n";
+import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
 import "../styles/site.css";
+
+type AlternateLocaleLink = {
+  locale: SiteLocale;
+  path: string;
+};
 
 type Props = {
   title?: string;
   description?: string;
+  locale?: SiteLocale;
+  contentLocale?: SiteLocale;
+  canonicalPath?: string;
+  alternateLocales?: AlternateLocaleLink[];
+  isFallback?: boolean;
+  enableLocaleRedirectOnRoot?: boolean;
 };
 
-const { title, description = siteMeta.description } = Astro.props;
+const {
+  title,
+  locale = "ja",
+  contentLocale = locale,
+  canonicalPath = Astro.url.pathname,
+  alternateLocales = [],
+  isFallback = false,
+  enableLocaleRedirectOnRoot = false,
+} = Astro.props as Props;
+const siteMeta = getSiteMeta(locale);
+const uiText = getUiText(locale);
+const description = Astro.props.description ?? siteMeta.description;
 const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
+const primaryNav = getPrimaryNav(locale);
+const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url).toString();
+const alternateLocaleUrls = alternateLocales.map((entry) => ({
+  ...entry,
+  href: new URL(entry.path, Astro.site ?? Astro.url).toString(),
+}));
 
 function isCurrentNavItem(itemHref: string, path: string) {
   if (itemHref === "/") {
@@ -23,33 +56,16 @@ function isCurrentNavItem(itemHref: string, path: string) {
 ---
 
 <!doctype html>
-<html lang="ja" data-theme="light">
+<html lang={toLanguageTag(isFallback ? contentLocale : locale)} data-theme="light" data-ui-locale={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <script is:inline>
-      (() => {
-        const storageKey = "mackysoft-theme";
-        const root = document.documentElement;
-        const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const isValidTheme = (value) => value === "light" || value === "dark";
-        const readStoredTheme = () => {
-          try {
-            const value = window.localStorage.getItem(storageKey);
-            return isValidTheme(value) ? value : null;
-          } catch {
-            return null;
-          }
-        };
-        const nextTheme = readStoredTheme() ?? (darkQuery.matches ? "dark" : "light");
-
-        root.dataset.theme = nextTheme;
-        root.style.colorScheme = nextTheme;
-      })();
-    </script>
+    <SiteSeo canonicalUrl={canonicalUrl} alternateLocaleUrls={alternateLocaleUrls} />
+    <ThemeBootstrap />
+    <RootLocaleRedirect enabled={enableLocaleRedirectOnRoot} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -60,7 +76,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
   <body>
     <header class="site-header" data-site-header>
       <div class="site-header__inner">
-        <a href="/" class="site-brand">{siteMeta.name}</a>
+        <a href={localizePath("/", locale)} class="site-brand">{siteMeta.name}</a>
         <nav class="site-header__nav" aria-label="Global">
           <ul class="site-nav">
             {primaryNav.map((item) => (
@@ -72,7 +88,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
             ))}
           </ul>
         </nav>
-        <SiteHeaderTools />
+        <SiteHeaderTools locale={locale} contentLocale={contentLocale} isFallback={isFallback} currentPath={currentPath} />
       </div>
     </header>
     <div class="shell">
@@ -84,7 +100,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
           {externalLinks.map((link) => (
             <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
           ))}
-          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href={localizePath("/privacy-policy/", locale)}>{uiText.common.privacyPolicy}</a></li>
         </ul>
       </footer>
     </div>

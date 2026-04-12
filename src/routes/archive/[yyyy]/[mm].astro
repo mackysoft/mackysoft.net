@@ -1,0 +1,63 @@
+---
+import ArticleCard from "../../../components/ArticleCard.astro";
+import PageLead from "../../../components/PageLead.astro";
+import PageHeader from "../../../components/PageHeader.astro";
+import { getArticlesArchiveMonthPageMeta } from "../../../features/articles/page-meta";
+import { formatArticleCountLabel, getUiText } from "../../../lib/ui-text";
+import { getContentYearMonth } from "../../../lib/content-date";
+import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
+import { formatBreadcrumb } from "../../../lib/breadcrumb";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getLocalArticles();
+  const yearMonths = new Map();
+
+  for (const article of articles) {
+    const { year, month } = getContentYearMonth(article.data.publishedAt);
+    const key = `${year}-${month}`;
+    const current = yearMonths.get(key) ?? [];
+    current.push(article);
+    yearMonths.set(key, current);
+  }
+
+  return Array.from(yearMonths.entries()).sort(([left], [right]) => left.localeCompare(right)).map(([key, monthArticles]) => {
+    const [year, month] = key.split("-");
+    return {
+      params: { yyyy: year, mm: month },
+      props: { year, month, articleEntries: monthArticles },
+    };
+  });
+}
+
+type Props = {
+  year: string;
+  month: string;
+  articleEntries: Awaited<ReturnType<typeof getLocalArticles>>;
+  locale?: SiteLocale;
+};
+const { year, month, articleEntries, locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const articles = await Promise.all(articleEntries.map((article) => toLocalArticleItem(article, locale)));
+const pageMeta = getArticlesArchiveMonthPageMeta(locale, year, month, {
+  archive: uiText.common.archive,
+});
+---
+
+<SiteLayout
+  title={pageMeta.title}
+  description={pageMeta.description}
+  locale={locale}
+  canonicalPath={localizePath(`/archive/${year}/${month}/`, locale)}
+  alternateLocales={createAlternateLocaleLinks(`/archive/${year}/${month}/`)}
+>
+  <PageHeader title={`${year}/${month}`} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
+
+  <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
+    {articles.map((article) => (
+      <ArticleCard article={article} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>

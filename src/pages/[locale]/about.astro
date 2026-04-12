@@ -1,0 +1,8 @@
+---
+import AboutRoute from "../../routes/about.astro";
+import { getNonDefaultLocaleStaticPaths } from "../../lib/locale-pages";
+
+export const getStaticPaths = getNonDefaultLocaleStaticPaths;
+---
+
+<AboutRoute />

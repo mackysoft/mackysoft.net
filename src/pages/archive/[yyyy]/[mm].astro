@@ -1,43 +1,14 @@
 ---
-import ArticleCard from "../../../components/ArticleCard.astro";
-import PageLead from "../../../components/PageLead.astro";
-import PageHeader from "../../../components/PageHeader.astro";
-import { getArticleYearMonth } from "../../../lib/article-dates";
-import type { ArticleItem } from "../../../lib/articles";
-import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
-import { formatPageBreadcrumb } from "../../../lib/page-header";
-import SiteLayout from "../../../layouts/SiteLayout.astro";
+import ArchiveMonthRoute, { getStaticPaths as getArchiveMonthStaticPaths } from "../../../routes/archive/[yyyy]/[mm].astro";
+import { getLocalArticles } from "../../../lib/articles";
 
-export async function getStaticPaths() {
-  const articles = await getLocalArticles();
-  const yearMonths = new Map();
+export const getStaticPaths = getArchiveMonthStaticPaths;
 
-  for (const article of articles) {
-    const { year, month } = getArticleYearMonth(article.data.publishedAt);
-    const key = `${year}-${month}`;
-    const current = yearMonths.get(key) ?? [];
-    current.push(toLocalArticleItem(article));
-    yearMonths.set(key, current);
-  }
-
-  return Array.from(yearMonths.entries()).sort(([left], [right]) => left.localeCompare(right)).map(([key, monthArticles]) => {
-    const [year, month] = key.split("-");
-    return {
-      params: { yyyy: year, mm: month },
-      props: { year, month, articles: monthArticles },
-    };
-  });
-}
-
-const { year, month, articles } = Astro.props as { year: string; month: string; articles: ArticleItem[] };
+const { year = Astro.params.yyyy ?? "", month = Astro.params.mm ?? "", articleEntries } = Astro.props as {
+  year?: string;
+  month?: string;
+  articleEntries: Awaited<ReturnType<typeof getLocalArticles>>;
+};
 ---
 
-<SiteLayout title={`Archive ${year}/${month}`} description={`${year} 年 ${month} 月の記事一覧です。`}>
-  <PageHeader title={`${year}/${month}`} eyebrow={formatPageBreadcrumb("Home", "Articles", "Archive")} />
-
-  <PageLead summary={`${articles.length} 件の記事があります。`}>
-    {articles.map((article) => (
-      <ArticleCard article={article} />
-    ))}
-  </PageLead>
-</SiteLayout>
+<ArchiveMonthRoute year={year} month={month} articleEntries={articleEntries} />

@@ -1,0 +1,77 @@
+---
+import {
+  defaultLocale,
+  getBrowserLocaleMatchers,
+  localeStorageKey,
+  localizePath,
+  supportedLocales,
+} from "../../lib/i18n";
+
+type Props = {
+  enabled?: boolean;
+};
+
+const { enabled = false } = Astro.props as Props;
+const clientLocales = supportedLocales.map((locale) => ({
+  code: locale,
+  rootPath: localizePath("/", locale),
+}));
+const browserLocaleMatchers = getBrowserLocaleMatchers();
+---
+
+{
+  enabled && (
+    <script
+      is:inline
+      define:vars={{ storageKey: localeStorageKey, defaultLocaleCode: defaultLocale, localeConfigs: clientLocales, browserLocaleMatchers }}
+    >
+      (() => {
+        const currentPath = window.location.pathname;
+        const navigationEntry = performance.getEntriesByType("navigation")[0];
+
+        if (currentPath !== "/") {
+          return;
+        }
+
+        if (navigationEntry && "type" in navigationEntry && navigationEntry.type === "back_forward") {
+          return;
+        }
+
+        const getPreferredLocale = () => {
+          try {
+            const storedLocale = window.localStorage.getItem(storageKey);
+
+            if (localeConfigs.some((locale) => locale.code === storedLocale)) {
+              return storedLocale;
+            }
+          } catch {
+            // Ignore storage failures and fall back to browser languages.
+          }
+
+          for (const candidate of navigator.languages ?? [navigator.language]) {
+            const normalizedCandidate = candidate.trim().toLowerCase().replaceAll("_", "-");
+            const matchedLocale = browserLocaleMatchers.find((matcher) =>
+              normalizedCandidate === matcher.prefix || normalizedCandidate.startsWith(`${matcher.prefix}-`),
+            );
+
+            if (matchedLocale) {
+              return matchedLocale.locale;
+            }
+          }
+
+          return defaultLocaleCode;
+        };
+
+        const preferredLocale = getPreferredLocale();
+
+        if (preferredLocale !== defaultLocaleCode) {
+          const matchedLocale = localeConfigs.find((locale) => locale.code === preferredLocale);
+
+          if (matchedLocale) {
+            window.location.replace(`${matchedLocale.rootPath}${window.location.search}${window.location.hash}`);
+          }
+        }
+      })();
+    </script>
+  )
+}
