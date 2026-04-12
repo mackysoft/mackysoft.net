@@ -5,7 +5,7 @@ import ThemeBootstrap from "../components/head/ThemeBootstrap.astro";
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
 import SiteHeaderTools from "../components/SiteHeaderTools.astro";
 import { getUiText } from "../lib/ui-text";
-import { localizePath, toLanguageTag, type SiteLocale } from "../lib/i18n";
+import { localizePath, stripLocaleFromPath, toLanguageTag, type SiteLocale } from "../lib/i18n";
 import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
 import "../styles/site.css";
 
@@ -45,6 +45,7 @@ const alternateLocaleUrls = alternateLocales.map((entry) => ({
   ...entry,
   href: new URL(entry.path, Astro.site ?? Astro.url).toString(),
 }));
+const enableSearchPanel = stripLocaleFromPath(currentPath) !== "/search/" && !(isFallback && locale !== contentLocale);
 
 function isCurrentNavItem(itemHref: string, path: string) {
   if (itemHref === "/") {
@@ -88,7 +89,13 @@ function isCurrentNavItem(itemHref: string, path: string) {
             ))}
           </ul>
         </nav>
-        <SiteHeaderTools locale={locale} contentLocale={contentLocale} isFallback={isFallback} currentPath={currentPath} />
+        <SiteHeaderTools
+          locale={locale}
+          contentLocale={contentLocale}
+          isFallback={isFallback}
+          currentPath={currentPath}
+          enableSearchPanel={enableSearchPanel}
+        />
       </div>
     </header>
     <div class="shell">

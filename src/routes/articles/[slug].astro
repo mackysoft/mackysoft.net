@@ -5,11 +5,13 @@ import { getCollection, render } from "astro:content";
 import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
 import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
+import SearchMetadata from "../../components/search/SearchMetadata.astro";
 import { getUiText } from "../../lib/ui-text";
 import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import { formatBreadcrumb } from "../../lib/breadcrumb";
+import { getSiteMeta } from "../../lib/site";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -52,7 +54,16 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
   canonicalPath={canonicalPath}
   alternateLocales={alternateLocales}
 >
-  <article class="article-page">
+  <article class="article-page" data-pagefind-body>
+    <SearchMetadata
+      type="article"
+      description={article.data.description}
+      source={getSiteMeta("ja").name}
+      updatedAt={article.data.updatedAt ?? article.data.publishedAt}
+      image={article.data.cover}
+      imageAlt={article.data.coverAlt}
+      tags={article.data.tags}
+    />
     <section class="page-header article-page-header">
       <p class="eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
     </section>

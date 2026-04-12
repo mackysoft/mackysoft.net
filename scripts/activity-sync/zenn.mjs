@@ -40,6 +40,10 @@ export function createZennCoverAlt(title, locale = "ja") {
   return locale === "en" ? `${title} cover image` : `${title} のカバー画像`;
 }
 
+export function extractZennArticleBodyText(bodyHtml = "") {
+  return normalizeWhitespace(cheerio.load(bodyHtml).root().text());
+}
+
 /**
  * @param {LocalizedArticleActivity} activity
  * @returns {LocalizedArticleActivity}
@@ -92,7 +96,8 @@ export function parseZennArticlePage(html) {
   const article = nextData?.props?.pageProps?.article;
   const locale = normalizeWhitespace(nextData?.props?.pageProps?.locale ?? article?.locale ?? "");
   const title = normalizeWhitespace(article?.title ?? $("title").text());
-  const description = summarizeDescription(article?.bodyHtml ? cheerio.load(article.bodyHtml).root().text() : "");
+  const content = extractZennArticleBodyText(article?.bodyHtml ?? "");
+  const description = summarizeDescription(content);
   const url = normalizeWhitespace(
     $("link[rel='canonical']").attr("href")
     ?? $("meta[property='og:url']").attr("content")
@@ -107,6 +112,7 @@ export function parseZennArticlePage(html) {
   return {
     title,
     description,
+    content,
     url,
     locale,
     isTranslated: Boolean(article?.isTranslated),

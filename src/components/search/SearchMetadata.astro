@@ -1,0 +1,48 @@
+---
+import type { ImageMetadata } from "astro";
+
+import type { SearchContentType } from "../../lib/search";
+
+type Props = {
+  type: SearchContentType;
+  description: string;
+  source?: string;
+  updatedAt?: Date | string;
+  image?: ImageMetadata | string;
+  imageAlt?: string;
+  tags?: string[];
+};
+
+const {
+  type,
+  description,
+  source,
+  updatedAt,
+  image,
+  imageAlt,
+  tags = [],
+} = Astro.props as Props;
+
+const normalizedUpdatedAt = updatedAt
+  ? (updatedAt instanceof Date ? updatedAt : new Date(updatedAt)).toISOString()
+  : undefined;
+const imageSrc = typeof image === "string" ? image : image?.src;
+const normalizedTags = tags.map((tag) => tag.trim()).filter(Boolean);
+---
+
+<div hidden data-pagefind-ignore>
+  <span data-pagefind-meta="type" data-pagefind-filter="type">{type}</span>
+  <span data-pagefind-meta="description">{description}</span>
+  {source && <span data-pagefind-meta="source">{source}</span>}
+  {normalizedUpdatedAt && (
+    <time datetime={normalizedUpdatedAt} data-pagefind-meta="updatedAt">
+      {normalizedUpdatedAt}
+    </time>
+  )}
+  {imageSrc && <span data-pagefind-meta={`image:${imageSrc}`}></span>}
+  {imageAlt && <span data-pagefind-meta={`imageAlt:${imageAlt}`}></span>}
+  {normalizedTags.length > 0 && <span data-pagefind-meta="tags">{normalizedTags.join(", ")}</span>}
+  {normalizedTags.map((tag) => (
+    <span data-pagefind-filter="tags">{tag}</span>
+  ))}
+</div>

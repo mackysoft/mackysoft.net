@@ -1,0 +1,63 @@
+---
+import { getUiText } from "../../lib/ui-text";
+import type { SiteLocale } from "../../lib/i18n";
+
+type Props = {
+  locale: SiteLocale;
+  mode: "page" | "inline";
+  searchPath: string;
+  initialQuery?: string;
+};
+
+const {
+  locale,
+  mode,
+  searchPath,
+  initialQuery = "",
+} = Astro.props as Props;
+const uiText = getUiText(locale);
+---
+
+<section
+  class="site-search"
+  data-site-search-panel
+  data-search-mode={mode}
+  data-search-locale={locale}
+  data-search-path={searchPath}
+>
+  <form class="site-search__form" role="search" action={searchPath} method="get" data-site-search-form>
+    <label class="site-search__input-wrap">
+      <span class="visually-hidden">{uiText.search.inputLabel}</span>
+      <input
+        class="site-search__input"
+        type="text"
+        name="q"
+        value={initialQuery}
+        placeholder={uiText.search.inputPlaceholder}
+        autocomplete="off"
+        spellcheck="false"
+        enterkeyhint="search"
+        data-site-search-input
+      />
+    </label>
+    {mode === "page" && (
+      <button type="submit" class="button-link site-search__submit" data-site-search-submit>
+        {uiText.search.submit}
+      </button>
+    )}
+  </form>
+
+  <div class="site-search__results" data-site-search-results hidden={mode === "inline"}>
+    <p class="visually-hidden" aria-live="polite" data-site-search-live></p>
+    <p class="site-search__summary" hidden data-site-search-summary></p>
+    <div class="site-search__viewport" data-site-search-viewport>
+      <div class="site-search__content" data-site-search-content></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initSiteSearch } from "../../scripts/site-search";
+
+  initSiteSearch();
+</script>

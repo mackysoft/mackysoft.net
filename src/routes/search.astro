@@ -1,0 +1,40 @@
+---
+import PageHeader from "../components/PageHeader.astro";
+import SearchPanel from "../components/search/SearchPanel.astro";
+import { formatBreadcrumb } from "../lib/breadcrumb";
+import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { getUiText } from "../lib/ui-text";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const searchPath = localizePath("/search/", locale);
+const initialQuery = Astro.url.searchParams.get("q") ?? "";
+---
+
+<SiteLayout
+  title={uiText.common.search}
+  description={uiText.search.pageDescription}
+  locale={locale}
+  canonicalPath={searchPath}
+  alternateLocales={createAlternateLocaleLinks("/search/")}
+>
+  <PageHeader title={uiText.common.search} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.search)}>
+    <p>{uiText.search.lead}</p>
+  </PageHeader>
+
+  <section class="content-panel search-page-panel">
+    <SearchPanel locale={locale} mode="page" searchPath={searchPath} initialQuery={initialQuery} />
+  </section>
+</SiteLayout>
+
+<style>
+  .search-page-panel {
+    padding: 1.25rem;
+  }
+</style>

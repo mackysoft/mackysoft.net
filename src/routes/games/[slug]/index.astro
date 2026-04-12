@@ -5,12 +5,14 @@ import { getCollection } from "astro:content";
 import GameActionPanel from "../../../components/GameActionPanel.astro";
 import GameScreenshotGallery from "../../../components/GameScreenshotGallery.astro";
 import GameStatusBadge from "../../../components/GameStatusBadge.astro";
+import SearchMetadata from "../../../components/search/SearchMetadata.astro";
 import { getUiText } from "../../../lib/ui-text";
 import { formatNumericDate } from "../../../lib/content-date";
 import { getGamePlatformLabel } from "../../../lib/game-presentation";
 import { resolveLocalizedGameBySlug } from "../../../lib/game-repository";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
 import { formatBreadcrumb } from "../../../lib/breadcrumb";
+import { getSiteMeta } from "../../../lib/site";
 import { getYouTubeEmbedUrl } from "../../../lib/youtube";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
@@ -61,7 +63,16 @@ const alternateLocales = createAlternateLocaleLinks(gamePath, game.availableLoca
   canonicalPath={canonicalPath}
   alternateLocales={alternateLocales}
 >
-  <article class="game-page">
+  <article class="game-page" data-pagefind-body>
+    <SearchMetadata
+      type="game"
+      description={game.data.description}
+      source={getSiteMeta("ja").name}
+      updatedAt={game.data.updatedAt ?? game.data.publishedAt}
+      image={game.data.cover}
+      imageAlt={game.data.coverAlt}
+      tags={game.data.tags}
+    />
     <p class="eyebrow game-page__eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.games)}</p>
 
     {game.isFallback && locale !== defaultLocale && (
