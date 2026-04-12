@@ -2,6 +2,7 @@
 import ArticleCard from "../../components/ArticleCard.astro";
 import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
+import { getArticlesTagPageMeta } from "../../features/articles/page-meta";
 import { formatArticleCount, getUiText } from "../../lib/copy";
 import { getLocalArticles, toLocalArticleItem } from "../../lib/articles";
 import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
@@ -31,11 +32,14 @@ const { tag, articleEntries, locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const uiText = getUiText(locale);
 const articles = await Promise.all(articleEntries.map((article) => toLocalArticleItem(article, locale)));
+const pageMeta = getArticlesTagPageMeta(locale, tag, {
+  tag: uiText.common.tag,
+});
 ---
 
 <SiteLayout
-  title={`${uiText.common.tag}: ${tag}`}
-  description={locale === "en" ? `Articles tagged with ${tag}.` : `${tag} に紐づく記事一覧です。`}
+  title={pageMeta.title}
+  description={pageMeta.description}
   locale={locale}
   canonicalPath={localizePath(`/tags/${tag}/`, locale)}
   alternateLocales={[

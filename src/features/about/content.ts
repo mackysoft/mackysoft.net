@@ -14,6 +14,7 @@ const aboutPageContentMap = {
     profile: {
       name: "Hiroya Aramaki（荒牧裕也）/ Makihiro",
       summary: "ゲームと開発アセットを作っている個人開発者です。ゲーム開発を軸に、技術・アセット制作・発信を続けています。",
+      avatarLinkAriaLabel: "Twitter を開く",
       avatar: {
         src: "https://github.com/mackysoft.png",
         alt: "Makihiro のアイコン",
@@ -99,6 +100,7 @@ const aboutPageContentMap = {
     profile: {
       name: "Hiroya Aramaki / Makihiro",
       summary: "I am an indie developer building games and development assets, and I keep publishing what I learn along the way.",
+      avatarLinkAriaLabel: "Open Twitter",
       avatar: {
         src: "https://github.com/mackysoft.png",
         alt: "Makihiro avatar",

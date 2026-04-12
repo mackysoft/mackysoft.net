@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
-import { createTranslationMap, resolveLocalizedFallbackState } from "./localized-entry";
+import { createTranslationMap, resolveLocalizedEntryBySlug, resolveLocalizedFallbackState } from "./localized-entry";
 import { getSiteMeta } from "./site";
 
 export type ArticleEntry = CollectionEntry<"articles">;
@@ -182,23 +182,23 @@ export async function getLocalArticles() {
 }
 
 export async function resolveLocalizedArticleBySlug(slug: string, locale: SiteLocale = defaultLocale): Promise<LocalizedArticleEntry | null> {
-  const [articles, translations] = await Promise.all([getLocalArticles(), getArticleTranslationMap()]);
-  const baseEntry = articles.find((article) => article.id === slug);
+  const localizedEntry = await resolveLocalizedEntryBySlug({
+    slug,
+    locale,
+    getBaseEntries: getLocalArticles,
+    getTranslationMap: getArticleTranslationMap,
+    mergeData: mergeArticleData,
+  });
 
-  if (!baseEntry) {
+  if (!localizedEntry) {
     return null;
   }
 
-  const translationEntry = translations.get(slug);
-  const selectedTranslation = locale === "en" ? translationEntry : undefined;
-  const data = mergeArticleData(baseEntry, selectedTranslation);
-  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(selectedTranslation));
+  const { baseEntry, translationEntry, data, ...localeState } = localizedEntry;
 
   return {
-    slug,
-    requestedLocale: locale,
-    ...fallbackState,
-    entry: selectedTranslation ?? baseEntry,
+    ...localeState,
+    entry: translationEntry ?? baseEntry,
     baseEntry,
     data,
     href: localizePath(`/articles/${slug}/`, locale),

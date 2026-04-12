@@ -43,7 +43,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
           href={profilePrimaryExternalLink.href}
           target="_blank"
           rel="noreferrer"
-          aria-label={locale === "en" ? `Open ${profilePrimaryExternalLink.label}` : `${profilePrimaryExternalLink.label} を開く`}
+          aria-label={aboutPageContent.profile.avatarLinkAriaLabel}
           class="avatar-link"
         >
         <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />

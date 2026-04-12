@@ -2,6 +2,7 @@
 import ArticleCard from "../../components/ArticleCard.astro";
 import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
+import { getArticlesIndexPageMeta } from "../../features/articles/page-meta";
 import { getUiText } from "../../lib/copy";
 import { getArticleItems } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
@@ -16,11 +17,14 @@ const { locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const uiText = getUiText(locale);
 const articleItems = await getArticleItems(locale);
+const pageMeta = getArticlesIndexPageMeta(locale, {
+  articles: uiText.common.articles,
+});
 ---
 
 <SiteLayout
-  title="Articles"
-  description={locale === "en" ? "Articles published on this site and Zenn." : "自サイトと Zenn に公開した記事一覧です。"}
+  title={pageMeta.title}
+  description={pageMeta.description}
   locale={locale}
   canonicalPath={localizePath("/articles/", locale)}
   alternateLocales={[

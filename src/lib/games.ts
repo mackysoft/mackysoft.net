@@ -1,7 +1,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
-import { createTranslationMap, resolveLocalizedFallbackState } from "./localized-entry";
+import { createTranslationMap, resolveLocalizedEntryBySlug } from "./localized-entry";
 
 export type GameEntry = CollectionEntry<"games">;
 export type GameTranslationEntry = CollectionEntry<"gameTranslations">;
@@ -110,22 +110,22 @@ export async function getGames() {
 }
 
 export async function resolveLocalizedGameBySlug(slug: string, locale: SiteLocale = defaultLocale): Promise<LocalizedGameEntry | null> {
-  const [games, translations] = await Promise.all([getGames(), getGameTranslationMap()]);
-  const baseEntry = games.find((game) => game.id === slug);
+  const localizedEntry = await resolveLocalizedEntryBySlug({
+    slug,
+    locale,
+    getBaseEntries: getGames,
+    getTranslationMap: getGameTranslationMap,
+    mergeData: mergeGameData,
+  });
 
-  if (!baseEntry) {
+  if (!localizedEntry) {
     return null;
   }
 
-  const translationEntry = translations.get(slug);
-  const selectedTranslation = locale === "en" ? translationEntry : undefined;
-  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(selectedTranslation));
+  const { baseEntry: _baseEntry, translationEntry: _translationEntry, ...localizedGame } = localizedEntry;
 
   return {
-    slug,
-    requestedLocale: locale,
-    ...fallbackState,
-    data: mergeGameData(baseEntry, selectedTranslation),
+    ...localizedGame,
     href: localizePath(`/games/${slug}/`, locale),
   };
 }

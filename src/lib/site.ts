@@ -1,27 +1,17 @@
+import { getSiteContent } from "../features/site/content";
 import { localizePath, type SiteLocale } from "./i18n";
 
-const siteDescriptionMap = {
-  ja: "ゲーム、アセット、技術記事を整理して残すための活動ハブ。",
-  en: "An activity hub for games, assets, and technical articles.",
-} as const;
-
-const primaryNavLabels = [
-  { path: "/about/", label: "About" },
-  { path: "/games/", label: "Games" },
-  { path: "/assets/", label: "Assets" },
-  { path: "/articles/", label: "Articles" },
-  { path: "/contact/", label: "Contact" },
-] as const;
-
 export function getSiteMeta(locale: SiteLocale) {
+  const content = getSiteContent(locale);
+
   return {
     name: "mackysoft.net",
-    description: siteDescriptionMap[locale],
+    description: content.description,
   } as const;
 }
 
 export function getPrimaryNav(locale: SiteLocale) {
-  return primaryNavLabels.map((item) => ({
+  return getSiteContent(locale).primaryNav.map((item) => ({
     href: localizePath(item.path, locale),
     label: item.label,
   }));

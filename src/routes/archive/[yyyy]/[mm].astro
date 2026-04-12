@@ -2,6 +2,7 @@
 import ArticleCard from "../../../components/ArticleCard.astro";
 import PageLead from "../../../components/PageLead.astro";
 import PageHeader from "../../../components/PageHeader.astro";
+import { getArticlesArchiveMonthPageMeta } from "../../../features/articles/page-meta";
 import { formatArticleCount, getUiText } from "../../../lib/copy";
 import { getArticleYearMonth } from "../../../lib/article-dates";
 import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
@@ -40,11 +41,14 @@ const { year, month, articleEntries, locale: localeProp } = Astro.props as Props
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const uiText = getUiText(locale);
 const articles = await Promise.all(articleEntries.map((article) => toLocalArticleItem(article, locale)));
+const pageMeta = getArticlesArchiveMonthPageMeta(locale, year, month, {
+  archive: uiText.common.archive,
+});
 ---
 
 <SiteLayout
-  title={`${uiText.common.archive} ${year}/${month}`}
-  description={locale === "en" ? `Articles published in ${year}/${month}.` : `${year} 年 ${month} 月の記事一覧です。`}
+  title={pageMeta.title}
+  description={pageMeta.description}
   locale={locale}
   canonicalPath={localizePath(`/archive/${year}/${month}/`, locale)}
   alternateLocales={[

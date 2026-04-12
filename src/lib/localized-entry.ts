@@ -5,6 +5,10 @@ type TranslationMapEntry = {
   filePath?: string | undefined;
 };
 
+type BaseMapEntry = {
+  id: string;
+};
+
 type TranslationMapOptions = {
   stripPrefix?: string;
 };
@@ -47,6 +51,55 @@ export function resolveLocalizedFallbackState(
   return {
     contentLocale,
     isFallback: requestedLocale !== contentLocale,
-    availableLocales: hasTranslation ? [defaultLocale, translationLocale] : [defaultLocale],
+  availableLocales: hasTranslation ? [defaultLocale, translationLocale] : [defaultLocale],
+  };
+}
+
+export type ResolvedLocalizedEntry<TBase, TTranslation, TData> = {
+  slug: string;
+  requestedLocale: SiteLocale;
+  contentLocale: SiteLocale;
+  isFallback: boolean;
+  availableLocales: SiteLocale[];
+  baseEntry: TBase;
+  translationEntry?: TTranslation;
+  data: TData;
+};
+
+type ResolveLocalizedEntryOptions<TBase extends BaseMapEntry, TTranslation extends TranslationMapEntry, TData> = {
+  slug: string;
+  locale?: SiteLocale;
+  getBaseEntries: () => Promise<TBase[]>;
+  getTranslationMap: () => Promise<Map<string, TTranslation>>;
+  mergeData: (baseEntry: TBase, translationEntry?: TTranslation) => TData;
+  translationLocale?: SiteLocale;
+};
+
+export async function resolveLocalizedEntryBySlug<TBase extends BaseMapEntry, TTranslation extends TranslationMapEntry, TData>({
+  slug,
+  locale = defaultLocale,
+  getBaseEntries,
+  getTranslationMap,
+  mergeData,
+  translationLocale = "en",
+}: ResolveLocalizedEntryOptions<TBase, TTranslation, TData>): Promise<ResolvedLocalizedEntry<TBase, TTranslation, TData> | null> {
+  const [baseEntries, translations] = await Promise.all([getBaseEntries(), getTranslationMap()]);
+  const baseEntry = baseEntries.find((entry) => entry.id === slug);
+
+  if (!baseEntry) {
+    return null;
+  }
+
+  const translationEntry = translations.get(slug);
+  const selectedTranslation = locale === translationLocale ? translationEntry : undefined;
+  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(selectedTranslation), translationLocale);
+
+  return {
+    slug,
+    requestedLocale: locale,
+    ...fallbackState,
+    baseEntry,
+    translationEntry: selectedTranslation,
+    data: mergeData(baseEntry, selectedTranslation),
   };
 }

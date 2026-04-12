@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { createTranslationMap, normalizeTranslationId, resolveLocalizedFallbackState } from "../../src/lib/localized-entry";
+import {
+  createTranslationMap,
+  normalizeTranslationId,
+  resolveLocalizedEntryBySlug,
+  resolveLocalizedFallbackState,
+} from "../../src/lib/localized-entry";
 
 describe("localized entry helpers", () => {
   test("normalizes translation ids for Astro entry ids and file paths", () => {
@@ -31,6 +36,68 @@ describe("localized entry helpers", () => {
       contentLocale: "ja",
       isFallback: true,
       availableLocales: ["ja"],
+    });
+  });
+
+  test("resolves a localized entry by slug with English fallback handling", async () => {
+    const baseEntry = {
+      id: "vision-introduction",
+      data: {
+        title: "Vision Introduction",
+      },
+    };
+    const translationEntry = {
+      id: "vision-introduction/index.en",
+      filePath: "src/content/articles/vision-introduction/index.en.md",
+      data: {
+        title: "Introduction to Vision",
+      },
+    };
+
+    await expect(
+      resolveLocalizedEntryBySlug({
+        slug: "vision-introduction",
+        locale: "en",
+        getBaseEntries: async () => [baseEntry],
+        getTranslationMap: async () => createTranslationMap([translationEntry], { stripPrefix: "src/content/articles/" }),
+        mergeData: (base, translation) => ({
+          title: translation?.data.title ?? base.data.title,
+        }),
+      }),
+    ).resolves.toEqual({
+      slug: "vision-introduction",
+      requestedLocale: "en",
+      contentLocale: "en",
+      isFallback: false,
+      availableLocales: ["ja", "en"],
+      baseEntry,
+      translationEntry,
+      data: {
+        title: "Introduction to Vision",
+      },
+    });
+
+    await expect(
+      resolveLocalizedEntryBySlug({
+        slug: "vision-introduction",
+        locale: "en",
+        getBaseEntries: async () => [baseEntry],
+        getTranslationMap: async () => new Map(),
+        mergeData: (base, translation) => ({
+          title: translation?.data.title ?? base.data.title,
+        }),
+      }),
+    ).resolves.toEqual({
+      slug: "vision-introduction",
+      requestedLocale: "en",
+      contentLocale: "ja",
+      isFallback: true,
+      availableLocales: ["ja"],
+      baseEntry,
+      translationEntry: undefined,
+      data: {
+        title: "Vision Introduction",
+      },
     });
   });
 });
