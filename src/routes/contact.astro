@@ -59,6 +59,9 @@ const contactChannels = contactPageContent.channels.map((channel) => {
             class="button-link contact-card__action"
             target={channel.action.isExternal ? "_blank" : undefined}
             rel={channel.action.isExternal ? "noreferrer" : undefined}
+            data-analytics-event="external_link_click"
+            data-analytics-label={channel.action.label}
+            data-analytics-location="contact-page"
           >
             {channel.action.label}
           </a>

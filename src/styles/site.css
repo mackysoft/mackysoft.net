@@ -141,11 +141,28 @@ pre {
   font-family: var(--font-mono);
 }
 
+code {
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.4rem;
+  background: var(--surface-soft-color);
+  font-size: 0.94em;
+}
+
 pre {
   overflow-x: auto;
   padding: 1rem 1.1rem;
   background: var(--code-bg-color);
   color: var(--code-text-color);
+}
+
+pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  border-radius: 0;
+  font-size: inherit;
 }
 
 table {
@@ -165,6 +182,35 @@ blockquote {
   padding: 0.9rem 1rem;
   border-left: 3px solid var(--accent-color);
   background: var(--accent-quote-bg-color);
+}
+
+.prose {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.prose :where(h2, h3, h4, p, ul, ol, table, pre, blockquote) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.prose :where(h2, h3, h4) {
+  scroll-margin-top: var(--site-anchor-offset);
+}
+
+.prose :where(ul, ol) {
+  padding-left: 1.25rem;
+}
+
+.prose :where(li + li) {
+  margin-top: 0.35rem;
+}
+
+.prose :where(hr) {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--border-color);
 }
 
 .shell {

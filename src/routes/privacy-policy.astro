@@ -1,8 +1,12 @@
 ---
-import PageLead from "../components/PageLead.astro";
+import { render } from "astro:content";
+
+import LocalizedHtmlLinks from "../components/LocalizedHtmlLinks.astro";
 import PageHeader from "../components/PageHeader.astro";
-import { getPrivacyPolicyContent } from "../features/privacy-policy/content";
+import { formatBreadcrumb } from "../lib/breadcrumb";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
+import { resolveLocalizedPageBySlug } from "../lib/pages";
+import { getUiText } from "../lib/ui-text";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 type Props = {
@@ -11,21 +15,30 @@ type Props = {
 
 const { locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
-const content = getPrivacyPolicyContent(locale);
+const uiText = getUiText(locale);
+const page = await resolveLocalizedPageBySlug("privacy-policy", locale);
+
+if (!page) {
+  throw new Error("Unknown page slug: privacy-policy");
+}
+
+const { Content } = await render(page.entry as never);
 ---
 
 <SiteLayout
-  title={content.title}
-  description={content.description}
+  title={page.data.title}
+  description={page.data.description}
   locale={locale}
+  contentLocale={page.contentLocale}
+  isFallback={page.isFallback}
   canonicalPath={localizePath("/privacy-policy/", locale)}
-  alternateLocales={createAlternateLocaleLinks("/privacy-policy/")}
+  alternateLocales={createAlternateLocaleLinks("/privacy-policy/", page.availableLocales)}
 >
-  <PageHeader title={content.hero.title} eyebrow={content.hero.eyebrow} />
+  <PageHeader title={page.data.title} eyebrow={formatBreadcrumb(uiText.common.home, page.data.title)} />
 
-  <PageLead panel>
-    {content.paragraphs.map((paragraph) => (
-      <p>{paragraph}</p>
-    ))}
-  </PageLead>
+  <section class="content-panel prose">
+    <LocalizedHtmlLinks locale={locale}>
+      <Content />
+    </LocalizedHtmlLinks>
+  </section>
 </SiteLayout>

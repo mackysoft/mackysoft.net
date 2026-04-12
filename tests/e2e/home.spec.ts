@@ -102,6 +102,66 @@ test.describe("home page", () => {
     await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(245, 241, 232, 0.9)");
   });
 
+  test("tracks the redirected English root visit only once", async ({ page }) => {
+    await page.addInitScript(() => {
+      const storageKey = "__analytics_events__";
+      const dataLayer: unknown[] = [];
+      const originalPush = Array.prototype.push;
+
+      dataLayer.push = function push(...items: unknown[]) {
+        const result = originalPush.apply(this, items);
+        const serializedEvents = dataLayer.map((item) => {
+          if (!item || typeof item !== "object" || !("length" in item)) {
+            return item;
+          }
+
+          return Array.from(item as ArrayLike<unknown>, (value) => {
+            return value instanceof Date ? value.toISOString() : value;
+          });
+        });
+
+        window.sessionStorage.setItem(storageKey, JSON.stringify(serializedEvents));
+        return result;
+      };
+
+      window.sessionStorage.removeItem(storageKey);
+      window.localStorage.removeItem("mackysoft-locale");
+      Object.defineProperty(window, "dataLayer", {
+        configurable: true,
+        writable: true,
+        value: dataLayer,
+      });
+      Object.defineProperty(window.navigator, "languages", {
+        configurable: true,
+        value: ["en-US"],
+      });
+      Object.defineProperty(window.navigator, "language", {
+        configurable: true,
+        value: "en-US",
+      });
+    });
+
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/en\/$/);
+
+    const configEvents = await page.evaluate(() => {
+      const storedEvents = window.sessionStorage.getItem("__analytics_events__");
+      const events = storedEvents ? JSON.parse(storedEvents) : [];
+
+      return events.filter((event: unknown) => Array.isArray(event) && event[0] === "config");
+    });
+
+    expect(configEvents).toHaveLength(1);
+    expect(configEvents[0]).toMatchObject([
+      "config",
+      "G-TEST123456",
+      {
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false,
+      },
+    ]);
+  });
+
   test("preserves search and hash when the root page redirects to English", async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem("mackysoft-locale");
