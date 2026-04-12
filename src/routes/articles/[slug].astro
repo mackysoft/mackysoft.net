@@ -89,7 +89,7 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
 
     <div class:list={["article-layout", tocHeadings.length > 0 && "article-layout--with-toc"]}>
       {tocHeadings.length > 0 && (
-        <div data-pagefind-ignore>
+        <div class="article-layout__toc" data-pagefind-ignore>
           <ArticleToc headings={tocHeadings} locale={locale} />
         </div>
       )}
@@ -211,7 +211,7 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
       order: 0;
     }
 
-    :global(.article-toc) {
+    .article-layout__toc {
       order: 1;
     }
   }
