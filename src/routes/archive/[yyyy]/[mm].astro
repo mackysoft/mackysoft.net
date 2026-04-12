@@ -1,0 +1,62 @@
+---
+import ArticleCard from "../../../components/ArticleCard.astro";
+import PageLead from "../../../components/PageLead.astro";
+import PageHeader from "../../../components/PageHeader.astro";
+import { formatArticleCount, getUiText } from "../../../lib/copy";
+import { getArticleYearMonth } from "../../../lib/article-dates";
+import { getLocalArticles, toLocalArticleItem } from "../../../lib/articles";
+import { getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
+import { formatPageBreadcrumb } from "../../../lib/page-header";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getLocalArticles();
+  const yearMonths = new Map();
+
+  for (const article of articles) {
+    const { year, month } = getArticleYearMonth(article.data.publishedAt);
+    const key = `${year}-${month}`;
+    const current = yearMonths.get(key) ?? [];
+    current.push(article);
+    yearMonths.set(key, current);
+  }
+
+  return Array.from(yearMonths.entries()).sort(([left], [right]) => left.localeCompare(right)).map(([key, monthArticles]) => {
+    const [year, month] = key.split("-");
+    return {
+      params: { yyyy: year, mm: month },
+      props: { year, month, articleEntries: monthArticles },
+    };
+  });
+}
+
+type Props = {
+  year: string;
+  month: string;
+  articleEntries: Awaited<ReturnType<typeof getLocalArticles>>;
+  locale?: SiteLocale;
+};
+const { year, month, articleEntries, locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const articles = await Promise.all(articleEntries.map((article) => toLocalArticleItem(article, locale)));
+---
+
+<SiteLayout
+  title={`${uiText.common.archive} ${year}/${month}`}
+  description={locale === "en" ? `Articles published in ${year}/${month}.` : `${year} 年 ${month} 月の記事一覧です。`}
+  locale={locale}
+  canonicalPath={localizePath(`/archive/${year}/${month}/`, locale)}
+  alternateLocales={[
+    { locale: "ja", path: `/archive/${year}/${month}/` },
+    { locale: "en", path: `/en/archive/${year}/${month}/` },
+  ]}
+>
+  <PageHeader title={`${year}/${month}`} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
+
+  <PageLead summary={formatArticleCount(articles.length, locale)}>
+    {articles.map((article) => (
+      <ArticleCard article={article} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>

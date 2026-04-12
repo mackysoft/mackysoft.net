@@ -1,15 +1,18 @@
 ---
 import { Image } from "astro:assets";
 
+import { getUiText } from "../lib/copy";
+import type { SiteLocale } from "../lib/i18n";
 import { formatArticleDate } from "../lib/article-dates";
 import type { ArticleItem } from "../lib/articles";
 
 type Props = {
   article: ArticleItem;
   layout?: "horizontal" | "vertical";
+  locale?: SiteLocale;
 };
 
-const { article, layout = "horizontal" } = Astro.props;
+const { article, layout = "horizontal", locale = "ja" } = Astro.props as Props;
 const isExternal = article.kind === "external";
 const cover = article.cover;
 const isRemoteCover = typeof cover === "string";
@@ -19,7 +22,8 @@ const coverHeight = typeof cover === "string" ? undefined : cover?.height;
 const coverAspectRatio = coverWidth && coverHeight ? `${coverWidth} / ${coverHeight}` : "1200 / 630";
 const verticalCoverStyle = layout === "vertical" ? `--article-cover-ratio: ${coverAspectRatio};` : undefined;
 const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
-const publishedAtLabel = formatArticleDate(article.publishedAt);
+const publishedAtLabel = formatArticleDate(article.publishedAt, locale);
+const uiText = getUiText(locale);
 ---
 
 <article class:list={["article-card", "activity-card", layout === "vertical" && "activity-card--compact", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
@@ -47,14 +51,19 @@ const publishedAtLabel = formatArticleDate(article.publishedAt);
         class="activity-card__title-link"
         target={isExternal ? "_blank" : undefined}
         rel={isExternal ? "noreferrer" : undefined}
-      >
+    >
         {article.title}
       </a>
     </h3>
+    {article.isFallback && locale === "en" && (
+      <div class="activity-card__badges">
+        <span class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</span>
+      </div>
+    )}
     {showDescription && <p class="article-card__description">{article.description}</p>}
     <p class="article-card__meta activity-card__meta">
       <span class="article-card__meta-date">
-        <span class="article-card__meta-label">公開日</span>
+        <span class="article-card__meta-label">{uiText.article.publishedAt}</span>
         <span>{publishedAtLabel}</span>
       </span>
       <span>{article.source}</span>

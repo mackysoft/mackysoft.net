@@ -1,17 +1,21 @@
 ---
+import { getUiText } from "../lib/copy";
+import type { SiteLocale } from "../lib/i18n";
 import { isExternalGameActionHref, sortGameActions, type GameAction } from "../lib/games";
 
 type Props = {
   actions: GameAction[];
+  locale?: SiteLocale;
 };
 
-const { actions } = Astro.props;
+const { actions, locale = "ja" } = Astro.props as Props;
 const sortedActions = sortGameActions(actions);
+const uiText = getUiText(locale);
 ---
 
 {
   sortedActions.length > 0 && (
-    <aside class="game-action-panel sticky-panel" aria-label="リンク">
+    <aside class="game-action-panel sticky-panel" aria-label={uiText.game.linksAriaLabel}>
       <div class="game-action-panel__inner content-panel">
         <div class="game-action-panel__actions">
           {sortedActions.map((action) => (

@@ -1,26 +1,5 @@
 ---
-import AssetCard from "../../components/AssetCard.astro";
-import PageLead from "../../components/PageLead.astro";
-import PageHeader from "../../components/PageHeader.astro";
-import { getReleaseActivities } from "../../lib/articles";
-import { formatPageBreadcrumb } from "../../lib/page-header";
-import SiteLayout from "../../layouts/SiteLayout.astro";
-
-const releases = getReleaseActivities();
+import AssetsRoute from "../../routes/assets/index.astro";
 ---
 
-<SiteLayout title="Assets" description="GitHub Releases として公開しているアセットの一覧です。">
-  <PageHeader title="Assets" eyebrow={formatPageBreadcrumb("Home", "Assets")} />
-
-  <PageLead class="assets-list">
-    {releases.map((release) => (
-      <AssetCard release={release} />
-    ))}
-  </PageLead>
-</SiteLayout>
-
-<style>
-  .assets-list {
-    grid-template-columns: 1fr;
-  }
-</style>
+<AssetsRoute />

@@ -1,0 +1,44 @@
+---
+import GameCard from "../../components/GameCard.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getUiText } from "../../lib/copy";
+import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { getLocalizedGames } from "../../lib/games";
+import { formatPageBreadcrumb } from "../../lib/page-header";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const games = (await getLocalizedGames(locale)).filter((game): game is NonNullable<typeof game> => game !== null);
+---
+
+<SiteLayout
+  title="Games"
+  description={locale === "en" ? "A list of published games." : "公開しているゲームの一覧です。"}
+  locale={locale}
+  canonicalPath={localizePath("/games/", locale)}
+  alternateLocales={[
+    { locale: "ja", path: "/games/" },
+    { locale: "en", path: "/en/games/" },
+  ]}
+>
+  <PageHeader title={uiText.common.games} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.games)} />
+
+  <section class="games-list" aria-label="Games list">
+    {games.map((game) => (
+      <GameCard game={game} locale={locale} />
+    ))}
+  </section>
+</SiteLayout>
+
+<style>
+  .games-list {
+    display: grid;
+    gap: 1rem;
+  }
+</style>

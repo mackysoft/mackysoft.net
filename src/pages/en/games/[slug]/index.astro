@@ -1,0 +1,9 @@
+---
+import GameRoute, { getStaticPaths as getGameStaticPaths } from "../../../../routes/games/[slug]/index.astro";
+
+export const getStaticPaths = getGameStaticPaths;
+
+const { slug } = Astro.props as { slug: string };
+---
+
+<GameRoute slug={slug} />

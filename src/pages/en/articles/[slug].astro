@@ -1,0 +1,9 @@
+---
+import ArticleRoute, { getStaticPaths as getArticleStaticPaths } from "../../../routes/articles/[slug].astro";
+
+export const getStaticPaths = getArticleStaticPaths;
+
+const { slug } = Astro.props as { slug: string };
+---
+
+<ArticleRoute slug={slug} />

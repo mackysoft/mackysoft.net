@@ -1,26 +1,5 @@
 ---
-import GameCard from "../../components/GameCard.astro";
-import PageHeader from "../../components/PageHeader.astro";
-import { getGames } from "../../lib/games";
-import { formatPageBreadcrumb } from "../../lib/page-header";
-import SiteLayout from "../../layouts/SiteLayout.astro";
-
-const games = await getGames();
+import GamesRoute from "../../routes/games/index.astro";
 ---
 
-<SiteLayout title="Games" description="公開しているゲームの一覧です。">
-  <PageHeader title="Games" eyebrow={formatPageBreadcrumb("Home", "Games")} />
-
-  <section class="games-list" aria-label="Games list">
-    {games.map((game) => (
-      <GameCard game={game} />
-    ))}
-  </section>
-</SiteLayout>
-
-<style>
-  .games-list {
-    display: grid;
-    gap: 1rem;
-  }
-</style>
+<GamesRoute />

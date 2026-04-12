@@ -1,13 +1,15 @@
 ---
+import type { SiteLocale } from "../lib/i18n";
 import { getGameStatusLabel, type GameStatus } from "../lib/games";
 
 type Props = {
   status: GameStatus;
   size?: "card" | "hero";
+  locale?: SiteLocale;
 };
 
-const { status, size = "card" } = Astro.props;
-const label = getGameStatusLabel(status);
+const { status, size = "card", locale = "ja" } = Astro.props as Props;
+const label = getGameStatusLabel(status, locale);
 ---
 
 <span class:list={["game-status-badge", `game-status-badge--${size}`, `game-status-badge--${status}`]}>{label}</span>

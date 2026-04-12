@@ -1,15 +1,31 @@
-export const siteMeta = {
-  name: "mackysoft.net",
-  description: "ゲーム、アセット、技術記事を整理して残すための活動ハブ。",
+import { localizePath, type SiteLocale } from "./i18n";
+
+const siteDescriptionMap = {
+  ja: "ゲーム、アセット、技術記事を整理して残すための活動ハブ。",
+  en: "An activity hub for games, assets, and technical articles.",
 } as const;
 
-export const primaryNav = [
-  { href: "/about/", label: "About" },
-  { href: "/games/", label: "Games" },
-  { href: "/assets/", label: "Assets" },
-  { href: "/articles/", label: "Articles" },
-  { href: "/contact/", label: "Contact" },
+const primaryNavLabels = [
+  { path: "/about/", label: "About" },
+  { path: "/games/", label: "Games" },
+  { path: "/assets/", label: "Assets" },
+  { path: "/articles/", label: "Articles" },
+  { path: "/contact/", label: "Contact" },
 ] as const;
+
+export function getSiteMeta(locale: SiteLocale) {
+  return {
+    name: "mackysoft.net",
+    description: siteDescriptionMap[locale],
+  } as const;
+}
+
+export function getPrimaryNav(locale: SiteLocale) {
+  return primaryNavLabels.map((item) => ({
+    href: localizePath(item.path, locale),
+    label: item.label,
+  }));
+}
 
 export const externalLinks = [
   { id: "github", href: "https://github.com/mackysoft", label: "GitHub" },

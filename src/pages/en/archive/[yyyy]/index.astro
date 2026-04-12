@@ -1,0 +1,13 @@
+---
+import ArchiveYearRoute, { getStaticPaths as getArchiveYearStaticPaths } from "../../../../routes/archive/[yyyy]/index.astro";
+import { getLocalArticles } from "../../../../lib/articles";
+
+export const getStaticPaths = getArchiveYearStaticPaths;
+
+const { year, articleEntries } = Astro.props as {
+  year: string;
+  articleEntries: Awaited<ReturnType<typeof getLocalArticles>>;
+};
+---
+
+<ArchiveYearRoute year={year} articleEntries={articleEntries} locale="en" />

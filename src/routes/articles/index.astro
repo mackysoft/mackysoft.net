@@ -1,0 +1,45 @@
+---
+import ArticleCard from "../../components/ArticleCard.astro";
+import PageLead from "../../components/PageLead.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getUiText } from "../../lib/copy";
+import { getArticleItems } from "../../lib/articles";
+import { formatPageBreadcrumb } from "../../lib/page-header";
+import { formatArticleCount } from "../../lib/copy";
+import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const articleItems = await getArticleItems(locale);
+---
+
+<SiteLayout
+  title="Articles"
+  description={locale === "en" ? "Articles published on this site and Zenn." : "自サイトと Zenn に公開した記事一覧です。"}
+  locale={locale}
+  canonicalPath={localizePath("/articles/", locale)}
+  alternateLocales={[
+    { locale: "ja", path: "/articles/" },
+    { locale: "en", path: "/en/articles/" },
+  ]}
+>
+  <PageHeader title={uiText.common.articles} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles)} />
+
+  <PageLead class="articles-list" summary={locale === "en" ? formatArticleCount(articleItems.length, locale) : undefined}>
+    {articleItems.map((article) => (
+      <ArticleCard article={article} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>
+
+<style>
+  .articles-list {
+    grid-template-columns: 1fr;
+  }
+</style>

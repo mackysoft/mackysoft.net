@@ -1,18 +1,22 @@
 ---
 import { Image } from "astro:assets";
 
+import { getUiText } from "../lib/copy";
+import type { SiteLocale } from "../lib/i18n";
 import GameStatusBadge from "./GameStatusBadge.astro";
 import { formatArticleDate } from "../lib/article-dates";
-import { getGamePlatformLabel, type GameEntry } from "../lib/games";
+import { getGamePlatformLabel, type LocalizedGameEntry } from "../lib/games";
 
 type Props = {
-  game: GameEntry;
+  game: LocalizedGameEntry;
+  locale?: SiteLocale;
 };
 
-const { game } = Astro.props;
-const href = `/games/${game.id}/`;
+const { game, locale = "ja" } = Astro.props as Props;
+const href = game.href;
 const publishedAt = game.data.publishedAt;
 const platforms = game.data.platforms;
+const uiText = getUiText(locale);
 ---
 
 <article class="game-card activity-card">
@@ -28,15 +32,16 @@ const platforms = game.data.platforms;
       {publishedAt && (
         <p class="game-card__meta activity-card__meta">
           <span class="game-card__meta-date">
-            <span class="game-card__meta-label">公開日</span>
-            <span>{formatArticleDate(publishedAt)}</span>
+            <span class="game-card__meta-label">{uiText.game.publishedAt}</span>
+            <span>{formatArticleDate(publishedAt, locale)}</span>
           </span>
         </p>
       )}
       <div class="game-card__metrics">
-        <GameStatusBadge status={game.data.status} size="card" />
+        <GameStatusBadge status={game.data.status} size="card" locale={locale} />
+        {game.isFallback && locale === "en" && <p class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</p>}
         {platforms.map((platform) => (
-          <p class="game-card__platform">{getGamePlatformLabel(platform)}</p>
+          <p class="game-card__platform">{getGamePlatformLabel(platform, locale)}</p>
         ))}
       </div>
     </div>

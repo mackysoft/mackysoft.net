@@ -1,0 +1,44 @@
+---
+import AssetCard from "../../components/AssetCard.astro";
+import PageLead from "../../components/PageLead.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getUiText } from "../../lib/copy";
+import { getReleaseActivities } from "../../lib/articles";
+import { formatPageBreadcrumb } from "../../lib/page-header";
+import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+type Props = {
+  locale?: SiteLocale;
+};
+
+const { locale: localeProp } = Astro.props as Props;
+const locale = localeProp ?? getPathLocale(Astro.url.pathname);
+const uiText = getUiText(locale);
+const releases = getReleaseActivities();
+---
+
+<SiteLayout
+  title="Assets"
+  description={locale === "en" ? "Assets published as GitHub Releases." : "GitHub Releases として公開しているアセットの一覧です。"}
+  locale={locale}
+  canonicalPath={localizePath("/assets/", locale)}
+  alternateLocales={[
+    { locale: "ja", path: "/assets/" },
+    { locale: "en", path: "/en/assets/" },
+  ]}
+>
+  <PageHeader title={uiText.common.assets} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.assets)} />
+
+  <PageLead class="assets-list">
+    {releases.map((release) => (
+      <AssetCard release={release} locale={locale} />
+    ))}
+  </PageLead>
+</SiteLayout>
+
+<style>
+  .assets-list {
+    grid-template-columns: 1fr;
+  }
+</style>

@@ -35,6 +35,31 @@ const articles = defineCollection({
       }),
 });
 
+const articleTranslations = defineCollection({
+  loader: glob({
+    base: "./src/content/articles",
+    pattern: "**/index.en.md",
+  }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string().min(1),
+        description: z.string().min(1),
+        cover: image().optional(),
+        coverAlt: z.string().optional(),
+        draft: z.boolean().default(false),
+      })
+      .superRefine((value, context) => {
+        if (value.cover && !value.coverAlt) {
+          context.addIssue({
+            code: "custom",
+            message: "cover がある場合は coverAlt が必要です。",
+            path: ["coverAlt"],
+          });
+        }
+      }),
+});
+
 const games = defineCollection({
   loader: glob({
     base: "./src/content/games",
@@ -75,7 +100,43 @@ const games = defineCollection({
     }),
 });
 
+const gameTranslations = defineCollection({
+  loader: glob({
+    base: "./src/content/games",
+    pattern: "*/index.en.md",
+  }),
+  schema: () =>
+    z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      coverAlt: z.string().min(1).optional(),
+      genre: z.string().min(1).optional(),
+      features: z.array(z.string().min(1)).optional(),
+      screenshots: z
+        .array(
+          z.object({
+            alt: z.string().min(1),
+          }),
+        )
+        .optional(),
+      actions: z
+        .array(
+          z.object({
+            kind: gameActionKindSchema,
+            label: z.string().min(1),
+            href: z.string().min(1).refine(isValidGameActionHref, "有効な http(s) URL またはサイト内パスを指定してください。"),
+          }),
+        )
+        .optional(),
+      languages: z.array(z.string().min(1)).optional(),
+      platforms: z.array(z.string().min(1)).optional(),
+      draft: z.boolean().default(false),
+    }),
+});
+
 export const collections = {
   articles,
+  articleTranslations,
   games,
+  gameTranslations,
 };

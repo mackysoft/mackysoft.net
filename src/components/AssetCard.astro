@@ -1,16 +1,20 @@
 ---
 import { Image } from "astro:assets";
 
+import { getUiText } from "../lib/copy";
+import type { SiteLocale } from "../lib/i18n";
 import { formatArticleDate } from "../lib/article-dates";
 import { formatReleaseStargazerCount, getReleaseRepoName, type ReleaseActivity } from "../lib/articles";
 
 type Props = {
   release: ReleaseActivity;
+  locale?: SiteLocale;
 };
 
-const { release } = Astro.props;
+const { release, locale = "ja" } = Astro.props as Props;
 const repoName = getReleaseRepoName(release.repo);
-const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
+const stargazerCount = formatReleaseStargazerCount(release.stargazerCount, locale);
+const uiText = getUiText(locale);
 ---
 
 <article class="asset-card activity-card">
@@ -33,8 +37,8 @@ const stargazerCount = formatReleaseStargazerCount(release.stargazerCount);
     <div class="asset-card__footer">
       <p class="asset-card__meta activity-card__meta">
         <span class="asset-card__meta-date">
-          <span class="asset-card__meta-label">最新リリース日</span>
-          <span>{formatArticleDate(new Date(release.publishedAt))}</span>
+          <span class="asset-card__meta-label">{uiText.release.latestReleaseDate}</span>
+          <span>{formatArticleDate(new Date(release.publishedAt), locale)}</span>
         </span>
       </p>
       <div class="asset-card__metrics">

@@ -1,30 +1,42 @@
 ---
+import { getUiText } from "../lib/copy";
+import type { SiteLocale } from "../lib/i18n";
+
 type Props = {
   title: string;
   shareUrl: string;
+  locale?: SiteLocale;
 };
 
-const { title, shareUrl } = Astro.props as Props;
+const { title, shareUrl, locale = "ja" } = Astro.props as Props;
 const fallbackTwitterUrl = new URL("https://twitter.com/intent/tweet");
 fallbackTwitterUrl.searchParams.set("text", title);
 fallbackTwitterUrl.searchParams.set("url", shareUrl);
+const uiText = getUiText(locale);
 ---
 
-<section class="article-share" aria-labelledby="article-share-title" data-article-share data-share-title={title}>
-  <h2 id="article-share-title">シェア</h2>
+<section
+  class="article-share"
+  aria-labelledby="article-share-title"
+  data-article-share
+  data-share-title={title}
+  data-share-copy-success={uiText.article.linkCopied}
+  data-share-copy-failed={uiText.article.copyFailed}
+>
+  <h2 id="article-share-title">{uiText.article.shareTitle}</h2>
 
   <div class="button-row article-share__actions">
     <div class="article-share__action" data-share-copy-action hidden>
-      <button type="button" class="button-link article-share__button" data-share-copy aria-label="コピーリンク">
+      <button type="button" class="button-link article-share__button" data-share-copy aria-label={uiText.article.copyLink}>
         <svg class="article-share__icon article-share__icon--stroke" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <rect x="8.25" y="7.25" width="9.5" height="11.5" rx="2.25" />
           <path d="M6.75 15.25H6A2.75 2.75 0 0 1 3.25 12.5V6A2.75 2.75 0 0 1 6 3.25h6.5A2.75 2.75 0 0 1 15.25 6v.75" />
         </svg>
-        <span class="visually-hidden">コピーリンク</span>
+        <span class="visually-hidden">{uiText.article.copyLink}</span>
       </button>
       <span class="article-share__bubble" role="status" aria-live="polite" data-share-status hidden></span>
     </div>
-    <button type="button" class="button-link article-share__button" data-share-native hidden aria-label="ネイティブシェア">
+    <button type="button" class="button-link article-share__button" data-share-native hidden aria-label={uiText.article.nativeShare}>
       <svg class="article-share__icon article-share__icon--stroke" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <circle cx="7" cy="12" r="2" />
         <circle cx="17" cy="6.5" r="2" />
@@ -32,7 +44,7 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
         <path d="M8.8 11.05 15.2 7.45" />
         <path d="M8.8 12.95 15.2 16.55" />
       </svg>
-      <span class="visually-hidden">ネイティブシェア</span>
+      <span class="visually-hidden">{uiText.article.nativeShare}</span>
     </button>
     <a
       href={fallbackTwitterUrl.toString()}
@@ -40,7 +52,7 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
       rel="noreferrer"
       class="button-link"
       data-share-twitter
-      aria-label="Twitter"
+      aria-label={uiText.article.twitter}
     >
       <svg class="article-share__icon article-share__icon--twitter" viewBox="0 0 1227 1227" aria-hidden="true" focusable="false">
         <g transform="translate(13.5 0)">
@@ -49,7 +61,7 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
           />
         </g>
       </svg>
-      <span class="visually-hidden">Twitter</span>
+      <span class="visually-hidden">{uiText.article.twitter}</span>
     </a>
   </div>
 </section>
@@ -63,6 +75,8 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
     root.dataset.shareReady = "true";
 
     const title = root.dataset.shareTitle ?? "";
+    const shareCopySuccessMessage = root.dataset.shareCopySuccess ?? "";
+    const shareCopyFailedMessage = root.dataset.shareCopyFailed ?? "";
     const currentUrl = window.location.href;
     const copyAction = root.querySelector("[data-share-copy-action]");
     const copyButton = root.querySelector("[data-share-copy]");
@@ -98,9 +112,9 @@ fallbackTwitterUrl.searchParams.set("url", shareUrl);
       copyButton.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(currentUrl);
-          setStatus("リンクをコピーしました");
+          setStatus(shareCopySuccessMessage);
         } catch {
-          setStatus("コピーに失敗しました");
+          setStatus(shareCopyFailedMessage);
         }
       });
     }

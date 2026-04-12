@@ -1,26 +1,5 @@
 ---
-import ArticleCard from "../../components/ArticleCard.astro";
-import PageLead from "../../components/PageLead.astro";
-import PageHeader from "../../components/PageHeader.astro";
-import { getArticleItems } from "../../lib/articles";
-import { formatPageBreadcrumb } from "../../lib/page-header";
-import SiteLayout from "../../layouts/SiteLayout.astro";
-
-const articleItems = await getArticleItems();
+import ArticlesRoute from "../../routes/articles/index.astro";
 ---
 
-<SiteLayout title="Articles" description="自サイトと Zenn に公開した記事一覧です。">
-  <PageHeader title="Articles" eyebrow={formatPageBreadcrumb("Home", "Articles")} />
-
-  <PageLead class="articles-list">
-    {articleItems.map((article) => (
-      <ArticleCard article={article} />
-    ))}
-  </PageLead>
-</SiteLayout>
-
-<style>
-  .articles-list {
-    grid-template-columns: 1fr;
-  }
-</style>
+<ArticlesRoute />
