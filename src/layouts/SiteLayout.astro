@@ -1,5 +1,6 @@
 ---
 import RootLocaleRedirect from "../components/head/RootLocaleRedirect.astro";
+import SiteAnalytics from "../components/head/SiteAnalytics.astro";
 import SiteSeo from "../components/head/SiteSeo.astro";
 import ThemeBootstrap from "../components/head/ThemeBootstrap.astro";
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
@@ -65,6 +66,7 @@ function isCurrentNavItem(itemHref: string, path: string) {
     <meta name="description" content={description} />
     <SiteSeo canonicalUrl={canonicalUrl} alternateLocaleUrls={alternateLocaleUrls} />
     <ThemeBootstrap />
+    <SiteAnalytics />
     <RootLocaleRedirect enabled={enableLocaleRedirectOnRoot} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -98,7 +100,18 @@ function isCurrentNavItem(itemHref: string, path: string) {
       <footer class="site-footer">
         <ul class="footer-links">
           {externalLinks.map((link) => (
-            <li><a href={link.href} target="_blank" rel="noreferrer">{link.label}</a></li>
+            <li>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                data-analytics-event="external_link_click"
+                data-analytics-label={link.label}
+                data-analytics-location="site-footer"
+              >
+                {link.label}
+              </a>
+            </li>
           ))}
           <li><a href={localizePath("/privacy-policy/", locale)}>{uiText.common.privacyPolicy}</a></li>
         </ul>

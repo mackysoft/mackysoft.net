@@ -26,6 +26,9 @@ const uiText = getUiText(locale);
               class="button-link game-action-panel__button"
               target={isExternalHttpHref(action.href) ? "_blank" : undefined}
               rel={isExternalHttpHref(action.href) ? "noreferrer" : undefined}
+              data-analytics-event="project_cta_click"
+              data-analytics-label={action.kind}
+              data-analytics-location="game-action-panel"
             >
               {action.label}
             </a>

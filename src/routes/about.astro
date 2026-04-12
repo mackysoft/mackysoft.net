@@ -42,6 +42,9 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
           rel="noreferrer"
           aria-label={aboutPageContent.profile.avatarLinkAriaLabel}
           class="avatar-link"
+          data-analytics-event="external_link_click"
+          data-analytics-label={profilePrimaryExternalLink.label}
+          data-analytics-location="about-profile"
         >
         <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
       </a>
@@ -83,7 +86,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
   <section class="content-grid section-grid">
     <section class="content-panel">
       <h2>{aboutPageContent.externalLinksHeading}</h2>
-      <DescribedLinkList items={aboutExternalLinks} />
+      <DescribedLinkList items={aboutExternalLinks} analyticsLocation="about-links" />
     </section>
 
     <section class="content-panel">
