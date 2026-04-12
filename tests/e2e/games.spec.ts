@@ -102,7 +102,7 @@ test.describe("games page", () => {
     await expect(main.getByRole("img", { name: "インベントリと取得アイテムを確認している画面" })).toBeVisible();
 
     await expect(main.getByRole("heading", { level: 2, name: "リンク" })).toHaveCount(0);
-    const primaryAction = actionCard.getByRole("link", { name: "unityroom で遊ぶ", exact: true });
+    const primaryAction = actionCard.getByRole("link", { name: "unityroom で遊ぶ（旧ビルド）", exact: true });
     await expect(primaryAction).toHaveAttribute(
       "href",
       "https://unityroom.com/games/treasure-rogue",
@@ -174,7 +174,7 @@ test.describe("games page", () => {
     await expect(detailTable).toContainText("Japanese / English");
     await expect(detailTable).toContainText("Platforms");
     await expect(detailTable).toContainText("Android (discontinued) / Browser");
-    await expect(actionPanel.getByRole("link", { name: "Play on unityroom", exact: true })).toHaveAttribute(
+    await expect(actionPanel.getByRole("link", { name: "Play on unityroom (old build)", exact: true })).toHaveAttribute(
       "href",
       "https://unityroom.com/games/treasure-rogue",
     );
