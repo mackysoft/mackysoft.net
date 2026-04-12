@@ -28,9 +28,14 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("Google Fonts");
     await expect(main).toContainText("youtube-nocookie.com");
     await expect(main).toContainText("GitHub、X、Zenn");
+    await expect(main.locator("code", { hasText: "youtube-nocookie.com" })).toBeVisible();
+    await expect(main.locator("code", { hasText: "mackysoft-theme" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "利用者による制御方法" })).toBeVisible();
     await expect(main).toContainText("localStorage");
     await expect(main).toContainText("オプトアウト アドオン");
+    await expect(main.getByRole("heading", { level: 2, name: "改定日" })).toBeVisible();
+    await expect(main).toContainText("制定日: 2026年4月12日");
+    await expect(main).toContainText("最終更新日: 2026年4月12日");
     await expect(page.locator(`script[src*="googletagmanager.com/gtag/js?id=${gaMeasurementId}"]`)).toHaveCount(1);
     expect(await page.evaluate(() => typeof (window as AnalyticsWindow).gtag)).toBe("function");
     expect(
@@ -61,8 +66,13 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("Google Fonts");
     await expect(main).toContainText("youtube-nocookie.com");
     await expect(main).toContainText("GitHub, X, or Zenn");
+    await expect(main.locator("code", { hasText: "youtube-nocookie.com" })).toBeVisible();
+    await expect(main.locator("code", { hasText: "mackysoft-theme" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "Visitor Controls" })).toBeVisible();
     await expect(main).toContainText("localStorage");
     await expect(main).toContainText("opt-out browser add-on");
+    await expect(main.getByRole("heading", { level: 2, name: "Revision Date" })).toBeVisible();
+    await expect(main).toContainText("Effective date: April 12, 2026");
+    await expect(main).toContainText("Last updated: April 12, 2026");
   });
 });

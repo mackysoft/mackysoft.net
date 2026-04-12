@@ -1,9 +1,11 @@
 ---
-import PageLead from "../components/PageLead.astro";
+import { render } from "astro:content";
+
+import LocalizedHtmlLinks from "../components/LocalizedHtmlLinks.astro";
 import PageHeader from "../components/PageHeader.astro";
-import { getPrivacyPolicyContent } from "../features/privacy-policy/content";
+import { formatBreadcrumb } from "../lib/breadcrumb";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
-import { isExternalHttpHref } from "../lib/safe-href";
+import { resolveLocalizedPageBySlug } from "../lib/pages";
 import SiteLayout from "../layouts/SiteLayout.astro";
 
 type Props = {
@@ -12,94 +14,36 @@ type Props = {
 
 const { locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
-const content = getPrivacyPolicyContent(locale);
+const page = await resolveLocalizedPageBySlug("privacy-policy", locale);
 
-function resolvePolicyLinkHref(href: string) {
-  if (href.startsWith("/")) {
-    return localizePath(href, locale);
-  }
-
-  return href;
+if (!page) {
+  throw new Error("Unknown page slug: privacy-policy");
 }
+
+const { Content } = await render(page.entry as never);
 ---
 
 <SiteLayout
-  title={content.title}
-  description={content.description}
+  title={page.data.title}
+  description={page.data.description}
   locale={locale}
+  contentLocale={page.contentLocale}
+  isFallback={page.isFallback}
   canonicalPath={localizePath("/privacy-policy/", locale)}
-  alternateLocales={createAlternateLocaleLinks("/privacy-policy/")}
+  alternateLocales={createAlternateLocaleLinks("/privacy-policy/", page.availableLocales)}
 >
-  <PageHeader title={content.hero.title} eyebrow={content.hero.eyebrow} />
+  <PageHeader title={page.data.title} eyebrow={formatBreadcrumb("Home", "Privacy Policy")} />
 
-  <PageLead panel>
-    {content.lead.map((paragraph) => (
-      <p>{paragraph}</p>
-    ))}
-  </PageLead>
-
-  <div class="privacy-policy-sections">
-    {content.sections.map((section) => (
-      <section class="content-panel privacy-policy-section">
-        <h2>{section.heading}</h2>
-        <div class="privacy-policy-section__body">
-          {section.paragraphs.map((paragraph) => (
-            <p>{paragraph}</p>
-          ))}
-          {section.items && (
-            <ul class="privacy-policy-section__list">
-              {section.items.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          )}
-          {section.links && (
-            <ul class="privacy-policy-section__links">
-              {section.links.map((link) => (
-                <li>
-                  <a
-                    href={resolvePolicyLinkHref(link.href)}
-                    target={isExternalHttpHref(link.href) ? "_blank" : undefined}
-                    rel={isExternalHttpHref(link.href) ? "noreferrer" : undefined}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
-    ))}
-  </div>
+  <section class="content-panel prose privacy-policy-content">
+    <LocalizedHtmlLinks locale={locale}>
+      <Content />
+    </LocalizedHtmlLinks>
+  </section>
 </SiteLayout>
 
 <style>
-  .privacy-policy-sections {
+  .privacy-policy-content {
     display: grid;
     gap: 1rem;
-  }
-
-  .privacy-policy-section {
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .privacy-policy-section h2,
-  .privacy-policy-section p,
-  .privacy-policy-section ul {
-    margin: 0;
-  }
-
-  .privacy-policy-section__body {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .privacy-policy-section__list,
-  .privacy-policy-section__links {
-    display: grid;
-    gap: 0.6rem;
-    padding-left: 1.2rem;
   }
 </style>

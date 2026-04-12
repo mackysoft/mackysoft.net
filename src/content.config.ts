@@ -135,9 +135,37 @@ const gameTranslations = defineCollection({
     }),
 });
 
+const pages = defineCollection({
+  loader: glob({
+    base: "./src/content/pages",
+    pattern: "**/index.md",
+  }),
+  schema: () =>
+    z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      draft: z.boolean().default(false),
+    }),
+});
+
+const pageTranslations = defineCollection({
+  loader: glob({
+    base: "./src/content/pages",
+    pattern: "**/index.*.md",
+  }),
+  schema: () =>
+    z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      draft: z.boolean().default(false),
+    }),
+});
+
 export const collections = {
   articles,
   articleTranslations,
   games,
   gameTranslations,
+  pages,
+  pageTranslations,
 };
