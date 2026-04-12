@@ -5,7 +5,6 @@ import PageHeader from "../../components/PageHeader.astro";
 import { getUiText } from "../../lib/copy";
 import { getArticleItems } from "../../lib/articles";
 import { formatPageBreadcrumb } from "../../lib/page-header";
-import { formatArticleCount } from "../../lib/copy";
 import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
@@ -31,7 +30,7 @@ const articleItems = await getArticleItems(locale);
 >
   <PageHeader title={uiText.common.articles} eyebrow={formatPageBreadcrumb(uiText.common.home, uiText.common.articles)} />
 
-  <PageLead class="articles-list" summary={locale === "en" ? formatArticleCount(articleItems.length, locale) : undefined}>
+  <PageLead class="articles-list">
     {articleItems.map((article) => (
       <ArticleCard article={article} locale={locale} />
     ))}

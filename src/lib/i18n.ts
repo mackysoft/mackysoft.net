@@ -4,6 +4,17 @@ export type SiteLocale = (typeof supportedLocales)[number];
 
 export const defaultLocale: SiteLocale = "ja";
 export const localeStorageKey = "mackysoft-locale";
+const localizableContentPathPrefixes = [
+  "/",
+  "/about/",
+  "/archive/",
+  "/articles/",
+  "/assets/",
+  "/contact/",
+  "/games/",
+  "/privacy-policy/",
+  "/tags/",
+] as const;
 
 export function isSiteLocale(value: string): value is SiteLocale {
   return supportedLocales.includes(value as SiteLocale);
@@ -59,6 +70,32 @@ export function switchLocalePath(pathname: string, locale: SiteLocale) {
   return localizePath(pathname, locale);
 }
 
+export function localizeContentHref(href: string, locale: SiteLocale) {
+  if (!href.startsWith("/")) {
+    return href;
+  }
+
+  if (href.startsWith("//") || href.startsWith("/_astro/")) {
+    return href;
+  }
+
+  const parsedUrl = new URL(href, "https://mackysoft.net");
+  const normalizedPathname = normalizePath(parsedUrl.pathname);
+  const shouldLocalize = localizableContentPathPrefixes.some((prefix) => {
+    if (prefix === "/") {
+      return normalizedPathname === "/";
+    }
+
+    return normalizedPathname === prefix.slice(0, -1) || normalizedPathname.startsWith(prefix);
+  });
+
+  if (!shouldLocalize) {
+    return href;
+  }
+
+  return `${localizePath(normalizedPathname, locale)}${parsedUrl.search}${parsedUrl.hash}`;
+}
+
 export function getLocalePreference(candidates: readonly string[] | null | undefined): SiteLocale {
   if (!candidates) {
     return defaultLocale;
@@ -82,4 +119,3 @@ export function getLocalePreference(candidates: readonly string[] | null | undef
 export function toLanguageTag(locale: SiteLocale) {
   return locale;
 }
-

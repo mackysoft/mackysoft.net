@@ -8,6 +8,7 @@ import { getUiText } from "../../lib/copy";
 import { formatArticleNumericDate } from "../../lib/article-dates";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
 import { getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
+import { localizeContentHtml } from "../../lib/localized-content";
 import { formatPageBreadcrumb } from "../../lib/page-header";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
@@ -45,6 +46,7 @@ const alternateLocales = article.availableLocales.includes("en")
       { locale: "en" as const, path: localizePath(articlePath, "en") },
     ]
   : [];
+const localizedContentHtml = localizeContentHtml(article.entry.rendered?.html ?? "", locale);
 ---
 
 <SiteLayout
@@ -91,7 +93,7 @@ const alternateLocales = article.availableLocales.includes("en")
             ))}
           </ul>
         )}
-        <Content />
+        {localizedContentHtml ? <Fragment set:html={localizedContentHtml} /> : <Content />}
         <ArticleShare title={article.data.title} shareUrl={shareUrl} locale={locale} />
       </section>
     </div>

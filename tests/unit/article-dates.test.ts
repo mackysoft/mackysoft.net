@@ -23,7 +23,7 @@ describe("article date formatting", () => {
       month: "03",
     });
     expect(formatArticleNumericDate(publishedAt)).toBe("2021/03/16");
-    expect(formatArticleDate(publishedAt)).toBe("2021年3月16日");
+    expect(formatArticleDate(publishedAt)).toBe("2021/03/16");
   });
 
   test("does not shift archive buckets across month boundaries", () => {
@@ -36,7 +36,7 @@ describe("article date formatting", () => {
     expect(formatArticleNumericDate(publishedAt)).toBe("2020/05/01");
   });
 
-  test("formats English article dates with an en-US presentation", () => {
+  test("keeps English article dates on the same YYYY/MM/DD format", () => {
     const publishedAt = new Date("2021-03-16T00:00:00+09:00");
 
     expect(getArticleDateParts(publishedAt, "en")).toEqual({
@@ -44,7 +44,7 @@ describe("article date formatting", () => {
       month: "03",
       day: "16",
     });
-    expect(formatArticleNumericDate(publishedAt, "en")).toBe("03/16/2021");
-    expect(formatArticleDate(publishedAt, "en")).toBe("Mar 16, 2021");
+    expect(formatArticleNumericDate(publishedAt, "en")).toBe("2021/03/16");
+    expect(formatArticleDate(publishedAt, "en")).toBe("2021/03/16");
   });
 });

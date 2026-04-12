@@ -15,8 +15,8 @@ test.describe("games page", () => {
     await expect(treasureRogueCard).toContainText("Android（配信終了）");
     await expect(treasureRogueCard).toContainText("ブラウザ");
     await expect(treasureRogueCard).toContainText("公開日");
-    await expect(treasureRogueCard).toContainText("2020年4月9日");
-    await expect(treasureRogueCard).not.toContainText("2020年5月21日");
+    await expect(treasureRogueCard).toContainText("2020/04/09");
+    await expect(treasureRogueCard).not.toContainText("2020/05/21");
     await expect(
       treasureRogueCard.getByRole("img", { name: "Treasure Rogue のタイトルロゴと主人公が写ったキービジュアル" }),
     ).toBeVisible();

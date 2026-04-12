@@ -37,6 +37,7 @@ test.describe("articles page", () => {
 
     await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
     await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
+    await expect(page.locator(".page-lead__summary")).toHaveCount(0);
     await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
 
     const zennCard = page.locator(".article-card").filter({ hasText: latestZennArticleJa.title }).first();
@@ -56,9 +57,11 @@ test.describe("articles page", () => {
 
     await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
     await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
+    await expect(page.locator(".page-lead__summary")).toHaveCount(0);
 
     const translatedZennCard = page.locator(".article-card").filter({ hasText: latestZennArticleEn.title }).first();
     await expect(translatedZennCard).toContainText("Published");
+    await expect(translatedZennCard).toContainText(formatArticleDate(new Date(latestZennArticle.publishedAt), "en"));
     await expect(translatedZennCard.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toHaveAttribute(
       "href",
       latestZennArticleEn.url,
@@ -269,5 +272,19 @@ test.describe("articles page", () => {
     await expect(page.getByRole("heading", { level: 1, name: "【Unity】CullingGroupをより簡単に実装する【Vision】" })).toBeVisible();
     await expect(page.locator(".article-page-header .eyebrow")).toHaveText("Home / Articles");
     await expect(page.locator(".article-content")).toContainText("CullingGroup");
+  });
+
+  test("keeps localized internal links inside English fallback article content", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/roguelike-map-generation-algorithm/");
+
+    const internalGameLink = page.locator(".article-content a").filter({ hasText: "『TreasureRogue』" }).first();
+
+    await expect(internalGameLink).toHaveAttribute("href", "/en/games/treasure-rogue/");
+
+    await page.goto("/en/articles/roguelike-random-enemy-select/");
+
+    const relatedArticleLink = page.locator(".article-content a").filter({ hasText: "ローグライクのマップ生成アルゴリズムについて解説" }).first();
+
+    await expect(relatedArticleLink).toHaveAttribute("href", "/en/articles/roguelike-map-generation-algorithm/");
   });
 });

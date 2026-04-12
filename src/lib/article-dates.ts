@@ -2,23 +2,13 @@ import type { SiteLocale } from "./i18n";
 
 const ARTICLE_TIME_ZONE = "Asia/Tokyo";
 
-function getNumericDateFormatter(locale: SiteLocale) {
-  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ja-JP", {
+function getNumericDateFormatter() {
+  return new Intl.DateTimeFormat("ja-JP", {
     calendar: "gregory",
     timeZone: ARTICLE_TIME_ZONE,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  });
-}
-
-function getLongDateFormatter(locale: SiteLocale) {
-  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ja-JP", {
-    calendar: "gregory",
-    timeZone: ARTICLE_TIME_ZONE,
-    year: "numeric",
-    month: "short",
-    day: "numeric",
   });
 }
 
@@ -29,7 +19,8 @@ type ArticleDateParts = {
 };
 
 export function getArticleDateParts(date: Date, locale: SiteLocale = "ja"): ArticleDateParts {
-  const parts = getNumericDateFormatter(locale).formatToParts(date);
+  void locale;
+  const parts = getNumericDateFormatter().formatToParts(date);
   let year = "";
   let month = "";
   let day = "";
@@ -57,20 +48,12 @@ export function getArticleYearMonth(date: Date, locale: SiteLocale = "ja"): { ye
 }
 
 export function formatArticleDate(date: Date, locale: SiteLocale = "ja"): string {
-  if (locale === "ja") {
-    const { year, month, day } = getArticleDateParts(date, locale);
-    return `${year}年${Number(month)}月${Number(day)}日`;
-  }
-
-  return getLongDateFormatter(locale).format(date);
+  return formatArticleNumericDate(date, locale);
 }
 
 export function formatArticleNumericDate(date: Date, locale: SiteLocale = "ja"): string {
+  void locale;
   const { year, month, day } = getArticleDateParts(date, locale);
-
-  if (locale === "en") {
-    return `${month}/${day}/${year}`;
-  }
 
   return `${year}/${month}/${day}`;
 }

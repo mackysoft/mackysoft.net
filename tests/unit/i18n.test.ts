@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
   getLocalePreference,
   getPathLocale,
+  localizeContentHref,
   localizePath,
   stripLocaleFromPath,
   switchLocalePath,
@@ -27,6 +28,15 @@ describe("i18n helpers", () => {
     expect(localizePath("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
     expect(switchLocalePath("/en/articles/vision-introduction/", "ja")).toBe("/articles/vision-introduction/");
     expect(switchLocalePath("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
+  });
+
+  test("localizes only known site content links", () => {
+    expect(localizeContentHref("/articles/vision-introduction/", "en")).toBe("/en/articles/vision-introduction/");
+    expect(localizeContentHref("/games/treasure-rogue/?from=article#play", "en")).toBe("/en/games/treasure-rogue/?from=article#play");
+    expect(localizeContentHref("/", "en")).toBe("/en/");
+    expect(localizeContentHref("/playfab-login/", "en")).toBe("/playfab-login/");
+    expect(localizeContentHref("https://zenn.dev/makihiro_dev", "en")).toBe("https://zenn.dev/makihiro_dev");
+    expect(localizeContentHref("#visionとは", "en")).toBe("#visionとは");
   });
 
   test("prefers supported browser languages in order and falls back to Japanese", () => {
