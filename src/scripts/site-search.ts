@@ -9,7 +9,7 @@ import {
   type SearchResultDataLike,
 } from "../lib/search";
 import { formatSearchResultCountLabel, getUiText } from "../lib/ui-text";
-import type { SiteLocale } from "../lib/i18n";
+import { isSiteLocale, type SiteLocale } from "../lib/i18n";
 
 type PagefindResult = {
   data: () => Promise<PagefindSearchResultData>;
@@ -336,7 +336,8 @@ function getPanelElements(root: HTMLElement): SearchPanelElements | null {
     || !(summary instanceof HTMLElement)
     || !(content instanceof HTMLElement)
     || !(live instanceof HTMLElement)
-    || (locale !== "ja" && locale !== "en")
+    || !locale
+    || !isSiteLocale(locale)
     || (mode !== "page" && mode !== "inline")
     || !searchPath
   ) {
@@ -411,7 +412,10 @@ function initSearchPanel(root: HTMLElement) {
         return;
       }
 
-      const results = await Promise.all(response.results.slice(0, 20).map((entry) => entry.data()));
+      const resultEntries = elements.mode === "inline"
+        ? response.results.slice(0, 20)
+        : response.results;
+      const results = await Promise.all(resultEntries.map((entry) => entry.data()));
 
       if (requestId !== currentRequestId) {
         return;

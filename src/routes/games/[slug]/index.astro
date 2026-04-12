@@ -12,7 +12,7 @@ import { getGamePlatformLabel } from "../../../lib/game-presentation";
 import { resolveLocalizedGameBySlug } from "../../../lib/game-repository";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../../lib/i18n";
 import { formatBreadcrumb } from "../../../lib/breadcrumb";
-import { getSiteMeta } from "../../../lib/site";
+import { siteName } from "../../../lib/site";
 import { getYouTubeEmbedUrl } from "../../../lib/youtube";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 
@@ -67,7 +67,7 @@ const alternateLocales = createAlternateLocaleLinks(gamePath, game.availableLoca
     <SearchMetadata
       type="game"
       description={game.data.description}
-      source={getSiteMeta("ja").name}
+      source={siteName}
       updatedAt={game.data.updatedAt ?? game.data.publishedAt}
       image={game.data.cover}
       imageAlt={game.data.coverAlt}

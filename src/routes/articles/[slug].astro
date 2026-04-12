@@ -11,7 +11,7 @@ import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import { formatBreadcrumb } from "../../lib/breadcrumb";
-import { getSiteMeta } from "../../lib/site";
+import { siteName } from "../../lib/site";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -54,11 +54,11 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
   canonicalPath={canonicalPath}
   alternateLocales={alternateLocales}
 >
-  <article class="article-page" data-pagefind-body>
+  <article class="article-page">
     <SearchMetadata
       type="article"
       description={article.data.description}
-      source={getSiteMeta("ja").name}
+      source={siteName}
       updatedAt={article.data.updatedAt ?? article.data.publishedAt}
       image={article.data.cover}
       imageAlt={article.data.coverAlt}
@@ -74,7 +74,7 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
       </section>
     )}
 
-    <header class="article-hero">
+    <header class="article-hero" data-pagefind-body>
       {article.data.cover && (
         <div class="cover">
           <Image src={article.data.cover} alt={article.data.coverAlt ?? ""} widths={[960, 720]} sizes="(max-width: 48rem) 100vw, 46rem" />
@@ -88,9 +88,13 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
     </header>
 
     <div class:list={["article-layout", tocHeadings.length > 0 && "article-layout--with-toc"]}>
-      {tocHeadings.length > 0 && <ArticleToc headings={tocHeadings} locale={locale} />}
+      {tocHeadings.length > 0 && (
+        <div data-pagefind-ignore>
+          <ArticleToc headings={tocHeadings} locale={locale} />
+        </div>
+      )}
 
-      <section class="content-panel prose article-content">
+      <section class="content-panel prose article-content" data-pagefind-body>
         {article.data.tags.length > 0 && (
           <ul class="tags article-content__tags" aria-label={uiText.article.tagsAriaLabel}>
             {article.data.tags.map((tag) => (
@@ -101,7 +105,9 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
         <LocalizedHtmlLinks locale={locale}>
           <Content />
         </LocalizedHtmlLinks>
-        <ArticleShare title={article.data.title} shareUrl={shareUrl} locale={locale} />
+        <div data-pagefind-ignore>
+          <ArticleShare title={article.data.title} shareUrl={shareUrl} locale={locale} />
+        </div>
       </section>
     </div>
   </article>

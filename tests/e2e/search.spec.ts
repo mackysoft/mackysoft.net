@@ -4,6 +4,8 @@ const localSearchQuery = "BoundingSphereUpdateMode";
 const localArticleWithoutCoverQuery = "コントラスト";
 const externalSearchQuery = "Vibe駆動開発";
 const releaseSearchQuery = "SerializeReference";
+const articleUiQuery = "コピーリンク";
+const overflowSearchQuery = "C#";
 
 async function setJapaneseLocale(page: Page) {
   await page.addInitScript(() => {
@@ -64,6 +66,15 @@ test.describe("site search", () => {
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
   });
 
+  test("does not index article share UI labels as searchable content", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.goto(`/search/?q=${encodeURIComponent(articleUiQuery)}`);
+
+    const pagePanel = page.locator('[data-search-mode="page"]').first();
+
+    await expect(pagePanel.locator('.activity-card__link-layer[href*="#article-share-title"]')).toHaveCount(0);
+  });
+
   test("keeps the same card structure when a result does not have a thumbnail", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent(localArticleWithoutCoverQuery)}`);
@@ -97,6 +108,19 @@ test.describe("site search", () => {
 
     await expect(releaseCard).toBeVisible();
     await expect(releaseCard.locator(".site-search-card__meta")).toContainText("GitHub");
+  });
+
+  test("shows every result on the dedicated search page even when there are more than twenty matches", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.goto(`/search/?q=${encodeURIComponent(overflowSearchQuery)}`);
+
+    const pagePanel = page.locator('[data-search-mode="page"]').first();
+    await expect(pagePanel.locator(".site-search__summary")).toContainText("件の検索結果");
+
+    await expect.poll(async () => pagePanel.locator(".site-search-card").count()).toBeGreaterThan(20);
+    const count = await pagePanel.locator(".site-search-card").count();
+    expect(count).toBeGreaterThan(20);
+    await expect(pagePanel.locator(".site-search__summary")).toContainText(`${count} 件の検索結果`);
   });
 
   test("does not include Japanese-only local pages in English search", { tag: "@size:medium" }, async ({ page }) => {

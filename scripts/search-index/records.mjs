@@ -3,6 +3,9 @@ import {
   parseZennArticlePage,
 } from "../activity-sync/zenn.mjs";
 import { normalizeWhitespace } from "../activity-sync/shared.mjs";
+import localeDefinitions from "../../src/config/locales.json" with { type: "json" };
+
+const searchRecordLanguages = Object.keys(localeDefinitions);
 
 function createSearchContent(parts) {
   return normalizeWhitespace(parts.filter(Boolean).join("\n\n"));
@@ -187,7 +190,7 @@ export function createReleaseSearchRecords(releases) {
       release.source,
     ]);
 
-    return ["ja", "en"].map((language) =>
+    return searchRecordLanguages.map((language) =>
       createSearchRecord({
         url: createSyntheticSearchRecordUrl("release", release.groupId, language),
         language,

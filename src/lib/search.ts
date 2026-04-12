@@ -1,4 +1,4 @@
-import type { SiteLocale } from "./i18n";
+import { getIntlLocale, type SiteLocale } from "./i18n";
 
 export const searchContentTypes = ["article", "game", "asset", "page"] as const;
 
@@ -70,7 +70,7 @@ export function formatSearchResultDate(value: string | null | undefined, locale:
     return null;
   }
 
-  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ja-JP", {
+  return new Intl.DateTimeFormat(getIntlLocale(locale), {
     calendar: "gregory",
     timeZone: "Asia/Tokyo",
     year: "numeric",
