@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const localSearchQuery = "BoundingSphereUpdateMode";
+const localArticleWithoutCoverQuery = "コントラスト";
 const externalSearchQuery = "Vibe駆動開発";
 const releaseSearchQuery = "SerializeReference";
 
@@ -28,6 +29,7 @@ test.describe("site search", () => {
 
     const firstCard = panel.locator(".site-search-card").first();
     await expect(firstCard.locator('.activity-card__link-layer')).toHaveAttribute("href", /vision-introduction/);
+    await expect(firstCard.locator(".site-search-card__cover")).toHaveCount(0);
     await expect(firstCard.locator(".site-search-card__excerpt")).toContainText(localSearchQuery);
 
     await page.keyboard.press("Escape");
@@ -48,7 +50,7 @@ test.describe("site search", () => {
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
   });
 
-  test("renders local article hits as cards with a matched excerpt on the search page", { tag: "@size:medium" }, async ({ page }) => {
+  test("renders local article hits as cards with an excerpt on the search page", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
 
@@ -57,9 +59,22 @@ test.describe("site search", () => {
     }).first();
 
     await expect(card).toBeVisible();
+    await expect(card.locator(".site-search-card__cover img")).toBeVisible();
     await expect(card.locator(".site-search-card__excerpt")).toContainText(localSearchQuery);
-    await expect(card.locator(".site-search-card__match")).toContainText("一致箇所");
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
+  });
+
+  test("keeps the same card structure when a result does not have a thumbnail", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.goto(`/search/?q=${encodeURIComponent(localArticleWithoutCoverQuery)}`);
+
+    const card = page.locator(".site-search-card").filter({
+      has: page.locator('.activity-card__link-layer[href*="gamedesign-contrast-cedec2018"]'),
+    }).first();
+
+    await expect(card).toBeVisible();
+    await expect(card.locator(".site-search-card__cover")).toBeVisible();
+    await expect(card.locator(".site-search-card__cover img")).toHaveCount(0);
   });
 
   test("includes external article and release records in the search results", { tag: "@size:medium" }, async ({ page }) => {

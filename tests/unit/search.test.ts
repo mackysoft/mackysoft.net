@@ -3,7 +3,6 @@ import { describe, expect, test } from "vitest";
 import {
   getSearchContentType,
   selectSearchExcerpt,
-  selectSearchMatchTitle,
   selectSearchTargetUrl,
 } from "../../src/lib/search";
 
@@ -44,7 +43,7 @@ describe("search helpers", () => {
     })).toBe("meta description");
   });
 
-  test("uses the first matched anchor URL and exposes the matched section title", () => {
+  test("uses the first matched anchor URL", () => {
     const result = {
       url: "/articles/example/",
       meta: {
@@ -60,7 +59,6 @@ describe("search helpers", () => {
     };
 
     expect(selectSearchTargetUrl(result)).toBe("/articles/example/#specific-heading");
-    expect(selectSearchMatchTitle(result)).toBe("Specific heading");
   });
 
   test("prefers an explicit target URL from search metadata", () => {

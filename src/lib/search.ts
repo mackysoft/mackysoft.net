@@ -16,6 +16,8 @@ export type SearchResultDataLike = {
   meta?: {
     title?: string | null;
     description?: string | null;
+    image?: string | null;
+    imageAlt?: string | null;
     updatedAt?: string | null;
     source?: string | null;
     type?: string | null;
@@ -44,15 +46,17 @@ export function selectSearchTargetUrl(data: SearchResultDataLike): string {
   return data.meta?.targetUrl?.trim() || selectSearchSubResult(data)?.url || data.url;
 }
 
-export function selectSearchMatchTitle(data: SearchResultDataLike): string | undefined {
-  const subResultTitle = selectSearchSubResult(data)?.title?.trim();
-  const pageTitle = data.meta?.title?.trim();
+export function selectSearchImage(data: SearchResultDataLike): { src: string; alt: string } | undefined {
+  const src = data.meta?.image?.trim();
 
-  if (!subResultTitle || !pageTitle || subResultTitle === pageTitle) {
+  if (!src) {
     return undefined;
   }
 
-  return subResultTitle;
+  return {
+    src,
+    alt: data.meta?.imageAlt?.trim() ?? "",
+  };
 }
 
 export function formatSearchResultDate(value: string | null | undefined, locale: SiteLocale): string | null {

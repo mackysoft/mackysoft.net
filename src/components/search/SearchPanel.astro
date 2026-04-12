@@ -25,9 +25,23 @@ const uiText = getUiText(locale);
   data-search-locale={locale}
   data-search-path={searchPath}
 >
-  <form class="site-search__form" role="search" action={searchPath} method="get" data-site-search-form>
+  <form
+    class:list={[
+      "site-search__form",
+    ]}
+    role="search"
+    action={searchPath}
+    method="get"
+    data-site-search-form
+  >
     <label class="site-search__input-wrap">
       <span class="visually-hidden">{uiText.search.inputLabel}</span>
+      <span class="site-search__input-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+          <path d="M16 16L21 21" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
+        </svg>
+      </span>
       <input
         class="site-search__input"
         type="text"
@@ -40,11 +54,6 @@ const uiText = getUiText(locale);
         data-site-search-input
       />
     </label>
-    {mode === "page" && (
-      <button type="submit" class="button-link site-search__submit" data-site-search-submit>
-        {uiText.search.submit}
-      </button>
-    )}
   </form>
 
   <div class="site-search__results" data-site-search-results hidden={mode === "inline"}>

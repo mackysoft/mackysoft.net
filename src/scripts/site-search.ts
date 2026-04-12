@@ -3,7 +3,7 @@ import {
   getSearchContentType,
   isExternalSearchUrl,
   selectSearchExcerpt,
-  selectSearchMatchTitle,
+  selectSearchImage,
   selectSearchSubResult,
   selectSearchTargetUrl,
   type SearchResultDataLike,
@@ -23,6 +23,8 @@ type PagefindSearchResultData = SearchResultDataLike & {
   meta: {
     title?: string;
     description?: string;
+    image?: string;
+    imageAlt?: string;
     updatedAt?: string;
     source?: string;
     type?: string;
@@ -176,7 +178,7 @@ function createMetaItem(text: string) {
   return item;
 }
 
-function createResultCard(result: PagefindSearchResultData, locale: SiteLocale) {
+function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
   const uiText = getUiText(locale);
   const card = document.createElement("article");
   card.className = "site-search-card activity-card";
@@ -185,11 +187,11 @@ function createResultCard(result: PagefindSearchResultData, locale: SiteLocale) 
   const targetUrl = selectSearchTargetUrl(result);
   const excerpt = selectSearchExcerpt(result);
   const excerptHtml = selectSearchSubResult(result)?.excerpt ?? result.excerpt ?? undefined;
-  const matchTitle = selectSearchMatchTitle(result);
   const type = getSearchContentType(result.meta.type);
   const source = result.meta.source?.trim();
   const formattedDate = formatSearchResultDate(result.meta.updatedAt, locale);
   const external = isExternalSearchUrl(targetUrl, window.location.origin);
+  const image = selectSearchImage(result);
 
   const link = document.createElement("a");
   link.className = "activity-card__link-layer";
@@ -203,8 +205,74 @@ function createResultCard(result: PagefindSearchResultData, locale: SiteLocale) 
 
   card.append(link);
 
+  if (mode === "page") {
+    const cover = document.createElement("div");
+    cover.className = "site-search-card__cover activity-card__cover";
+
+    if (image) {
+      cover.dataset.coverState = "ready";
+
+      const img = document.createElement("img");
+      img.src = image.src;
+      img.alt = image.alt;
+      img.width = 480;
+      img.height = 252;
+      img.sizes = "(max-width: 720px) 100vw, 28rem";
+      img.loading = "lazy";
+      img.decoding = "async";
+
+      cover.append(img);
+    } else {
+      cover.dataset.coverState = "empty";
+      cover.setAttribute("aria-hidden", "true");
+    }
+
+    card.append(cover);
+  }
+
   const body = document.createElement("div");
   body.className = "site-search-card__body activity-card__body";
+
+  const heading = document.createElement("h2");
+  heading.className = "site-search-card__title activity-card__title";
+  heading.textContent = title;
+  body.append(heading);
+
+  const copy = document.createElement("div");
+  copy.className = "site-search-card__copy";
+
+  if (excerpt) {
+    const excerptElement = document.createElement("p");
+    excerptElement.className = "site-search-card__excerpt";
+
+    if (excerptHtml) {
+      excerptElement.innerHTML = excerptHtml;
+    } else {
+      excerptElement.textContent = excerpt;
+    }
+
+    copy.append(excerptElement);
+  }
+
+  body.append(copy);
+
+  const footer = document.createElement("div");
+  footer.className = "site-search-card__footer";
+
+  const meta = document.createElement("p");
+  meta.className = "site-search-card__meta activity-card__meta";
+
+  if (formattedDate) {
+    meta.append(createMetaItem(formattedDate));
+  }
+
+  if (source) {
+    meta.append(createMetaItem(source));
+  }
+
+  if (meta.childElementCount > 0) {
+    footer.append(meta);
+  }
 
   const badges = document.createElement("div");
   badges.className = "activity-card__badges";
@@ -221,47 +289,8 @@ function createResultCard(result: PagefindSearchResultData, locale: SiteLocale) 
     badges.append(externalBadge);
   }
 
-  body.append(badges);
-
-  const heading = document.createElement("h2");
-  heading.className = "site-search-card__title activity-card__title";
-  heading.textContent = title;
-  body.append(heading);
-
-  if (matchTitle) {
-    const match = document.createElement("p");
-    match.className = "site-search-card__match";
-    match.textContent = `${uiText.search.matchedSection}: ${matchTitle}`;
-    body.append(match);
-  }
-
-  if (excerpt) {
-    const excerptElement = document.createElement("p");
-    excerptElement.className = "site-search-card__excerpt";
-
-    if (excerptHtml) {
-      excerptElement.innerHTML = excerptHtml;
-    } else {
-      excerptElement.textContent = excerpt;
-    }
-
-    body.append(excerptElement);
-  }
-
-  const meta = document.createElement("p");
-  meta.className = "site-search-card__meta activity-card__meta";
-
-  if (formattedDate) {
-    meta.append(createMetaItem(formattedDate));
-  }
-
-  if (source) {
-    meta.append(createMetaItem(source));
-  }
-
-  if (meta.childElementCount > 0) {
-    body.append(meta);
-  }
+  footer.append(badges);
+  body.append(footer);
 
   card.append(body);
 
@@ -280,7 +309,7 @@ function renderResults(elements: SearchPanelElements, results: PagefindSearchRes
   cards.className = "site-search__results-grid";
 
   for (const result of results) {
-    cards.append(createResultCard(result, elements.locale));
+    cards.append(createResultCard(result, elements.locale, elements.mode));
   }
 
   showResultsArea(elements);

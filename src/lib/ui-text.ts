@@ -60,7 +60,6 @@ type UiText = {
     errorTitle: string;
     errorBody: string;
     externalBadge: string;
-    matchedSection: string;
     typeLabel: Record<"article" | "game" | "asset" | "page", string>;
   };
 };
@@ -136,7 +135,6 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
       errorTitle: "検索を読み込めませんでした",
       errorBody: "時間を置いてもう一度試してください。",
       externalBadge: "外部",
-      matchedSection: "一致箇所",
       typeLabel: {
         article: "記事",
         game: "ゲーム",
@@ -204,7 +202,6 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
       errorTitle: "Search is unavailable",
       errorBody: "Please try again later.",
       externalBadge: "External",
-      matchedSection: "Matched section",
       typeLabel: {
         article: "Article",
         game: "Game",

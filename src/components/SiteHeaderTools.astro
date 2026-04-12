@@ -26,10 +26,10 @@ const searchPath = localizePath("/search/", locale);
 ---
 
 <div class="site-header-tools" role="group" aria-label={uiText.header.toolsLabel} data-site-header-tools>
+  <ThemeToggle locale={locale} />
+  <LocaleMenu locale={locale} contentLocale={contentLocale} isFallback={isFallback} currentPath={currentPath} />
   <div class="site-header-search">
     <SearchTrigger locale={locale} href={searchPath} enableInline={enableSearchPanel} />
     {enableSearchPanel && <SearchInlinePanel locale={locale} />}
   </div>
-  <ThemeToggle locale={locale} />
-  <LocaleMenu locale={locale} contentLocale={contentLocale} isFallback={isFallback} currentPath={currentPath} />
 </div>
