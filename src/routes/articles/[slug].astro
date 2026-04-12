@@ -212,6 +212,10 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
     }
 
     .article-layout__toc {
+      display: contents;
+    }
+
+    :global(.article-toc) {
       order: 1;
     }
   }
