@@ -119,7 +119,7 @@ async function getArticleTranslationMap() {
     articleTranslationsPromise = (async () => {
       const { getCollection } = await import("astro:content");
       const entries = await getCollection("articleTranslations", ({ data }) => !data.draft);
-      return createTranslationMap(entries);
+      return createTranslationMap(entries, { stripPrefix: "src/content/articles/" });
     })();
   }
 

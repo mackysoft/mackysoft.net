@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
+
 test.describe("site header", () => {
   test("shows static header tools after navigation on desktop", { tag: "@size:medium" }, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
@@ -112,25 +114,23 @@ test.describe("site header", () => {
     await page.getByRole("menuitemradio", { name: "English" }).click();
 
     await expect(page).toHaveURL("/en/articles/vision-introduction/");
-    await expect(page.locator(".article-fallback-notice")).toContainText("This page is currently available only in Japanese.");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1, name: translatedVisionTitle })).toBeVisible();
     expect(await page.evaluate(() => window.localStorage.getItem("mackysoft-locale"))).toBe("en");
   });
 
-  test("separates selected locale and content locale in the fallback dropdown state", { tag: "@size:medium" }, async ({ page }) => {
+  test("shows the translated article locale as both selected and current", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/en/articles/vision-introduction/");
 
     await page.locator("[data-site-language-toggle]").click();
 
-    const japaneseItem = page.locator(".site-language-menu__item--current-content");
-    const selectedItem = page.locator('.site-language-menu__item[aria-checked="true"]');
+    const currentContentItem = page.locator(".site-language-menu__item--current-content");
+    const selectedItem = page.locator('.site-language-menu__item--current[aria-checked="true"]');
 
-    await expect(japaneseItem).toHaveText("Japanese");
+    await expect(currentContentItem).toHaveCount(0);
     await expect(selectedItem).toHaveText("English");
-    await expect(japaneseItem).toHaveCSS("background-color", "rgba(14, 107, 99, 0.1)");
-    await expect(japaneseItem).toHaveCSS("color", "rgb(14, 107, 99)");
-    await expect(selectedItem).toHaveCSS("background-color", "rgba(255, 255, 255, 0.52)");
-    await expect(selectedItem).toHaveCSS("border-color", "rgba(30, 27, 24, 0.24)");
-    await expect(selectedItem).toHaveCSS("color", "rgb(30, 27, 24)");
+    await expect(selectedItem).toHaveCSS("background-color", "rgba(14, 107, 99, 0.1)");
+    await expect(selectedItem).toHaveCSS("color", "rgb(14, 107, 99)");
     expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").content)).toBe('"✓"');
     expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").color)).toBe("rgb(14, 107, 99)");
   });

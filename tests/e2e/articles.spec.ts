@@ -30,6 +30,7 @@ const activityData = JSON.parse(
 const latestZennArticle = activityData.articles[0]!;
 const latestZennArticleJa = latestZennArticle.locales.ja;
 const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.locales.ja;
+const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
 
 test.describe("articles page", () => {
   test("shows local and Zenn articles in the same card format", { tag: "@size:medium" }, async ({ page }) => {
@@ -52,7 +53,7 @@ test.describe("articles page", () => {
     );
   });
 
-  test("shows translated external metadata and Japanese-only local fallbacks on the English index page", { tag: "@size:medium" }, async ({ page }) => {
+  test("shows translated external metadata and localized local articles on the English index page", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/en/articles/");
 
     await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
@@ -67,19 +68,20 @@ test.describe("articles page", () => {
       latestZennArticleEn.url,
     );
 
-    const fallbackLocalCard = page.locator(".article-card").filter({ hasText: "【Unity】CullingGroupをより簡単に実装する【Vision】" }).first();
-    await expect(fallbackLocalCard).toContainText("Japanese only");
-    await expect(
-      fallbackLocalCard.getByRole("link", { name: "【Unity】CullingGroupをより簡単に実装する【Vision】", exact: true }),
-    ).toHaveAttribute("href", "/en/articles/vision-introduction/");
+    const localizedLocalCard = page.locator(".article-card").filter({ hasText: translatedVisionTitle }).first();
+    await expect(localizedLocalCard).not.toContainText("Japanese only");
+    await expect(localizedLocalCard.getByRole("link", { name: translatedVisionTitle, exact: true })).toHaveAttribute(
+      "href",
+      "/en/articles/vision-introduction/",
+    );
   });
 
   test("navigates from anywhere on an article card", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/en/articles/");
 
-    const fallbackLocalCard = page.locator(".article-card").filter({ hasText: "【Unity】CullingGroupをより簡単に実装する【Vision】" }).first();
+    const localizedLocalCard = page.locator(".article-card").filter({ hasText: translatedVisionTitle }).first();
 
-    await fallbackLocalCard.click();
+    await localizedLocalCard.click();
 
     await expect(page).toHaveURL("/en/articles/vision-introduction/");
   });
@@ -274,42 +276,28 @@ test.describe("articles page", () => {
     await context.close();
   });
 
-  test("keeps English local article routes and shows a Japanese fallback notice", { tag: "@size:medium" }, async ({ page }) => {
+  test("renders translated English local article routes without fallback notice", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/en/articles/vision-introduction/");
 
     const breadcrumb = page.locator(".article-page-header .eyebrow");
-    const fallbackNotice = page.locator(".article-fallback-notice");
-    const hero = page.locator(".article-hero");
 
     await expect(page).toHaveURL("/en/articles/vision-introduction/");
-    await expect(fallbackNotice).toContainText("This page is currently available only in Japanese.");
-    await expect(page.getByRole("heading", { level: 1, name: "【Unity】CullingGroupをより簡単に実装する【Vision】" })).toBeVisible();
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1, name: translatedVisionTitle })).toBeVisible();
     await expect(breadcrumb).toHaveText("Home / Articles");
-    await expect(page.locator(".article-content")).toContainText("CullingGroup");
-
-    const breadcrumbBox = await breadcrumb.boundingBox();
-    const fallbackBox = await fallbackNotice.boundingBox();
-    const heroBox = await hero.boundingBox();
-
-    if (!breadcrumbBox || !fallbackBox || !heroBox) {
-      throw new Error("fallback article layout must be visible before order assertions");
-    }
-
-    expect(breadcrumbBox.y).toBeLessThan(fallbackBox.y);
-    expect(fallbackBox.y).toBeLessThan(heroBox.y);
-    expect(heroBox.y - (fallbackBox.y + fallbackBox.height)).toBeGreaterThan(12);
+    await expect(page.locator(".article-content")).toContainText("What is the CullingGroup API?");
   });
 
-  test("keeps localized internal links inside English fallback article content", { tag: "@size:medium" }, async ({ page }) => {
+  test("keeps localized internal links inside English article content", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/en/articles/roguelike-map-generation-algorithm/");
 
-    const internalGameLink = page.locator(".article-content a").filter({ hasText: "『TreasureRogue』" }).first();
+    const internalGameLink = page.locator('.article-content a[href="/en/games/treasure-rogue/"]').first();
 
     await expect(internalGameLink).toHaveAttribute("href", "/en/games/treasure-rogue/");
 
     await page.goto("/en/articles/roguelike-random-enemy-select/");
 
-    const relatedArticleLink = page.locator(".article-content a").filter({ hasText: "ローグライクのマップ生成アルゴリズムについて解説" }).first();
+    const relatedArticleLink = page.locator('.article-content a[href="/en/articles/roguelike-map-generation-algorithm/"]').first();
 
     await expect(relatedArticleLink).toHaveAttribute("href", "/en/articles/roguelike-map-generation-algorithm/");
   });
