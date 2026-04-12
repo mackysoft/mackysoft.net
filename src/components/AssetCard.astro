@@ -1,6 +1,4 @@
 ---
-import { Image } from "astro:assets";
-
 import { getUiText } from "../lib/ui-text";
 import type { SiteLocale } from "../lib/i18n";
 import { formatContentDate } from "../lib/content-date";
@@ -20,12 +18,14 @@ const uiText = getUiText(locale);
 <article class="asset-card activity-card">
   <a href={release.url} class="activity-card__link-layer" aria-label={repoName} target="_blank" rel="noreferrer"></a>
   <div class="asset-card__cover activity-card__cover">
-    <Image
+    <img
       src={release.coverUrl}
       alt={release.coverAlt}
       width={480}
       height={252}
       sizes="(max-width: 720px) 100vw, 28rem"
+      loading="lazy"
+      decoding="async"
     />
   </div>
   <div class="asset-card__body activity-card__body">
