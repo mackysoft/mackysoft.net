@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
+import { createTranslationMap, resolveLocalizedFallbackState } from "./localized-entry";
 import { getSiteMeta } from "./site";
 
 export type ArticleEntry = CollectionEntry<"articles">;
@@ -91,10 +92,6 @@ const releaseStarCountFormatterMap: Record<SiteLocale, Intl.NumberFormat> = {
 let localArticlesPromise: Promise<ArticleEntry[]> | undefined;
 let articleTranslationsPromise: Promise<Map<string, ArticleTranslationEntry>> | undefined;
 
-function normalizeTranslationId(id: string) {
-  return id.replace(/\/index\.[a-z-]+$/, "");
-}
-
 function mergeArticleData(baseEntry: ArticleEntry, translationEntry?: ArticleTranslationEntry) {
   return {
     title: translationEntry?.data.title ?? baseEntry.data.title,
@@ -108,13 +105,12 @@ function mergeArticleData(baseEntry: ArticleEntry, translationEntry?: ArticleTra
 }
 
 function getArticleVariant(article: ArticleActivity, locale: SiteLocale) {
+  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(article.locales[locale]));
   const variant = article.locales[locale] ?? article.locales.ja;
-  const contentLocale = article.locales[locale] ? locale : defaultLocale;
 
   return {
     variant,
-    contentLocale,
-    isFallback: locale !== contentLocale,
+    ...fallbackState,
   };
 }
 
@@ -123,7 +119,7 @@ async function getArticleTranslationMap() {
     articleTranslationsPromise = (async () => {
       const { getCollection } = await import("astro:content");
       const entries = await getCollection("articleTranslations", ({ data }) => !data.draft);
-      return new Map(entries.map((entry) => [normalizeTranslationId(entry.id), entry]));
+      return createTranslationMap(entries);
     })();
   }
 
@@ -196,14 +192,12 @@ export async function resolveLocalizedArticleBySlug(slug: string, locale: SiteLo
   const translationEntry = translations.get(slug);
   const selectedTranslation = locale === "en" ? translationEntry : undefined;
   const data = mergeArticleData(baseEntry, selectedTranslation);
-  const contentLocale: SiteLocale = selectedTranslation ? "en" : "ja";
+  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(selectedTranslation));
 
   return {
     slug,
     requestedLocale: locale,
-    contentLocale,
-    isFallback: locale !== contentLocale,
-    availableLocales: translationEntry ? ["ja", "en"] : ["ja"],
+    ...fallbackState,
     entry: selectedTranslation ?? baseEntry,
     baseEntry,
     data,

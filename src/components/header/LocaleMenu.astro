@@ -1,0 +1,120 @@
+---
+import { getUiText } from "../../lib/copy";
+import { supportedLocales, switchLocalePath, type SiteLocale } from "../../lib/i18n";
+
+type Props = {
+  locale: SiteLocale;
+  contentLocale?: SiteLocale;
+  isFallback?: boolean;
+  currentPath: string;
+};
+
+const { locale, contentLocale = locale, isFallback = false, currentPath } = Astro.props as Props;
+const uiText = getUiText(locale);
+const localeLinks = supportedLocales.map((targetLocale) => ({
+  locale: targetLocale,
+  href: switchLocalePath(currentPath, targetLocale),
+  label: uiText.header.languageName[targetLocale],
+  isSelected: locale === targetLocale,
+  isCurrentContent: (isFallback ? contentLocale : locale) === targetLocale,
+}));
+---
+
+<details class="site-language-menu" data-site-tool="language">
+  <summary class="site-header-tool site-header-tool--language" aria-label={uiText.header.languageMenu} data-site-language-toggle>
+    <svg class="site-header-tool__symbol" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+      <path d="M3.5 12H20.5" fill="none" stroke="currentColor" stroke-width="1.8"></path>
+      <path
+        d="M12 3.5C14.4 5.8 15.8 8.8 15.8 12C15.8 15.2 14.4 18.2 12 20.5C9.6 18.2 8.2 15.2 8.2 12C8.2 8.8 9.6 5.8 12 3.5Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      ></path>
+    </svg>
+    <span class="site-header-tool__label">{uiText.header.languageShortLabel[locale]}</span>
+    <svg class="site-header-tool__caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M7 10L12 15L17 10"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.8"
+      ></path>
+    </svg>
+  </summary>
+
+  <div class="site-language-menu__popover" role="menu" aria-label={uiText.header.languageMenu}>
+    {localeLinks.map((entry) => (
+      entry.isSelected ? (
+        <span
+          class:list={[
+            "site-language-menu__item",
+            "site-language-menu__item--selected",
+            entry.isCurrentContent && "site-language-menu__item--current",
+          ]}
+          role="menuitemradio"
+          aria-checked="true"
+        >
+          {entry.label}
+        </span>
+      ) : (
+        <a
+          href={entry.href}
+          class:list={[
+            "site-language-menu__item",
+            entry.isCurrentContent && "site-language-menu__item--current-content",
+          ]}
+          role="menuitemradio"
+          aria-checked="false"
+          data-locale-switch-link={entry.locale}
+        >
+          {entry.label}
+        </a>
+      )
+    ))}
+  </div>
+</details>
+
+<script is:inline>
+  (() => {
+    for (const link of document.querySelectorAll("[data-locale-switch-link]")) {
+      if (!(link instanceof HTMLAnchorElement)) {
+        continue;
+      }
+
+      link.addEventListener("click", () => {
+        try {
+          window.localStorage.setItem("mackysoft-locale", link.dataset.localeSwitchLink ?? "");
+        } catch {
+          // Ignore storage failures and continue navigation.
+        }
+      });
+    }
+
+    for (const menu of document.querySelectorAll(".site-language-menu")) {
+      if (!(menu instanceof HTMLDetailsElement)) {
+        continue;
+      }
+
+      menu.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          menu.open = false;
+        }
+      });
+    }
+
+    window.addEventListener("click", (event) => {
+      for (const menu of document.querySelectorAll(".site-language-menu")) {
+        if (!(menu instanceof HTMLDetailsElement)) {
+          continue;
+        }
+
+        if (!menu.contains(event.target instanceof Node ? event.target : null)) {
+          menu.open = false;
+        }
+      }
+    });
+  })();
+</script>

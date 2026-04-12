@@ -1,4 +1,7 @@
 ---
+import RootLocaleRedirect from "../components/head/RootLocaleRedirect.astro";
+import SiteSeo from "../components/head/SiteSeo.astro";
+import ThemeBootstrap from "../components/head/ThemeBootstrap.astro";
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
 import SiteHeaderTools from "../components/SiteHeaderTools.astro";
 import { getUiText } from "../lib/copy";
@@ -60,79 +63,9 @@ function isCurrentNavItem(itemHref: string, path: string) {
     <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalUrl} />
-    {alternateLocaleUrls.map((entry) => (
-      <link rel="alternate" hreflang={toLanguageTag(entry.locale)} href={entry.href} />
-    ))}
-    <script is:inline>
-      (() => {
-        const storageKey = "mackysoft-theme";
-        const root = document.documentElement;
-        const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const isValidTheme = (value) => value === "light" || value === "dark";
-        const readStoredTheme = () => {
-          try {
-            const value = window.localStorage.getItem(storageKey);
-            return isValidTheme(value) ? value : null;
-          } catch {
-            return null;
-          }
-        };
-        const nextTheme = readStoredTheme() ?? (darkQuery.matches ? "dark" : "light");
-
-        root.dataset.theme = nextTheme;
-        root.style.colorScheme = nextTheme;
-      })();
-    </script>
-    {
-      enableLocaleRedirectOnRoot && (
-        <script is:inline>
-          (() => {
-            const storageKey = "mackysoft-locale";
-            const currentPath = window.location.pathname;
-            const navigationEntry = performance.getEntriesByType("navigation")[0];
-
-            if (currentPath !== "/") {
-              return;
-            }
-
-            if (navigationEntry && "type" in navigationEntry && navigationEntry.type === "back_forward") {
-              return;
-            }
-
-            const getPreferredLocale = () => {
-              try {
-                const storedLocale = window.localStorage.getItem(storageKey);
-
-                if (storedLocale === "ja" || storedLocale === "en") {
-                  return storedLocale;
-                }
-              } catch {
-                // Ignore storage failures and fall back to browser languages.
-              }
-
-              for (const candidate of navigator.languages ?? [navigator.language]) {
-                const normalizedCandidate = candidate.toLowerCase();
-
-                if (normalizedCandidate === "en" || normalizedCandidate.startsWith("en-")) {
-                  return "en";
-                }
-
-                if (normalizedCandidate === "ja" || normalizedCandidate.startsWith("ja-")) {
-                  return "ja";
-                }
-              }
-
-              return "ja";
-            };
-
-            if (getPreferredLocale() === "en") {
-              window.location.replace("/en/");
-            }
-          })();
-        </script>
-      )
-    }
+    <SiteSeo canonicalUrl={canonicalUrl} alternateLocaleUrls={alternateLocaleUrls} />
+    <ThemeBootstrap />
+    <RootLocaleRedirect enabled={enableLocaleRedirectOnRoot} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

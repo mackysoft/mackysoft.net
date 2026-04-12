@@ -1,0 +1,57 @@
+---
+type Props = {
+  enabled?: boolean;
+};
+
+const { enabled = false } = Astro.props as Props;
+---
+
+{
+  enabled && (
+    <script is:inline>
+      (() => {
+        const storageKey = "mackysoft-locale";
+        const currentPath = window.location.pathname;
+        const navigationEntry = performance.getEntriesByType("navigation")[0];
+
+        if (currentPath !== "/") {
+          return;
+        }
+
+        if (navigationEntry && "type" in navigationEntry && navigationEntry.type === "back_forward") {
+          return;
+        }
+
+        const getPreferredLocale = () => {
+          try {
+            const storedLocale = window.localStorage.getItem(storageKey);
+
+            if (storedLocale === "ja" || storedLocale === "en") {
+              return storedLocale;
+            }
+          } catch {
+            // Ignore storage failures and fall back to browser languages.
+          }
+
+          for (const candidate of navigator.languages ?? [navigator.language]) {
+            const normalizedCandidate = candidate.toLowerCase();
+
+            if (normalizedCandidate === "en" || normalizedCandidate.startsWith("en-")) {
+              return "en";
+            }
+
+            if (normalizedCandidate === "ja" || normalizedCandidate.startsWith("ja-")) {
+              return "ja";
+            }
+          }
+
+          return "ja";
+        };
+
+        if (getPreferredLocale() === "en") {
+          window.location.replace("/en/");
+        }
+      })();
+    </script>
+  )
+}

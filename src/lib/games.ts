@@ -1,6 +1,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
+import { createTranslationMap, resolveLocalizedFallbackState } from "./localized-entry";
 
 export type GameEntry = CollectionEntry<"games">;
 export type GameTranslationEntry = CollectionEntry<"gameTranslations">;
@@ -46,13 +47,6 @@ const supportedYouTubeHosts = new Set(["youtu.be", "youtube.com", "www.youtube.c
 let gamesPromise: Promise<GameEntry[]> | undefined;
 let gameTranslationsPromise: Promise<Map<string, GameTranslationEntry>> | undefined;
 
-function normalizeTranslationId(id: string) {
-  return id
-    .replace(/\\/g, "/")
-    .replace(/^src\/content\/games\//, "")
-    .replace(/\/index(?:\.[a-z-]+)?(?:\.(?:md|mdx))?$/, "");
-}
-
 function mergeGameData(baseEntry: GameEntry, translationEntry?: GameTranslationEntry): GameEntry["data"] {
   const translatedScreenshots = translationEntry?.data.screenshots;
   const screenshots = translatedScreenshots && translatedScreenshots.length === baseEntry.data.screenshots.length
@@ -81,18 +75,7 @@ async function getGameTranslationMap() {
     gameTranslationsPromise = (async () => {
       const { getCollection } = await import("astro:content");
       const entries = await getCollection("gameTranslations", ({ data }) => !data.draft);
-      return new Map(
-        entries.flatMap((entry) => {
-          const candidateKeys = new Set([
-            normalizeTranslationId(entry.id),
-            entry.filePath ? normalizeTranslationId(entry.filePath) : null,
-          ]);
-
-          return [...candidateKeys]
-            .filter((key): key is string => Boolean(key))
-            .map((key) => [key, entry] as const);
-        }),
-      );
+      return createTranslationMap(entries, { stripPrefix: "src/content/games/" });
     })();
   }
 
@@ -136,14 +119,12 @@ export async function resolveLocalizedGameBySlug(slug: string, locale: SiteLocal
 
   const translationEntry = translations.get(slug);
   const selectedTranslation = locale === "en" ? translationEntry : undefined;
-  const contentLocale: SiteLocale = selectedTranslation ? "en" : "ja";
+  const fallbackState = resolveLocalizedFallbackState(locale, Boolean(selectedTranslation));
 
   return {
     slug,
     requestedLocale: locale,
-    contentLocale,
-    isFallback: locale !== contentLocale,
-    availableLocales: translationEntry ? ["ja", "en"] : ["ja"],
+    ...fallbackState,
     data: mergeGameData(baseEntry, selectedTranslation),
     href: localizePath(`/games/${slug}/`, locale),
   };
