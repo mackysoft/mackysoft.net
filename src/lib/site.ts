@@ -21,6 +21,7 @@ export function getPrimaryNav(locale: SiteLocale) {
 
 export const externalLinks = [
   { id: "github", href: "https://github.com/mackysoft", label: "GitHub" },
+  { id: "githubSponsors", href: "https://github.com/sponsors/mackysoft", label: "GitHub Sponsors" },
   { id: "twitter", href: "https://twitter.com/makihiro_dev", label: "Twitter" },
   { id: "zenn", href: "https://zenn.dev/makihiro_dev", label: "Zenn" },
 ] as const;
