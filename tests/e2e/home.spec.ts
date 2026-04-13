@@ -60,6 +60,7 @@ test.describe("home page", () => {
     await expect(homeHero.getByRole("link", { name: homePageContentJa.heroContactCta, exact: true })).toHaveAttribute("href", "/contact/");
     await expect(page.getByRole("heading", { level: 2, name: "仕事・相談と OSS の窓口" })).toHaveCount(0);
     await expect(latestArticlesHeading).toBeVisible();
+    await expect(latestArticlesHeading.locator("xpath=preceding-sibling::p[1]")).toHaveText("Latest Articles");
     await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
     const latestArticleCard = main.locator(".article-card").filter({ hasText: "Zenn" }).first();
     await expect(latestArticleCard).toBeVisible();
@@ -68,6 +69,7 @@ test.describe("home page", () => {
     await expect(main.locator(".article-card__tags")).toHaveCount(0);
     const latestReleasesHeading = page.getByRole("heading", { level: 2, name: "最新のリリース" });
     await expect(latestReleasesHeading).toBeVisible();
+    await expect(latestReleasesHeading.locator("xpath=preceding-sibling::p[1]")).toHaveText("Latest Releases");
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: homePageContentJa.latestReleasesCta, exact: true })).toHaveAttribute("href", "/assets/");
     await expect(main.locator(".release-card").first()).toBeVisible();
@@ -100,6 +102,7 @@ test.describe("home page", () => {
 
     const gamesHeading = page.getByRole("heading", { level: 2, name: homePageContentJa.gamesHeading });
     await expect(gamesHeading).toBeVisible();
+    await expect(gamesHeading.locator("xpath=preceding-sibling::p[1]")).toHaveText("Games");
     await expect(page.getByRole("link", { name: homePageContentJa.gamesCta, exact: true })).toHaveAttribute("href", "/games/");
     const homeGameCard = main.locator(".game-card").first();
     await expect(homeGameCard).toBeVisible();
