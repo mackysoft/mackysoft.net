@@ -172,8 +172,8 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "View Games", exact: true })).toHaveAttribute("href", "/en/games/");
     await expect(page.getByRole("main").locator(".game-card").first()).toContainText("Treasure Rogue");
-    await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgba(255, 252, 246, 0.78)");
-    await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(245, 241, 232, 0.9)");
+    await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(255, 255, 255, 0.94)");
   });
 
   test("tracks the redirected English root visit only once", async ({ page }) => {

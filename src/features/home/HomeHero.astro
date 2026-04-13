@@ -77,8 +77,21 @@ const profile = getProfileContent(locale);
     min-width: 0;
   }
 
+  .home-hero__cta:not(.home-hero__cta--secondary) {
+    border-color: var(--action-button-border-color);
+    background: var(--action-button-bg-color);
+    color: var(--action-button-text-color);
+  }
+
+  .home-hero__cta:not(.home-hero__cta--secondary):hover,
+  .home-hero__cta:not(.home-hero__cta--secondary):focus-visible {
+    border-color: var(--action-button-border-color);
+    background: var(--action-button-hover-bg-color);
+    color: var(--action-button-text-color);
+  }
+
   .home-hero__cta--secondary {
-    background: transparent;
+    background: var(--surface-color);
   }
 
   .home-hero__cta--secondary:hover,
