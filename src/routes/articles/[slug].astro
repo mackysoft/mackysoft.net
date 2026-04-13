@@ -42,7 +42,7 @@ if (!article) {
 const { Content, headings } = await render(article.entry as never);
 const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
 const articlePath = `/articles/${slug}/`;
-const shareUrl = toAbsoluteSiteUrl(siteUrl, articlePath);
+const shareUrl = toAbsoluteSiteUrl(siteUrl, article.href);
 const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
 const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
 ---
