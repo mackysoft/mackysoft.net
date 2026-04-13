@@ -1,13 +1,12 @@
 import type { APIRoute } from "astro";
 
 import { getPublicUrlEntries, renderSitemapXml } from "../lib/publishing/sitemap";
+import { requireSiteUrl } from "../lib/site-url.mjs";
 
 export const GET: APIRoute = async ({ site }) => {
-  if (!site) {
-    throw new Error("Astro site must be configured to build the sitemap.");
-  }
+  const siteUrl = requireSiteUrl(site, "Astro site must be configured to build the sitemap.");
 
-  const entries = await getPublicUrlEntries(site);
+  const entries = await getPublicUrlEntries(siteUrl);
 
   return new Response(renderSitemapXml(entries), {
     headers: {

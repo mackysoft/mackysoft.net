@@ -8,11 +8,16 @@ import SiteHeaderTools from "../components/SiteHeaderTools.astro";
 import { getUiText } from "../lib/ui-text";
 import { localizePath, stripLocaleFromPath, toLanguageTag, type SiteLocale } from "../lib/i18n";
 import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
+import { buildSiteLayoutUrls, requireSiteUrl } from "../lib/site-url.mjs";
 import "../styles/site.css";
 
 type AlternateLocaleLink = {
   locale: SiteLocale;
   path: string;
+};
+
+type AlternateLocaleUrl = AlternateLocaleLink & {
+  href: string;
 };
 
 type Props = {
@@ -41,12 +46,15 @@ const description = Astro.props.description ?? siteMeta.description;
 const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
 const primaryNav = getPrimaryNav(locale);
-const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url).toString();
-const rssFeedUrl = new URL("/feed.xml", Astro.site ?? Astro.url).toString();
-const alternateLocaleUrls = alternateLocales.map((entry) => ({
-  ...entry,
-  href: new URL(entry.path, Astro.site ?? Astro.url).toString(),
-}));
+const siteUrl = requireSiteUrl(Astro.site, "Astro site must be configured to build public URLs.");
+const { canonicalUrl, rssFeedUrl, alternateLocaleUrls } = buildSiteLayoutUrls(siteUrl, {
+  canonicalPath,
+  alternateLocales,
+}) as {
+  canonicalUrl: string;
+  rssFeedUrl: string;
+  alternateLocaleUrls: AlternateLocaleUrl[];
+};
 const enableSearchPanel = stripLocaleFromPath(currentPath) !== "/search/" && !(isFallback && locale !== contentLocale);
 const footerColumns = [
   {

@@ -255,23 +255,28 @@ test.describe("articles page", () => {
     expect((await bubble.textContent())?.trim().length).toBeGreaterThan(0);
   });
 
-  test("keeps share fallback usable without JavaScript", { tag: "@size:medium" }, async ({ browser }) => {
+  test("keeps share fallback usable without JavaScript on localized article pages", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
 
-    await page.goto("http://127.0.0.1:4322/articles/vision-introduction/");
+    for (const [pathname, expectedShareUrl] of [
+      ["/articles/vision-introduction/", "https://mackysoft.net/articles/vision-introduction/"],
+      ["/en/articles/vision-introduction/", "https://mackysoft.net/en/articles/vision-introduction/"],
+    ] as const) {
+      await page.goto(`http://127.0.0.1:4322${pathname}`);
 
-    const shareSection = page.locator("[data-article-share]");
-    const copyAction = shareSection.locator("[data-share-copy-action]");
-    const nativeShareButton = shareSection.locator("[data-share-native]");
-    const twitterButton = shareSection.locator("[data-share-twitter]");
+      const shareSection = page.locator("[data-article-share]");
+      const copyAction = shareSection.locator("[data-share-copy-action]");
+      const nativeShareButton = shareSection.locator("[data-share-native]");
+      const twitterButton = shareSection.locator("[data-share-twitter]");
 
-    await expect(copyAction).toHaveAttribute("hidden", "");
-    await expect(nativeShareButton).toHaveAttribute("hidden", "");
-    await expect(twitterButton).toHaveAttribute("href", /twitter\.com\/intent\/tweet/);
+      await expect(copyAction).toHaveAttribute("hidden", "");
+      await expect(nativeShareButton).toHaveAttribute("hidden", "");
+      await expect(twitterButton).toHaveAttribute("href", /twitter\.com\/intent\/tweet/);
 
-    const twitterHref = await twitterButton.getAttribute("href");
-    expect(twitterHref).toContain(encodeURIComponent("https://mackysoft.net/articles/vision-introduction/"));
+      const twitterHref = await twitterButton.getAttribute("href");
+      expect(twitterHref).toContain(encodeURIComponent(expectedShareUrl));
+    }
 
     await context.close();
   });

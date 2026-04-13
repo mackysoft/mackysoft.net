@@ -1,6 +1,8 @@
 import type { SiteLocale } from "./i18n";
 
 const CONTENT_TIME_ZONE = "Asia/Tokyo";
+const dateOnlyPattern = /^(\d{4})-(\d{2})-(\d{2})$/;
+const dateTimeMinutePattern = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/;
 
 function getNumericDateFormatter() {
   return new Intl.DateTimeFormat("ja-JP", {
@@ -56,4 +58,36 @@ export function formatNumericDate(date: Date, locale: SiteLocale = "ja"): string
   const { year, month, day } = getContentDateParts(date, locale);
 
   return `${year}/${month}/${day}`;
+}
+
+export function parseContentDateInput(value: string): Date | null {
+  const normalizedValue = value.trim();
+  const dateTimeMinuteMatch = normalizedValue.match(dateTimeMinutePattern);
+
+  if (dateTimeMinuteMatch) {
+    const [, year, month, day, hour, minute] = dateTimeMinuteMatch;
+    return new Date(`${year}-${month}-${day}T${hour}:${minute}:00+09:00`);
+  }
+
+  const dateOnlyMatch = normalizedValue.match(dateOnlyPattern);
+
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    return new Date(`${year}-${month}-${day}T00:00:00+09:00`);
+  }
+
+  const parsedDate = new Date(normalizedValue);
+  return Number.isNaN(parsedDate.valueOf()) ? null : parsedDate;
+}
+
+export function coerceContentDateInput(value: unknown) {
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  return parseContentDateInput(value) ?? value;
 }

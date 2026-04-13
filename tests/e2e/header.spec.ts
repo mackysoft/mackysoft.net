@@ -77,7 +77,7 @@ test.describe("site header", () => {
     await expect(languageTool).toHaveAttribute("open", "");
     await expect(languageTool.getByRole("menuitemradio", { name: "日本語" })).toBeVisible();
     await expect(languageTool.getByRole("menuitemradio", { name: "English" })).toBeVisible();
-    await expect(languageTool.locator(".site-language-menu__popover")).toHaveCSS("background-color", "rgb(236, 229, 216)");
+    await expect(languageTool.locator(".site-language-menu__popover")).toHaveCSS("background-color", "rgb(246, 248, 251)");
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "プライバシーポリシー", exact: true })).toHaveAttribute(
       "href",
       "/privacy-policy/",
@@ -225,9 +225,9 @@ test.describe("site header", () => {
 
     await expect(currentContentItem).toHaveCount(0);
     await expect(selectedItem).toHaveText("English");
-    await expect(selectedItem).toHaveCSS("background-color", "rgba(14, 107, 99, 0.1)");
-    await expect(selectedItem).toHaveCSS("color", "rgb(14, 107, 99)");
+    await expect(selectedItem).toHaveCSS("background-color", "rgba(0, 104, 224, 0.08)");
+    await expect(selectedItem).toHaveCSS("color", "rgb(0, 104, 224)");
     expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").content)).toBe('"✓"');
-    expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").color)).toBe("rgb(14, 107, 99)");
+    expect(await selectedItem.evaluate((element) => getComputedStyle(element, "::after").color)).toBe("rgb(0, 104, 224)");
   });
 });
