@@ -523,6 +523,45 @@ h3,
   color: var(--muted-color);
 }
 
+.site-footer__inner {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-footer__rss-link {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--surface-soft-color);
+  color: var(--muted-color);
+  text-decoration: none;
+  transition:
+    transform 90ms ease-out,
+    color 90ms ease-out,
+    border-color 90ms ease-out,
+    background-color 90ms ease-out;
+}
+
+.site-footer__rss-link:hover,
+.site-footer__rss-link:focus-visible {
+  color: var(--accent-color);
+  border-color: var(--accent-border-color);
+  background: var(--accent-surface-color);
+  transform: translateY(-1px);
+}
+
+.site-footer__rss-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 .content-panel {
   padding: 1.6rem;
   border: 1px solid var(--border-color);

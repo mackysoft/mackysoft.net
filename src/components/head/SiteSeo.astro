@@ -12,9 +12,11 @@ type Props = {
   siteName: string;
   canonicalUrl: string;
   alternateLocaleUrls?: AlternateLocaleLink[];
+  rssFeedUrl?: string;
+  rssFeedTitle?: string;
 };
 
-const { title, description, siteName, canonicalUrl, alternateLocaleUrls = [] } = Astro.props as Props;
+const { title, description, siteName, canonicalUrl, alternateLocaleUrls = [], rssFeedUrl, rssFeedTitle } = Astro.props as Props;
 ---
 
 <link rel="canonical" href={canonicalUrl} />
@@ -23,6 +25,7 @@ const { title, description, siteName, canonicalUrl, alternateLocaleUrls = [] } =
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonicalUrl} />
+{rssFeedUrl && <link rel="alternate" type="application/rss+xml" title={rssFeedTitle ?? siteName} href={rssFeedUrl} />}
 {alternateLocaleUrls.map((entry) => (
   <link rel="alternate" hreflang={toLanguageTag(entry.locale)} href={entry.href} />
 ))}

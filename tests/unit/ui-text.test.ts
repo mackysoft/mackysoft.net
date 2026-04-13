@@ -14,6 +14,7 @@ describe("ui text", () => {
     expect(uiText.common.search).toBe("検索");
     expect(uiText.common.contact).toBe("問い合わせ");
     expect(uiText.common.privacyPolicy).toBe("プライバシーポリシー");
+    expect(uiText.common.rssFeed).toBe("RSS フィード");
 
     expect(uiText.breadcrumb.home).toBe("Home");
     expect(uiText.breadcrumb.about).toBe("About");
@@ -36,5 +37,6 @@ describe("ui text", () => {
     expect(uiText.common.search).toBe(uiText.breadcrumb.search);
     expect(uiText.common.contact).toBe(uiText.breadcrumb.contact);
     expect(uiText.common.privacyPolicy).toBe(uiText.breadcrumb.privacyPolicy);
+    expect(uiText.common.rssFeed).toBe("RSS feed");
   });
 });

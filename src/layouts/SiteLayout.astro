@@ -42,6 +42,7 @@ const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
 const primaryNav = getPrimaryNav(locale);
 const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url).toString();
+const rssFeedUrl = new URL("/feed.xml", Astro.site ?? Astro.url).toString();
 const alternateLocaleUrls = alternateLocales.map((entry) => ({
   ...entry,
   href: new URL(entry.path, Astro.site ?? Astro.url).toString(),
@@ -70,6 +71,8 @@ function isCurrentNavItem(itemHref: string, path: string) {
       description={description}
       siteName={siteMeta.name}
       canonicalUrl={canonicalUrl}
+      rssFeedUrl={rssFeedUrl}
+      rssFeedTitle={`${siteMeta.name} - ${uiText.common.rssFeed}`}
       alternateLocaleUrls={alternateLocaleUrls}
     />
     <ThemeBootstrap />
@@ -111,23 +114,32 @@ function isCurrentNavItem(itemHref: string, path: string) {
         <slot />
       </main>
       <footer class="site-footer">
-        <ul class="footer-links">
-          {externalLinks.map((link) => (
-            <li>
-              <a
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                data-analytics-event="external_link_click"
-                data-analytics-label={link.label}
-                data-analytics-location="site-footer"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-          <li><a href={localizePath("/privacy-policy/", locale)}>{uiText.common.privacyPolicy}</a></li>
-        </ul>
+        <div class="site-footer__inner">
+          <ul class="footer-links">
+            {externalLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  data-analytics-event="external_link_click"
+                  data-analytics-label={link.label}
+                  data-analytics-location="site-footer"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+            <li><a href={localizePath("/privacy-policy/", locale)}>{uiText.common.privacyPolicy}</a></li>
+          </ul>
+          <a href="/feed.xml" class="site-footer__rss-link" aria-label={uiText.common.rssFeed} title={uiText.common.rssFeed}>
+            <svg class="site-footer__rss-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="6" cy="18" r="1.7" fill="currentColor"></circle>
+              <path d="M4.5 11.5a8 8 0 0 1 8 8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
+              <path d="M4.5 5.5c7.73 0 14 6.27 14 14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
+            </svg>
+          </a>
+        </div>
       </footer>
     </div>
     <SiteHeaderOffsetSync />
