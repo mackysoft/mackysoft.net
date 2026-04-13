@@ -4,6 +4,7 @@ import type { SiteLocale } from "./i18n";
 type CommonUiText = SiteVocabulary & {
   japaneseOnlyBadge: string;
   fallbackNotice: string;
+  rssFeed: string;
 };
 
 type UiText = {
@@ -73,6 +74,15 @@ const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnly
   en: {
     japaneseOnlyBadge: "Japanese only",
     fallbackNotice: "This page is currently available only in Japanese.",
+  },
+};
+
+const commonUiTextSupplementMap: Record<SiteLocale, Pick<CommonUiText, "rssFeed">> = {
+  ja: {
+    rssFeed: "RSS フィード",
+  },
+  en: {
+    rssFeed: "RSS feed",
   },
 };
 
@@ -219,6 +229,7 @@ export function getUiText(locale: SiteLocale) {
     common: {
       ...getSiteVocabulary(locale),
       ...commonUiTextOverrides[locale],
+      ...commonUiTextSupplementMap[locale],
     },
     breadcrumb: getBreadcrumbVocabulary(locale),
   };

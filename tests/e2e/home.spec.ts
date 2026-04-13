@@ -126,6 +126,21 @@ test.describe("home page", () => {
     expect(latestReleasesHeadingBox.y).toBeLessThan(gamesHeadingBox.y);
   });
 
+  test("shows an RSS shortcut on the right side of the footer", { tag: "@size:medium" }, async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    await page.goto("/");
+
+    const footer = page.locator(".site-footer");
+    const footerInner = footer.locator(".site-footer__inner");
+    const rssLink = footer.getByRole("link", { name: "RSS フィード" });
+
+    await expect(rssLink).toBeVisible();
+    await expect(rssLink).toHaveAttribute("href", "/feed.xml");
+    await expect(footerInner).toHaveCSS("justify-content", "space-between");
+  });
+
   test("redirects the first root visit to /en/ when English is preferred", async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem("mackysoft-locale");

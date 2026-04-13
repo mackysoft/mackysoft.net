@@ -63,6 +63,7 @@ async function expectSeo(page: Page, expectation: SeoExpectation) {
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", expectation.title);
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", expectation.description);
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", expectation.canonicalUrl);
+  await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", "https://mackysoft.net/feed.xml");
 }
 
 test.describe("SEO metadata", () => {
