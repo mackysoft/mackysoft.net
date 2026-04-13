@@ -25,6 +25,15 @@ type TaxonomyMapEntry = {
   status: "mapped" | "excluded";
   notes: string;
 };
+type TaxonomyMapDraftEntry = {
+  legacyPath?: string;
+  legacySlug?: string;
+  legacyName?: string;
+  newTag?: string;
+  newPath?: string;
+  status?: string;
+  notes?: string;
+};
 
 const repoRoot = path.resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const articlesRoot = path.join(repoRoot, "src/content/articles");
@@ -92,12 +101,18 @@ function parseTaxonomyMap(yamlText: string) {
   const entries: TaxonomyMapEntry[] = [];
   const lines = yamlText.split(/\r?\n/);
   let section: TaxonomySection | null = null;
-  let current: Partial<TaxonomyMapEntry> | null = null;
+  let current: TaxonomyMapDraftEntry | null = null;
 
   function commitCurrent() {
     if (!current || !section) {
       return;
     }
+
+    if (current.status && current.status !== "mapped" && current.status !== "excluded") {
+      throw new Error(`Unsupported taxonomy status: ${current.status}`);
+    }
+
+    const status = current.status === "mapped" ? "mapped" : "excluded";
 
     entries.push({
       kind: section === "categories" ? "category" : "tag",
@@ -106,7 +121,7 @@ function parseTaxonomyMap(yamlText: string) {
       legacyName: current.legacyName ?? "",
       newTag: current.newTag ?? "",
       newPath: current.newPath ?? "",
-      status: (current.status as TaxonomyMapEntry["status"] | undefined) ?? "excluded",
+      status,
       notes: current.notes ?? "",
     });
   }
@@ -152,7 +167,7 @@ function parseTaxonomyMap(yamlText: string) {
 }
 
 function camelizeTaxonomyKey(key: string) {
-  return key.replace(/_([a-z])/g, (_, character: string) => character.toUpperCase()) as keyof TaxonomyMapEntry;
+  return key.replace(/_([a-z])/g, (_, character: string) => character.toUpperCase()) as keyof TaxonomyMapDraftEntry;
 }
 
 function toYearLegacyPath(date: Date) {
