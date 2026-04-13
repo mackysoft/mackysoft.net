@@ -16,6 +16,33 @@ const activityData = JSON.parse(
 const latestExternalArticleUrl = activityData.articles[0]!.locales.ja.url;
 
 test.describe("publishing endpoints", () => {
+  test("serves robots.txt with a sitemap reference", { tag: "@size:medium" }, async ({ request }) => {
+    const response = await request.get("/robots.txt");
+    const body = await response.text();
+
+    expect(response.ok()).toBeTruthy();
+    expect(response.headers()["content-type"]).toContain("text/plain");
+    expect(body).toContain("User-agent: *");
+    expect(body).toContain("Allow: /");
+    expect(body).toContain("Sitemap: https://mackysoft.net/sitemap.xml");
+  });
+
+  test("serves llms.txt with curated canonical site links", { tag: "@size:medium" }, async ({ request }) => {
+    const response = await request.get("/llms.txt");
+    const body = await response.text();
+
+    expect(response.ok()).toBeTruthy();
+    expect(response.headers()["content-type"]).toContain("text/plain");
+    expect(body).toContain("# mackysoft.net");
+    expect(body).toContain("Canonical site for Hiroya Aramaki / Makihiro");
+    expect(body).toContain("[About](https://mackysoft.net/about/)");
+    expect(body).toContain("## Supported Languages");
+    expect(body).toContain("- Japanese: https://mackysoft.net/");
+    expect(body).toContain("- English: https://mackysoft.net/en/");
+    expect(body).toContain("[RSS Feed](https://mackysoft.net/feed.xml)");
+    expect(body).not.toContain("English About");
+  });
+
   test("serves feed.xml with only public local articles", { tag: "@size:medium" }, async ({ request }) => {
     const response = await request.get("/feed.xml");
     const body = await response.text();
