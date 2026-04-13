@@ -16,6 +16,7 @@ npm install
 ```bash
 npm run dev
 npm run build
+npm run deploy:workers
 npm run preview
 npm run check
 npm run import:wordpress
@@ -28,3 +29,17 @@ npm run import:wordpress
 ```bash
 npm run import:wordpress
 ```
+
+## Cloudflare Workers Preview
+
+- Preview URL: `https://site.mackysoft.workers.dev`
+- Required secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+- Local deploy command:
+
+```bash
+npm run build
+npm run deploy:workers
+```
+
+- `master` への push 後は、CI 成功を条件に GitHub Actions から Cloudflare Workers へ deploy されます。
+- `mackysoft.net` の custom domain 切替は後続タスクです。
