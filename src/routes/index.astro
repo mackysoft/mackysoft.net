@@ -30,7 +30,7 @@ const localizedHomePath = localizePath("/", locale);
   enableLocaleRedirectOnRoot={locale === defaultLocale}
 >
   <h1 class="visually-hidden">{content.homeHeading}</h1>
-  <HomeHero locale={locale} ctaLabel={content.aboutCta} />
+  <HomeHero locale={locale} primaryCtaLabel={content.heroPrimaryCta} contactCtaLabel={content.heroContactCta} />
 
   <section class="content-panel">
     <div class="section-head">
@@ -80,21 +80,6 @@ const localizedHomePath = localizePath("/", locale);
       </div>
     </section>
   )}
-
-  <section class="content-grid feature-grid">
-    <section class="content-panel">
-      <p class="eyebrow">{content.aboutEyebrow}</p>
-      <h2>{content.aboutHeading}</h2>
-      <p>{content.aboutBody}</p>
-      <a href={localizePath("/about/", locale)} class="button-link">{content.aboutCta}</a>
-    </section>
-    <section class="content-panel">
-      <p class="eyebrow">{content.contactEyebrow}</p>
-      <h2>{content.contactHeading}</h2>
-      <p>{content.contactBody}</p>
-      <a href={localizePath("/contact/", locale)} class="button-link">{content.contactCta}</a>
-    </section>
-  </section>
 </SiteLayout>
 
 <style>
@@ -110,10 +95,6 @@ const localizedHomePath = localizePath("/", locale);
     justify-content: space-between;
     align-items: end;
     margin-bottom: 1rem;
-  }
-
-  .feature-grid {
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   }
 
   .latest-articles-grid {

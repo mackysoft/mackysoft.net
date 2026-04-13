@@ -4,10 +4,11 @@ import { getProfileContent } from "../profile/content";
 
 type Props = {
   locale: SiteLocale;
-  ctaLabel: string;
+  primaryCtaLabel: string;
+  contactCtaLabel: string;
 };
 
-const { locale, ctaLabel } = Astro.props as Props;
+const { locale, primaryCtaLabel, contactCtaLabel } = Astro.props as Props;
 const profile = getProfileContent(locale);
 ---
 
@@ -23,7 +24,10 @@ const profile = getProfileContent(locale);
     <p class="home-hero__name">{profile.home.name}</p>
     <p class="home-hero__summary">{profile.home.summary}</p>
   </div>
-  <a href={localizePath("/about/", locale)} class="button-link home-hero__cta">{ctaLabel}</a>
+  <div class="button-row home-hero__actions">
+    <a href={localizePath("/about/", locale)} class="button-link home-hero__cta">{primaryCtaLabel}</a>
+    <a href={localizePath("/contact/", locale)} class="button-link home-hero__cta home-hero__cta--secondary">{contactCtaLabel}</a>
+  </div>
 </section>
 
 <style>
@@ -65,8 +69,31 @@ const profile = getProfileContent(locale);
     color: var(--muted-color);
   }
 
-  .home-hero__cta {
+  .home-hero__actions {
     justify-self: start;
+  }
+
+  .home-hero__cta {
+    min-width: 0;
+  }
+
+  .home-hero__cta--secondary {
+    background: transparent;
+  }
+
+  .home-hero__cta--secondary:hover,
+  .home-hero__cta--secondary:focus-visible {
+    background: var(--surface-soft-color);
+  }
+
+  @media (max-width: 719px) {
+    .home-hero__actions {
+      width: 100%;
+    }
+
+    .home-hero__actions :global(.button-link) {
+      flex: 1 1 auto;
+    }
   }
 
   @media (min-width: 720px) {
@@ -75,8 +102,9 @@ const profile = getProfileContent(locale);
       gap: 1rem 1.3rem;
     }
 
-    .home-hero__cta {
+    .home-hero__actions {
       justify-self: end;
+      justify-content: end;
     }
   }
 </style>

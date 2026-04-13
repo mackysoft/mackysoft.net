@@ -4,6 +4,7 @@ import path from "node:path";
 import { expect, test } from "@playwright/test";
 
 import { formatContentDate } from "../../src/lib/content-date";
+import { getHomePageContent } from "../../src/features/home/content";
 import { getProfileContent } from "../../src/features/profile/content";
 
 const activityData = JSON.parse(
@@ -31,6 +32,8 @@ const latestZennArticleJa = latestZennArticle.locales.ja;
 const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.locales.ja;
 const latestRelease = activityData.releases[0]!;
 const latestReleaseRepoName = latestRelease.repo.split("/").at(-1)!;
+const homePageContentJa = getHomePageContent("ja");
+const homePageContentEn = getHomePageContent("en");
 const homeHeroJa = getProfileContent("ja").home;
 const homeHeroEn = getProfileContent("en").home;
 
@@ -53,7 +56,9 @@ test.describe("home page", () => {
     await expect(homeHero.getByRole("img", { name: "Makihiro のアイコン" })).toBeVisible();
     await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroJa.name);
     await expect(homeHero).toContainText(homeHeroJa.summary);
-    await expect(homeHero.getByRole("link", { name: "About", exact: true })).toHaveAttribute("href", "/about/");
+    await expect(homeHero.getByRole("link", { name: homePageContentJa.heroPrimaryCta, exact: true })).toHaveAttribute("href", "/about/");
+    await expect(homeHero.getByRole("link", { name: homePageContentJa.heroContactCta, exact: true })).toHaveAttribute("href", "/contact/");
+    await expect(page.getByRole("heading", { level: 2, name: "仕事・相談と OSS の窓口" })).toHaveCount(0);
     await expect(latestArticlesHeading).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
     const latestArticleCard = main.locator(".article-card").filter({ hasText: "Zenn" }).first();
@@ -141,7 +146,9 @@ test.describe("home page", () => {
     await expect(homeHero.getByRole("img", { name: "Makihiro avatar" })).toBeVisible();
     await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroEn.name);
     await expect(homeHero).toContainText(homeHeroEn.summary);
-    await expect(homeHero.getByRole("link", { name: "About", exact: true })).toHaveAttribute("href", "/en/about/");
+    await expect(homeHero.getByRole("link", { name: homePageContentEn.heroPrimaryCta, exact: true })).toHaveAttribute("href", "/en/about/");
+    await expect(homeHero.getByRole("link", { name: homePageContentEn.heroContactCta, exact: true })).toHaveAttribute("href", "/en/contact/");
+    await expect(page.getByRole("heading", { level: 2, name: "Work, consulting, and OSS contact paths" })).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 2, name: "Latest Articles" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Games" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toBeVisible();
