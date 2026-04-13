@@ -57,7 +57,9 @@ test.describe("home page", () => {
     await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroJa.name);
     await expect(homeHero).toContainText(homeHeroJa.summary);
     await expect(homeHero.getByRole("link", { name: homePageContentJa.heroPrimaryCta, exact: true })).toHaveAttribute("href", "/about/");
-    await expect(homeHero.getByRole("link", { name: homePageContentJa.heroContactCta, exact: true })).toHaveAttribute("href", "/contact/");
+    const homeHeroContactCta = homeHero.getByRole("link", { name: homePageContentJa.heroContactCta, exact: true });
+    await expect(homeHeroContactCta).toHaveAttribute("href", "/contact/");
+    await expect(homeHeroContactCta).toHaveCSS("background-color", "rgb(238, 242, 247)");
     await expect(page.getByRole("heading", { level: 2, name: "仕事・相談と OSS の窓口" })).toHaveCount(0);
     await expect(latestArticlesHeading).toBeVisible();
     await expect(latestArticlesHeading.locator("xpath=preceding-sibling::p[1]")).toHaveText("Latest Articles");

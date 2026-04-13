@@ -18,7 +18,7 @@ test.describe("theme toggle", () => {
     await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgb(17, 27, 46)");
     await expect(page.getByRole("link", { name: "記事一覧を見る", exact: true })).toHaveCSS(
       "background-color",
-      "rgb(22, 35, 58)",
+      "rgb(28, 45, 73)",
     );
 
     await page.goto("/games/treasure-rogue/");

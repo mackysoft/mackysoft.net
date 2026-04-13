@@ -18,6 +18,11 @@ test.describe("contact page", () => {
       "href",
       "mailto:mackysoft0129@gmail.com",
     );
+    await expect(contactCards.first()).toHaveCSS("background-color", "rgb(246, 248, 251)");
+    await expect(contactCards.first().getByRole("link", { name: "メールで問い合わせる" })).toHaveCSS(
+      "background-color",
+      "rgb(238, 242, 247)",
+    );
 
     await expect(contactCards.nth(1).getByRole("link", { name: "GitHub を開く" })).toHaveAttribute(
       "href",
