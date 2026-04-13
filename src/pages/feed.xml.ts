@@ -3,11 +3,10 @@ import type { APIRoute } from "astro";
 
 import { getFeedLastBuildDate, getPublicLocalArticles, toRssFeedItems } from "../lib/publishing/feed";
 import { getSiteMeta } from "../lib/site";
+import { requireSiteUrl } from "../lib/site-url.mjs";
 
 export const GET: APIRoute = async ({ site }) => {
-  if (!site) {
-    throw new Error("Astro site must be configured to build the RSS feed.");
-  }
+  const siteUrl = requireSiteUrl(site, "Astro site must be configured to build the RSS feed.");
 
   const articles = await getPublicLocalArticles();
   const lastBuildDate = getFeedLastBuildDate(articles);
@@ -20,7 +19,7 @@ export const GET: APIRoute = async ({ site }) => {
   return rss({
     title: siteMeta.name,
     description: siteMeta.description,
-    site,
+    site: siteUrl,
     items: toRssFeedItems(articles),
     customData,
   });

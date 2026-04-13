@@ -141,5 +141,6 @@ npm run deploy:workers
 
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_API_TOKEN`
+- Release checklist: [`docs/cloudflare-workers-release-checklist.md`](docs/cloudflare-workers-release-checklist.md)
 
 `workers.dev` の URL は `workers_dev: true` の設定により Cloudflare 側で払い出されますが、この README では正規の利用先として案内しません。公開導線はカスタムドメイン側に寄せて管理してください。

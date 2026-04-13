@@ -7,12 +7,14 @@ import { describe, expect, test } from "vitest";
 
 import {
   buildStaticRedirects,
+  createStaticRedirectHtml,
   resolveRedirectOutputPath,
 } from "../../scripts/build-static-redirects.mjs";
 import {
   getGeneratedRedirectRows,
   parseUrlMapCsv,
 } from "../../scripts/migration/url-map.mjs";
+import { toAbsoluteSiteUrl } from "../../src/lib/site-url.mjs";
 
 const csvHeader = "legacy_path,new_path,content_type,redirect_kind,status";
 
@@ -31,6 +33,7 @@ describe("static redirects", () => {
     await withTempDir(async (tempDir) => {
       const csvPath = path.join(tempDir, "url-map.csv");
       const distPath = path.join(tempDir, "dist");
+      const site = new URL("https://preview.example.com");
 
       await writeFile(csvPath, [
         csvHeader,
@@ -40,7 +43,7 @@ describe("static redirects", () => {
         "/private/,,page,exact,excluded",
       ].join("\n"), "utf8");
 
-      const redirects = await buildStaticRedirects({ csvPath, distPath });
+      const redirects = await buildStaticRedirects({ csvPath, distPath, site });
 
       expect(redirects.map((redirect: { legacyPath: string }) => redirect.legacyPath)).toEqual([
         "/legacy-article/",
@@ -50,7 +53,7 @@ describe("static redirects", () => {
       const outputPath = resolveRedirectOutputPath(distPath, "/legacy-article/");
       const html = await readFile(outputPath, "utf8");
 
-      expect(html).toContain('<link rel="canonical" href="https://mackysoft.net/articles/new-article/" />');
+      expect(html).toContain(`<link rel="canonical" href="${toAbsoluteSiteUrl(site, "/articles/new-article/")}" />`);
       expect(html).toContain('<meta name="robots" content="noindex, nofollow" />');
       expect(html).toContain('<meta http-equiv="refresh" content="0;url=/articles/new-article/" />');
       expect(html).toContain("window.location.search");
@@ -61,6 +64,18 @@ describe("static redirects", () => {
       expect(existsSync(resolveRedirectOutputPath(distPath, "/about/"))).toBe(false);
       expect(existsSync(resolveRedirectOutputPath(distPath, "/private/"))).toBe(false);
     });
+  });
+
+  test("uses the injected site for redirect canonical URLs", () => {
+    const html = createStaticRedirectHtml({
+      legacyPath: "/legacy-article/",
+      newPath: "/articles/new-article/",
+      site: new URL("https://preview.example.com"),
+    });
+
+    expect(html).toContain('<meta http-equiv="refresh" content="0;url=/articles/new-article/" />');
+    expect(html).toContain('<link rel="canonical" href="https://preview.example.com/articles/new-article/" />');
+    expect(html).toContain("window.location.hash");
   });
 
   test("rejects CSV files without required headers", () => {
