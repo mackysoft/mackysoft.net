@@ -58,18 +58,12 @@ const uiText = getUiText(locale);
     background: var(--action-button-bg-color);
     color: var(--action-button-text-color);
     font-weight: 700;
-    box-shadow: 0 0.9rem 1.9rem var(--action-button-shadow-color);
-    transition:
-      transform 160ms ease,
-      box-shadow 160ms ease,
-      background-color 160ms ease;
+    transition: background-color 160ms ease;
   }
 
   .game-action-panel__button:hover,
   .game-action-panel__button:focus-visible {
     background: var(--action-button-hover-bg-color);
     color: var(--action-button-text-color);
-    box-shadow: 0 0.95rem 2rem var(--action-button-shadow-hover-color);
-    transform: translateY(-1px);
   }
 </style>

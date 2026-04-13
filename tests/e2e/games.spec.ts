@@ -107,7 +107,7 @@ test.describe("games page", () => {
       "href",
       "https://unityroom.com/games/treasure-rogue",
     );
-    await expect(primaryAction).toHaveCSS("background-color", "rgb(76, 175, 80)");
+    await expect(primaryAction).toHaveCSS("background-color", "rgb(0, 104, 224)");
     await expect(actionCard.getByRole("link")).toHaveCount(1);
     await expect(actionCard.getByRole("link", { name: /Google Play|Press Kit|配信ガイドライン/ })).toHaveCount(0);
     await expect(actionPanel).toHaveCSS("position", "sticky");
