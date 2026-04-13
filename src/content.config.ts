@@ -2,11 +2,16 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
+import { coerceContentDateInput } from "./lib/content-date";
 import { isValidActionHref } from "./lib/safe-href";
 import { isSupportedYouTubeUrl } from "./lib/youtube";
 
 const gameActionKindSchema = z.enum(["play", "store", "press-kit", "streaming-guidelines", "privacy-policy", "repository"]);
 const gameStatusSchema = z.enum(["active", "archived", "prototype"]);
+const contentDateSchema = z.preprocess(
+  coerceContentDateInput,
+  z.date().refine((value) => !Number.isNaN(value.valueOf()), "有効な日付を指定してください。"),
+);
 
 const articles = defineCollection({
   loader: glob({
@@ -18,8 +23,8 @@ const articles = defineCollection({
       .object({
         title: z.string().min(1),
         description: z.string().min(1),
-        publishedAt: z.coerce.date(),
-        updatedAt: z.coerce.date().optional(),
+        publishedAt: contentDateSchema,
+        updatedAt: contentDateSchema.optional(),
         tags: z.array(z.string().min(1)).default([]),
         cover: image().optional(),
         coverAlt: z.string().optional(),
@@ -74,8 +79,8 @@ const games = defineCollection({
       cover: image(),
       coverAlt: z.string().min(1),
       genre: z.string().min(1).optional(),
-      publishedAt: z.coerce.date().optional(),
-      updatedAt: z.coerce.date().optional(),
+      publishedAt: contentDateSchema.optional(),
+      updatedAt: contentDateSchema.optional(),
       trailerUrl: z.string().min(1).refine(isSupportedYouTubeUrl, "現在は YouTube の URL のみ対応しています。").optional(),
       tags: z.array(z.string().min(1)).default([]),
       languages: z.array(z.string().min(1)).default([]),

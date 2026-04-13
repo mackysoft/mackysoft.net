@@ -7,7 +7,7 @@ import { describe, expect, test } from "vitest";
 
 import {
   createArticleTemplate,
-  formatIsoDateTime,
+  formatDateTimeMinute,
   isValidArticleSlug,
   parseCreateArticleArgs,
   scaffoldArticle,
@@ -31,24 +31,24 @@ describe("create article script", () => {
     expect(isValidArticleSlug("trailing-")).toBe(false);
   });
 
-  test("formats ISO datetime with timezone offset", () => {
+  test("formats minute-level values in JST", () => {
     const date = new Date("2026-04-14T01:23:45.000Z");
-    expect(formatIsoDateTime(date)).toMatch(/^2026-04-14T\d{2}:23:45[+-]\d{2}:\d{2}$/);
+    expect(formatDateTimeMinute(date)).toBe("2026-04-14 10:23");
   });
 
   test("creates markdown templates with required frontmatter", () => {
     const template = createArticleTemplate({
-      title: "記事タイトル",
-      description: "記事概要",
-      publishedAt: "2026-04-14T09:00:00+09:00",
+      publishedAt: "2026-04-14 13:37",
     });
 
-    expect(template).toContain('title: "記事タイトル"');
-    expect(template).toContain('publishedAt: "2026-04-14T09:00:00+09:00"');
+    expect(template).toContain('title: ""');
+    expect(template).toContain('description: ""');
+    expect(template).toContain('publishedAt: "2026-04-14 13:37"');
     expect(template).toContain("tags: []");
     expect(template).toContain("draft: true");
     expect(template).not.toContain("updatedAt:");
     expect(template).not.toContain("cover:");
+    expect(template).not.toContain("本文をここから書きます。");
   });
 
   test("parses only slug and help option", () => {
@@ -68,16 +68,18 @@ describe("create article script", () => {
         slug: "new-article",
         title: "新しい記事",
         description: "概要",
-        publishedAt: "2026-04-14T09:00:00+09:00",
+        publishedAt: "2026-04-14 13:37",
       }, { root: tempDir });
 
       const japanesePath = path.join(contentRoot, "new-article/index.md");
+      const content = readFileSync(japanesePath, "utf8");
 
       expect(existsSync(japanesePath)).toBe(true);
       expect(existsSync(path.join(contentRoot, "new-article/index.en.md"))).toBe(false);
-      expect(readFileSync(japanesePath, "utf8")).toContain('title: "新しい記事"');
-      expect(readFileSync(japanesePath, "utf8")).toContain("tags: []");
-      expect(readFileSync(japanesePath, "utf8")).not.toContain("updatedAt:");
+      expect(content).toContain('title: "新しい記事"');
+      expect(content).toContain("tags: []");
+      expect(content).not.toContain("updatedAt:");
+      expect(content.endsWith("---\n")).toBe(true);
     });
   });
 

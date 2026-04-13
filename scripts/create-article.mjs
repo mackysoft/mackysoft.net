@@ -8,26 +8,44 @@ import { repoRoot } from "./activity-sync/shared.mjs";
 
 export const articleSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const defaultJapaneseTitle = "TODO: 記事タイトルを入力";
-const defaultJapaneseDescription = "TODO: 記事一覧と OGP 用の概要を入力";
+const contentTimeZone = "Asia/Tokyo";
 
-function formatTimezoneOffset(date) {
-  const totalMinutes = -date.getTimezoneOffset();
-  const sign = totalMinutes >= 0 ? "+" : "-";
-  const absoluteMinutes = Math.abs(totalMinutes);
-  const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, "0");
-  const minutes = String(absoluteMinutes % 60).padStart(2, "0");
-  return `${sign}${hours}:${minutes}`;
+function getDateFormatter() {
+  return new Intl.DateTimeFormat("ja-JP", {
+    calendar: "gregory",
+    timeZone: contentTimeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
 
-export function formatIsoDateTime(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${formatTimezoneOffset(date)}`;
+export function formatDateTimeMinute(date = new Date()) {
+  const parts = getDateFormatter().formatToParts(date);
+  let year = "";
+  let month = "";
+  let day = "";
+  let hour = "";
+  let minute = "";
+
+  for (const part of parts) {
+    if (part.type === "year") {
+      year = part.value;
+    } else if (part.type === "month") {
+      month = part.value;
+    } else if (part.type === "day") {
+      day = part.value;
+    } else if (part.type === "hour") {
+      hour = part.value;
+    } else if (part.type === "minute") {
+      minute = part.value;
+    }
+  }
+
+  return `${year}-${month}-${day} ${hour}:${minute}`;
 }
 
 function quoteYamlString(value) {
@@ -48,9 +66,9 @@ export function resolveArticlePaths(slug, { root = repoRoot } = {}) {
 }
 
 export function createArticleTemplate({
-  title = defaultJapaneseTitle,
-  description = defaultJapaneseDescription,
-  publishedAt = formatIsoDateTime(),
+  title = "",
+  description = "",
+  publishedAt = formatDateTimeMinute(),
   draft = true,
 } = {}) {
   return `---
@@ -60,8 +78,6 @@ publishedAt: ${quoteYamlString(publishedAt)}
 tags: []
 draft: ${draft}
 ---
-
-本文をここから書きます。
 `;
 }
 
@@ -101,7 +117,7 @@ export async function scaffoldArticle(options, { root = repoRoot } = {}) {
     slug,
     title,
     description,
-    publishedAt = formatIsoDateTime(),
+    publishedAt = formatDateTimeMinute(),
   } = options;
 
   if (!slug) {

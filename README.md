@@ -88,20 +88,19 @@ src/content/articles/my-article/
 
 ```md
 ---
-title: "記事タイトル"
-description: "記事一覧と OGP で使う概要文"
-publishedAt: "2026-04-14T09:00:00+09:00"
+title: ""
+description: ""
+publishedAt: "2026-04-14 13:37"
 tags: []
 draft: true
 ---
-
-本文を Markdown で書きます。
 ```
 
 記事 frontmatter の扱い:
 
 - `title`, `description`, `publishedAt` は必須です。
 - `updatedAt`, `tags`, `cover`, `coverAlt`, `draft` は任意です。
+- `publishedAt` と `updatedAt` は `YYYY-MM-DD HH:mm` 形式を基本にします。
 - `cover` を指定する場合は `coverAlt` も必須です。
 - `draft: true` にすると記事一覧と記事ページの取得対象から外れます。
 
