@@ -22,6 +22,6 @@ screenshots:
   - alt: "Inventory screen showing collected items"
 actions:
   - kind: "play"
-    label: "Play on unityroom (old build)"
+    label: "Play on unityroom"
     href: "https://unityroom.com/games/treasure-rogue"
 ---

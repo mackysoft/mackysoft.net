@@ -31,7 +31,7 @@ screenshots:
     alt: "インベントリと取得アイテムを確認している画面"
 actions:
   - kind: "play"
-    label: "unityroom で遊ぶ（旧ビルド）"
+    label: "unityroom で遊ぶ"
     href: "https://unityroom.com/games/treasure-rogue"
 ---
 
