@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import { getFeedLastBuildDate, selectPublicLocalArticles, toRssFeedItems } from "../../src/lib/publishing/feed";
+import { renderLlmsTxt, renderRobotsTxt } from "../../src/lib/publishing/public-text";
 import { buildSitemapEntries } from "../../src/lib/publishing/sitemap";
+import { toAbsoluteSiteUrl } from "../../src/lib/site-url.mjs";
 
 describe("publishing helpers", () => {
   test("selects only public local articles for the feed", () => {
@@ -74,7 +76,8 @@ describe("publishing helpers", () => {
   });
 
   test("includes only canonical english detail routes in sitemap entries", () => {
-    const entries = buildSitemapEntries(new URL("https://mackysoft.net"), {
+    const site = new URL("https://mackysoft.net");
+    const entries = buildSitemapEntries(site, {
       articleDetails: [
         {
           slug: "vision-introduction",
@@ -106,13 +109,28 @@ describe("publishing helpers", () => {
 
     const locations = entries.map((entry) => entry.loc);
 
-    expect(locations).toContain("https://mackysoft.net/en/");
-    expect(locations).toContain("https://mackysoft.net/en/articles/vision-introduction/");
-    expect(locations).toContain("https://mackysoft.net/en/games/treasure-rogue/");
-    expect(locations).toContain("https://mackysoft.net/en/privacy-policy/");
-    expect(locations).toContain("https://mackysoft.net/en/tags/unity/");
-    expect(locations).toContain("https://mackysoft.net/en/archive/2021/03/");
-    expect(locations).toContain("https://mackysoft.net/articles/debug-context/");
-    expect(locations).not.toContain("https://mackysoft.net/en/articles/debug-context/");
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/articles/vision-introduction/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/games/treasure-rogue/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/privacy-policy/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/tags/unity/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/archive/2021/03/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/articles/debug-context/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/articles/debug-context/"));
+  });
+
+  test("renders robots.txt and llms.txt from the configured public site", () => {
+    const site = new URL("https://preview.example.com");
+    const robots = renderRobotsTxt(site);
+    const llms = renderLlmsTxt(site);
+
+    expect(robots).toContain(`Sitemap: ${toAbsoluteSiteUrl(site, "/sitemap.xml")}`);
+
+    expect(llms).toContain(`[About](${toAbsoluteSiteUrl(site, "/about/")})`);
+    expect(llms).toContain(`- Japanese: ${toAbsoluteSiteUrl(site, "/")}`);
+    expect(llms).toContain(`- English: ${toAbsoluteSiteUrl(site, "/en/")}`);
+    expect(llms).toContain(`[Sitemap](${toAbsoluteSiteUrl(site, "/sitemap.xml")})`);
+    expect(llms).toContain(`[RSS Feed](${toAbsoluteSiteUrl(site, "/feed.xml")})`);
+    expect(llms).not.toContain("English About");
   });
 });

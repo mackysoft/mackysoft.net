@@ -1,11 +1,13 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  coerceContentDateInput,
   formatContentDate,
   formatNumericDate,
   getContentDateParts,
   getContentYear,
   getContentYearMonth,
+  parseContentDateInput,
 } from "../../src/lib/content-date";
 
 describe("content date formatting", () => {
@@ -46,5 +48,23 @@ describe("content date formatting", () => {
     });
     expect(formatNumericDate(publishedAt, "en")).toBe("2021/03/16");
     expect(formatContentDate(publishedAt, "en")).toBe("2021/03/16");
+  });
+
+  test("parses date-only input as JST midnight", () => {
+    const publishedAt = parseContentDateInput("2026-04-14");
+
+    expect(publishedAt?.toISOString()).toBe("2026-04-13T15:00:00.000Z");
+    expect(formatContentDate(publishedAt!)).toBe("2026/04/14");
+  });
+
+  test("parses minute-level input as JST time", () => {
+    const publishedAt = parseContentDateInput("2026-04-14 13:37");
+
+    expect(publishedAt?.toISOString()).toBe("2026-04-14T04:37:00.000Z");
+    expect(formatContentDate(publishedAt!)).toBe("2026/04/14");
+  });
+
+  test("keeps unsupported values for schema validation", () => {
+    expect(coerceContentDateInput("not-a-date")).toBe("not-a-date");
   });
 });

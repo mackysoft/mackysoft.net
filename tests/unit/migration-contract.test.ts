@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 
 import { parseUrlMapCsv } from "../../scripts/migration/url-map.mjs";
-import { getContentYear, getContentYearMonth } from "../../src/lib/content-date";
+import { getContentYear, getContentYearMonth, parseContentDateInput } from "../../src/lib/content-date";
 
 type ArticleRecord = {
   slug: string;
@@ -78,7 +78,7 @@ function parseArticleRecord(slug: string): ArticleRecord {
   return {
     slug,
     draft: /^draft:\s*true$/m.test(frontmatter),
-    publishedAt: new Date(publishedAtMatch[1]),
+    publishedAt: parseContentDateInput(publishedAtMatch[1]) ?? new Date(publishedAtMatch[1]),
     tags,
   };
 }
