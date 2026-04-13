@@ -34,6 +34,7 @@ npm run import:wordpress
 
 - Preview URL: `https://site.mackysoft.workers.dev`
 - Required secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+- Release checklist: [`docs/cloudflare-workers-release-checklist.md`](docs/cloudflare-workers-release-checklist.md)
 - Local deploy command:
 
 ```bash

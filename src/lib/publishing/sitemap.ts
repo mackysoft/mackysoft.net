@@ -1,6 +1,7 @@
 import { getContentYear, getContentYearMonth } from "../content-date";
 import { localizePath, type SiteLocale } from "../i18n";
 import { createTranslationMap } from "../localized-entry";
+import { toAbsoluteSiteUrl } from "../site-url.mjs";
 
 type TranslationMapEntry = {
   id: string;
@@ -49,10 +50,6 @@ function sortPaths(paths: readonly string[]) {
   return [...paths].sort((left, right) => left.localeCompare(right, "ja"));
 }
 
-function toAbsoluteUrl(site: URL, path: string) {
-  return new URL(path, site).toString();
-}
-
 function pushUrlEntry(
   entries: PublicUrlEntry[],
   seenLocations: Set<string>,
@@ -60,7 +57,7 @@ function pushUrlEntry(
   path: string,
   lastmod?: Date,
 ) {
-  const loc = toAbsoluteUrl(site, path);
+  const loc = toAbsoluteSiteUrl(site, path);
 
   if (seenLocations.has(loc)) {
     return;

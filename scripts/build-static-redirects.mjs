@@ -2,11 +2,13 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import astroConfig from "../astro.config.mjs";
+import { requireSiteUrl, toAbsoluteSiteUrl } from "../src/lib/site-url.mjs";
 import { repoRoot } from "./activity-sync/shared.mjs";
 import { getGeneratedRedirectRows, loadUrlMap, urlMapPath } from "./migration/url-map.mjs";
 
-export const redirectSiteOrigin = "https://mackysoft.net";
 export const redirectDistPath = path.join(repoRoot, "dist");
+export const redirectSite = requireSiteUrl(astroConfig.site, "Astro site must be configured to build static redirects.");
 
 function escapeHtml(value) {
   return String(value)
@@ -27,8 +29,8 @@ export function resolveRedirectOutputPath(distPath, legacyPath) {
   return path.join(distPath, ...segments, "index.html");
 }
 
-export function createStaticRedirectHtml({ legacyPath, newPath }) {
-  const canonicalUrl = new URL(newPath, redirectSiteOrigin).toString();
+export function createStaticRedirectHtml({ legacyPath, newPath, site = redirectSite }) {
+  const canonicalUrl = toAbsoluteSiteUrl(site, newPath);
   const escapedLegacyPath = escapeHtml(legacyPath);
   const escapedNewPath = escapeHtml(newPath);
   const escapedCanonicalUrl = escapeHtml(canonicalUrl);
@@ -58,7 +60,7 @@ export function createStaticRedirectHtml({ legacyPath, newPath }) {
 `;
 }
 
-export async function buildStaticRedirects({ csvPath = urlMapPath, distPath = redirectDistPath } = {}) {
+export async function buildStaticRedirects({ csvPath = urlMapPath, distPath = redirectDistPath, site = redirectSite } = {}) {
   const rows = await loadUrlMap({ filePath: csvPath });
   const redirects = getGeneratedRedirectRows(rows, { source: csvPath });
 
@@ -67,7 +69,7 @@ export async function buildStaticRedirects({ csvPath = urlMapPath, distPath = re
   for (const redirect of redirects) {
     const outputPath = resolveRedirectOutputPath(distPath, redirect.legacyPath);
     await mkdir(path.dirname(outputPath), { recursive: true });
-    await writeFile(outputPath, createStaticRedirectHtml(redirect), "utf8");
+    await writeFile(outputPath, createStaticRedirectHtml({ ...redirect, site }), "utf8");
   }
 
   return redirects.map((redirect) => ({
