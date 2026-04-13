@@ -73,7 +73,7 @@ const alternateLocales = createAlternateLocaleLinks(gamePath, game.availableLoca
       imageAlt={game.data.coverAlt}
       tags={game.data.tags}
     />
-    <p class="eyebrow game-page__eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.games)}</p>
+    <p class="eyebrow game-page__eyebrow">{formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.games)}</p>
 
     {game.isFallback && locale !== defaultLocale && (
       <section class="content-panel game-fallback-notice">

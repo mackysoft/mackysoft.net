@@ -48,7 +48,7 @@ test.describe("home page", () => {
 
     await expect(page).toHaveTitle("mackysoft.net");
     await expect(page.getByRole("banner").getByRole("link", { name: "mackysoft.net", exact: true })).toBeVisible();
-    await expect(page.locator("main > h1.visually-hidden")).toHaveText("Home");
+    await expect(page.locator("main > h1.visually-hidden")).toHaveText(homePageContentJa.homeHeading);
     const homeHero = main.locator("[data-home-hero]");
     const latestArticlesHeading = page.getByRole("heading", { level: 2, name: "最新の記事" });
 
@@ -69,7 +69,7 @@ test.describe("home page", () => {
     const latestReleasesHeading = page.getByRole("heading", { level: 2, name: "最新のリリース" });
     await expect(latestReleasesHeading).toBeVisible();
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "View Assets", exact: true })).toHaveAttribute("href", "/assets/");
+    await expect(page.getByRole("link", { name: homePageContentJa.latestReleasesCta, exact: true })).toHaveAttribute("href", "/assets/");
     await expect(main.locator(".release-card").first()).toBeVisible();
     await expect(main.locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
     await expect(main.locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
@@ -98,9 +98,9 @@ test.describe("home page", () => {
     expect(firstReleaseStarIconWidth).toBeGreaterThan(8);
     expect(firstReleaseStarIconWidth).toBeLessThan(20);
 
-    const gamesHeading = page.getByRole("heading", { level: 2, name: "Games" });
+    const gamesHeading = page.getByRole("heading", { level: 2, name: homePageContentJa.gamesHeading });
     await expect(gamesHeading).toBeVisible();
-    await expect(page.getByRole("link", { name: "View Games", exact: true })).toHaveAttribute("href", "/games/");
+    await expect(page.getByRole("link", { name: homePageContentJa.gamesCta, exact: true })).toHaveAttribute("href", "/games/");
     const homeGameCard = main.locator(".game-card").first();
     await expect(homeGameCard).toBeVisible();
     await expect(homeGameCard).toContainText("Treasure Rogue");
@@ -269,7 +269,7 @@ test.describe("home page", () => {
 
     await expect(page).toHaveURL("/about/");
     await expect(page.locator("html")).toHaveAttribute("data-ui-locale", "ja");
-    await expect(page.getByRole("heading", { level: 1, name: "About" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "プロフィール" })).toBeVisible();
   });
 
   test("falls back to a local cover treatment when release images fail", async ({ page }) => {

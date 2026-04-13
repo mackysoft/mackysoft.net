@@ -5,12 +5,12 @@ import { getProfileContent } from "../profile/content";
 
 const aboutPageContentMap = {
   ja: {
-    title: "About | Hiroya Aramaki（荒牧裕也）/ Makihiro",
+    title: "プロフィール | Hiroya Aramaki（荒牧裕也）/ Makihiro",
     description:
       "Hiroya Aramaki（荒牧裕也）/ Makihiro のプロフィール、ゲーム開発を軸にした活動領域、このサイトの役割、外部リンク、連絡導線をまとめたページです。",
     hero: {
       eyebrow: formatBreadcrumb("Home", "About"),
-      title: "About",
+      title: "プロフィール",
     },
     whatIDo: {
       heading: "何をしている人か",
@@ -31,32 +31,32 @@ const aboutPageContentMap = {
     siteGuide: {
       heading: "このサイトで見られるもの",
       paragraphs: [
-        "このサイトでは、公開しているゲーム、アセット、執筆をまとめています。",
+        "このサイトでは、公開しているゲーム、アセット、記事、問い合わせ先をまとめています。",
       ],
       items: [
         {
-          label: "Games",
+          label: "ゲーム",
           href: "/games/",
           description: "制作したゲームや公開中の作品を見られます。",
         },
         {
-          label: "Assets",
+          label: "アセット",
           href: "/assets/",
           description: "開発用アセットやツールをまとめています。",
         },
         {
-          label: "Articles",
+          label: "記事",
           href: "/articles/",
           description: "技術記事や開発に関する文章を読めます。",
         },
         {
-          label: "Contact",
+          label: "問い合わせ",
           href: "/contact/",
-          description: "仕事や相談、問い合わせの案内です。",
+          description: "仕事や相談、問い合わせ方法を案内しています。",
         },
       ],
     },
-    externalLinksHeading: "リンク",
+    externalLinksHeading: "外部リンク",
     externalLinks: [
       {
         id: "github" as ExternalLinkId,
@@ -74,9 +74,9 @@ const aboutPageContentMap = {
     contact: {
       heading: "仕事・問い合わせ",
       paragraphs: [
-        "仕事・相談や OSS 関連の連絡は Contact からどうぞ。",
+        "仕事の相談や OSS 関連の連絡は、問い合わせページから受け付けています。",
       ],
-      ctaLabel: "Contact を開く",
+      ctaLabel: "問い合わせ先を見る",
       href: "/contact/",
     },
   },

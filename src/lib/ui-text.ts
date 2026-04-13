@@ -1,4 +1,4 @@
-import { getSiteVocabulary, type SiteVocabulary } from "../features/site/vocabulary";
+import { getBreadcrumbVocabulary, getSiteVocabulary, type SiteVocabulary } from "../features/site/vocabulary";
 import type { SiteLocale } from "./i18n";
 
 type CommonUiText = SiteVocabulary & {
@@ -62,6 +62,7 @@ type UiText = {
     externalBadge: string;
     typeLabel: Record<"article" | "game" | "asset" | "page", string>;
   };
+  breadcrumb: SiteVocabulary;
 };
 
 const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnlyBadge" | "fallbackNotice">> = {
@@ -75,7 +76,7 @@ const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnly
   },
 };
 
-const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
+const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
   ja: {
     header: {
       toolsLabel: "ヘッダーツール",
@@ -94,12 +95,12 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common">> = {
     article: {
       publishedAt: "公開日",
       updatedAt: "更新日",
-      tagsAriaLabel: "Article tags",
+      tagsAriaLabel: "記事のタグ",
       tocTitle: "目次",
-      tocNavLabel: "Article table of contents",
-      shareTitle: "シェア",
+      tocNavLabel: "記事の目次",
+      shareTitle: "共有",
       copyLink: "コピーリンク",
-      nativeShare: "ネイティブシェア",
+      nativeShare: "共有する",
       twitter: "Twitter",
       linkCopied: "リンクをコピーしました",
       copyFailed: "コピーに失敗しました",
@@ -219,6 +220,7 @@ export function getUiText(locale: SiteLocale) {
       ...getSiteVocabulary(locale),
       ...commonUiTextOverrides[locale],
     },
+    breadcrumb: getBreadcrumbVocabulary(locale),
   };
 }
 

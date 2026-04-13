@@ -34,7 +34,7 @@ const { Content } = await render(page.entry as never);
   canonicalPath={localizePath("/privacy-policy/", locale)}
   alternateLocales={createAlternateLocaleLinks("/privacy-policy/", page.availableLocales)}
 >
-  <PageHeader title={page.data.title} eyebrow={formatBreadcrumb(uiText.common.home, page.data.title)} />
+  <PageHeader title={page.data.title} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.privacyPolicy)} />
 
   <section class="content-panel prose">
     <LocalizedHtmlLinks locale={locale}>

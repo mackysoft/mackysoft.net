@@ -8,8 +8,8 @@ test.describe("games page", () => {
     const treasureRogueCard = main.locator(".game-card").filter({ hasText: "Treasure Rogue" }).first();
 
     await expect(main.locator(".page-header .eyebrow")).toHaveText("Home / Games");
-    await expect(main.getByRole("heading", { level: 1, name: "Games" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Games", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(main.getByRole("heading", { level: 1, name: "ゲーム" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "ゲーム", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(treasureRogueCard).toBeVisible();
     await expect(treasureRogueCard).toContainText("アーカイブ済み");
     await expect(treasureRogueCard).toContainText("Android（配信終了）");
@@ -78,7 +78,7 @@ test.describe("games page", () => {
 
     await expect(breadcrumb).toHaveText("Home / Games");
     await expect(page.locator(".site-header")).toHaveCount(1);
-    await expect(page.getByRole("link", { name: "Games", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("link", { name: "ゲーム", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(heroTitle).toBeVisible();
     await expect(hero).toContainText("拾ったアイテムを駆使して敵を倒しながら突き進もう！ アナタはどれだけ奥に進めるかな？");
     await expect(hero).toContainText("アーカイブ済み");

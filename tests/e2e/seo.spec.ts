@@ -18,32 +18,32 @@ const seoExpectations: SeoExpectation[] = [
   },
   {
     path: "/articles/",
-    title: "Articles | mackysoft.net",
+    title: "記事 | mackysoft.net",
     description: "自サイトと Zenn に公開した記事一覧です。",
     canonicalUrl: "https://mackysoft.net/articles/",
   },
   {
     path: "/games/",
-    title: "Games | mackysoft.net",
+    title: "ゲーム | mackysoft.net",
     description: "公開しているゲームの一覧です。",
     canonicalUrl: "https://mackysoft.net/games/",
   },
   {
     path: "/assets/",
-    title: "Assets | mackysoft.net",
+    title: "アセット | mackysoft.net",
     description: "GitHub Releases として公開しているアセットの一覧です。",
     canonicalUrl: "https://mackysoft.net/assets/",
   },
   {
     path: "/about/",
-    title: "About | Hiroya Aramaki（荒牧裕也）/ Makihiro | mackysoft.net",
+    title: "プロフィール | Hiroya Aramaki（荒牧裕也）/ Makihiro | mackysoft.net",
     description:
       "Hiroya Aramaki（荒牧裕也）/ Makihiro のプロフィール、ゲーム開発を軸にした活動領域、このサイトの役割、外部リンク、連絡導線をまとめたページです。",
     canonicalUrl: "https://mackysoft.net/about/",
   },
   {
     path: "/search/",
-    title: "Search | mackysoft.net",
+    title: "検索 | mackysoft.net",
     description: "サイト内の記事、ゲーム、外部記事、公開アセットを検索できます。",
     canonicalUrl: "https://mackysoft.net/search/",
   },

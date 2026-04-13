@@ -12,6 +12,6 @@ test.describe("legacy redirects", () => {
     await page.goto("/treasure-rogue/privacy-policy/");
 
     await expect(page).toHaveURL("/privacy-policy/");
-    await expect(page.getByRole("main").getByRole("heading", { level: 1, name: "Privacy Policy" })).toBeVisible();
+    await expect(page.getByRole("main").getByRole("heading", { level: 1, name: "プライバシーポリシー" })).toBeVisible();
   });
 });

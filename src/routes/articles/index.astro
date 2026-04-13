@@ -29,7 +29,7 @@ const pageMeta = getArticlesIndexPageMeta(locale, {
   canonicalPath={localizePath("/articles/", locale)}
   alternateLocales={createAlternateLocaleLinks("/articles/")}
 >
-  <PageHeader title={uiText.common.articles} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles)} />
+  <PageHeader title={uiText.common.articles} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.articles)} />
 
   <PageLead class="articles-list">
     {articleItems.map((article) => (

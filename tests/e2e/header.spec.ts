@@ -57,6 +57,11 @@ test.describe("site header", () => {
     await expect(brand).toBeVisible();
     await expect(tools).toBeVisible();
     await expect(nav).toBeVisible();
+    await expect(nav.getByRole("link", { name: "プロフィール", exact: true })).toHaveAttribute("href", "/about/");
+    await expect(nav.getByRole("link", { name: "ゲーム", exact: true })).toHaveAttribute("href", "/games/");
+    await expect(nav.getByRole("link", { name: "アセット", exact: true })).toHaveAttribute("href", "/assets/");
+    await expect(nav.getByRole("link", { name: "記事", exact: true })).toHaveAttribute("href", "/articles/");
+    await expect(nav.getByRole("link", { name: "問い合わせ", exact: true })).toHaveAttribute("href", "/contact/");
     await expect(searchTool).toBeVisible();
     await expect(searchTool).toHaveAttribute("href", "/search/");
     await expect(searchTool).toHaveAttribute("aria-label", "検索を開く");
@@ -73,6 +78,10 @@ test.describe("site header", () => {
     await expect(languageTool.getByRole("menuitemradio", { name: "日本語" })).toBeVisible();
     await expect(languageTool.getByRole("menuitemradio", { name: "English" })).toBeVisible();
     await expect(languageTool.locator(".site-language-menu__popover")).toHaveCSS("background-color", "rgb(236, 229, 216)");
+    await expect(page.getByRole("contentinfo").getByRole("link", { name: "プライバシーポリシー", exact: true })).toHaveAttribute(
+      "href",
+      "/privacy-policy/",
+    );
 
     const brandBox = await brand.boundingBox();
     const toolsBox = await tools.boundingBox();

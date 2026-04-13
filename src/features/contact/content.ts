@@ -4,26 +4,26 @@ import type { SiteLocale } from "../../lib/i18n";
 
 const contactPageContentMap = {
   ja: {
-    title: "Contact",
-    description: "仕事・相談と OSS 関連の連絡窓口、返信方針をまとめたページです。",
+    title: "問い合わせ",
+    description: "仕事・相談や OSS 関連の問い合わせ窓口と、返信方針をまとめたページです。",
     hero: {
       eyebrow: formatBreadcrumb("Home", "Contact"),
-      title: "Contact",
+      title: "問い合わせ",
     },
-    lead: "連絡は以下からどうぞ。用途に近い窓口から送ってください。",
+    lead: "ご連絡は、用途に近い窓口からお願いします。",
     channels: [
       {
         heading: "仕事・相談",
-        description: "相談や問い合わせ、仕事の連絡はメールで受けています。",
+        description: "仕事の相談やお問い合わせは、メールで受け付けています。",
         action: {
           type: "email",
           href: "mailto:mackysoft0129@gmail.com",
-          label: "メールで連絡する",
+          label: "メールで問い合わせる",
         },
       },
       {
         heading: "OSS・アセット関連",
-        description: "不具合報告や技術的な話は GitHub から受けています。",
+        description: "不具合報告や技術的な相談は GitHub から受け付けています。",
         action: {
           type: "external",
           externalLinkId: "github" as ExternalLinkId,
