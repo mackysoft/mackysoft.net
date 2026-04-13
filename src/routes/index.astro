@@ -123,7 +123,11 @@ const localizedHomePath = localizePath("/", locale);
   }
 
   .latest-games-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 20rem));
-    justify-content: start;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .latest-games-grid > :global(.game-card) {
+    justify-self: start;
+    width: min(100%, 19.5rem);
   }
 </style>
