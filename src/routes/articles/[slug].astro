@@ -12,6 +12,7 @@ import { resolveLocalizedArticleBySlug } from "../../lib/articles";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
 import { formatBreadcrumb } from "../../lib/breadcrumb";
 import { siteName } from "../../lib/site";
+import { requireSiteUrl, toAbsoluteSiteUrl } from "../../lib/site-url.mjs";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 
 export async function getStaticPaths() {
@@ -31,6 +32,7 @@ type Props = {
 const { slug = Astro.params.slug ?? "", locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const uiText = getUiText(locale);
+const siteUrl = requireSiteUrl(Astro.site, "Astro site must be configured to build article URLs.");
 const article = await resolveLocalizedArticleBySlug(slug, locale);
 
 if (!article) {
@@ -39,8 +41,8 @@ if (!article) {
 
 const { Content, headings } = await render(article.entry as never);
 const tocHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
-const shareUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 const articlePath = `/articles/${slug}/`;
+const shareUrl = toAbsoluteSiteUrl(siteUrl, articlePath);
 const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
 const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
 ---
