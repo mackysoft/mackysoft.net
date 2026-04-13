@@ -10,30 +10,35 @@ import type { LocalizedGameEntry } from "../lib/game-repository";
 
 type Props = {
   game: LocalizedGameEntry;
+  layout?: "horizontal" | "compact";
   locale?: SiteLocale;
 };
 
-const { game, locale = "ja" } = Astro.props as Props;
+const { game, layout = "horizontal", locale = "ja" } = Astro.props as Props;
 const href = game.href;
 const publishedAt = game.data.publishedAt;
 const platforms = game.data.platforms;
+const publishedAtLabel = publishedAt ? formatContentDate(publishedAt, locale) : null;
+const coverSizes = layout === "compact" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
 const uiText = getUiText(locale);
 ---
 
-<article class="game-card activity-card">
+<article class:list={["game-card", "activity-card", layout === "compact" && "activity-card--compact", `game-card--${layout}`]}>
   <a href={href} class="activity-card__link-layer" aria-label={game.data.title}></a>
   <div class="game-card__cover activity-card__cover">
-    <Image src={game.data.cover} alt={game.data.coverAlt} widths={[480]} sizes="(max-width: 720px) 100vw, 28rem" />
+    <Image src={game.data.cover} alt={game.data.coverAlt} widths={[480]} sizes={coverSizes} />
   </div>
   <div class="game-card__body activity-card__body">
     <h3 class="activity-card__title">{game.data.title}</h3>
-    <p class="game-card__description">{game.data.description}</p>
+    <div class="game-card__copy">
+      <p class="game-card__description">{game.data.description}</p>
+    </div>
     <div class="game-card__footer">
-      {publishedAt && (
+      {publishedAtLabel && (
         <p class="game-card__meta activity-card__meta">
           <span class="game-card__meta-date">
             <span class="game-card__meta-label">{uiText.game.publishedAt}</span>
-            <span>{formatContentDate(publishedAt, locale)}</span>
+            <span>{publishedAtLabel}</span>
           </span>
         </p>
       )}
@@ -49,7 +54,7 @@ const uiText = getUiText(locale);
 </article>
 
 <style>
-  .game-card {
+  .game-card--horizontal {
     gap: 1rem;
     padding: 1.25rem;
   }
@@ -67,6 +72,10 @@ const uiText = getUiText(locale);
 
   .game-card__body {
     gap: 0.85rem;
+  }
+
+  .game-card__copy {
+    min-height: 0;
   }
 
   .game-card__platform,
@@ -135,8 +144,31 @@ const uiText = getUiText(locale);
     -webkit-line-clamp: 3;
   }
 
+  .game-card--compact {
+    gap: 0.75rem;
+  }
+
+  .game-card--compact .game-card__body {
+    gap: 0.4rem;
+  }
+
+  .game-card--compact h3 {
+    font-size: clamp(0.96rem, 0.9rem + 0.28vw, 1.08rem);
+    line-height: 1.32;
+    -webkit-line-clamp: 3;
+  }
+
+  .game-card--compact .game-card__description {
+    font-size: 0.92rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .game-card--compact .game-card__meta {
+    font-size: 0.84rem;
+  }
+
   @media (min-width: 760px) {
-    .game-card {
+    .game-card--horizontal {
       grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
       align-items: start;
     }

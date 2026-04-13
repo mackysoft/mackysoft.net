@@ -1,8 +1,10 @@
 ---
 import ArticleCard from "../components/ArticleCard.astro";
+import GameCard from "../components/GameCard.astro";
 import ReleaseCard from "../components/ReleaseCard.astro";
 import { getHomePageContent } from "../features/home/content";
 import { getArticleItems } from "../lib/articles";
+import { getLocalizedGames } from "../lib/game-repository";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
 import { getLatestReleases } from "../lib/releases";
 import SiteLayout from "../layouts/SiteLayout.astro";
@@ -16,6 +18,7 @@ const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const content = getHomePageContent(locale);
 const latestArticles = (await getArticleItems(locale)).slice(0, 3);
 const latestReleases = getLatestReleases();
+const homeGames = (await getLocalizedGames(locale)).filter((game): game is NonNullable<typeof game> => game !== null).slice(0, 3);
 const localizedHomePath = localizePath("/", locale);
 ---
 
@@ -45,7 +48,7 @@ const localizedHomePath = localizePath("/", locale);
   {latestReleases.length > 0 && (
     <section class="content-panel">
       <div class="section-head">
-      <div>
+        <div>
           <p class="eyebrow">{content.latestReleasesEyebrow}</p>
           <h2>{content.latestReleasesHeading}</h2>
         </div>
@@ -54,6 +57,23 @@ const localizedHomePath = localizePath("/", locale);
       <div class="content-grid latest-releases-grid">
         {latestReleases.map((release) => (
           <ReleaseCard release={release} locale={locale} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {homeGames.length > 0 && (
+    <section class="content-panel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">{content.gamesEyebrow}</p>
+          <h2>{content.gamesHeading}</h2>
+        </div>
+        <a href={localizePath("/games/", locale)} class="button-link">{content.gamesCta}</a>
+      </div>
+      <div class="content-grid latest-games-grid">
+        {homeGames.map((game) => (
+          <GameCard game={game} layout="compact" locale={locale} />
         ))}
       </div>
     </section>
@@ -100,5 +120,10 @@ const localizedHomePath = localizePath("/", locale);
 
   .latest-releases-grid {
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+
+  .latest-games-grid {
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 20rem));
+    justify-content: start;
   }
 </style>

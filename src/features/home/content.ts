@@ -9,6 +9,9 @@ const homePageContentMap = {
     latestReleasesEyebrow: "Latest Releases",
     latestReleasesHeading: "最新のリリース",
     latestReleasesCta: "View Assets",
+    gamesEyebrow: "Games",
+    gamesHeading: "Games",
+    gamesCta: "View Games",
     aboutEyebrow: "About",
     aboutHeading: "活動の正本をここに集約する",
     aboutBody: "外部サービスに依存しすぎず、プロフィール、作品、記事、連絡導線を一か所で追える構成に切り替えています。",
@@ -27,6 +30,9 @@ const homePageContentMap = {
     latestReleasesEyebrow: "Latest Releases",
     latestReleasesHeading: "Latest Releases",
     latestReleasesCta: "View Assets",
+    gamesEyebrow: "Games",
+    gamesHeading: "Games",
+    gamesCta: "View Games",
     aboutEyebrow: "About",
     aboutHeading: "A single source of truth for ongoing work",
     aboutBody: "The site is being rebuilt so profile, projects, writing, and contact paths can be followed in one place without leaning too heavily on external services.",
@@ -42,4 +48,3 @@ const homePageContentMap = {
 export function getHomePageContent(locale: SiteLocale) {
   return homePageContentMap[locale];
 }
-

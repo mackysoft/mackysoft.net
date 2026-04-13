@@ -37,38 +37,41 @@ test.describe("home page", () => {
     });
     await page.goto("/");
 
+    const main = page.getByRole("main");
+
     await expect(page).toHaveTitle("mackysoft.net");
     await expect(page.getByRole("banner").getByRole("link", { name: "mackysoft.net", exact: true })).toBeVisible();
     await expect(page.locator("main > h1.visually-hidden")).toHaveText("Home");
     await expect(page.getByRole("heading", { level: 2, name: "最新の記事" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
-    const latestArticleCard = page.getByRole("main").locator(".article-card").filter({ hasText: "Zenn" }).first();
+    const latestArticleCard = main.locator(".article-card").filter({ hasText: "Zenn" }).first();
     await expect(latestArticleCard).toBeVisible();
     await expect(latestArticleCard).toContainText("公開日");
     await expect(latestArticleCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "ja"));
-    await expect(page.getByRole("main").locator(".article-card__tags")).toHaveCount(0);
-    await expect(page.getByRole("heading", { level: 2, name: "最新のリリース" })).toBeVisible();
+    await expect(main.locator(".article-card__tags")).toHaveCount(0);
+    const latestReleasesHeading = page.getByRole("heading", { level: 2, name: "最新のリリース" });
+    await expect(latestReleasesHeading).toBeVisible();
     await expect(page.getByRole("link", { name: latestReleaseRepoName, exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "View Assets", exact: true })).toHaveAttribute("href", "/assets/");
-    await expect(page.getByRole("main").locator(".release-card").first()).toBeVisible();
-    await expect(page.getByRole("main").locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
-    await expect(page.getByRole("main").locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
+    await expect(main.locator(".release-card").first()).toBeVisible();
+    await expect(main.locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
+    await expect(main.locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
     await expect(page.getByRole("img", { name: latestRelease.coverAlt }).first()).toBeVisible();
-    await expect(page.getByRole("main").locator(".release-card").first()).toContainText("最新リリース日");
-    await expect(page.getByRole("main").locator(".release-card").first()).toContainText(
+    await expect(main.locator(".release-card").first()).toContainText("最新リリース日");
+    await expect(main.locator(".release-card").first()).toContainText(
       formatContentDate(new Date(latestRelease.publishedAt)),
     );
-    await expect(page.getByRole("main").locator(".release-card").first()).toContainText(latestRelease.version);
+    await expect(main.locator(".release-card").first()).toContainText(latestRelease.version);
 
     if (latestRelease.description) {
-      await expect(page.getByRole("main").locator(".release-card").first()).toContainText(latestRelease.description);
+      await expect(main.locator(".release-card").first()).toContainText(latestRelease.description);
     }
 
     if (latestRelease.license) {
-      await expect(page.getByRole("main").locator(".release-card").first()).toContainText(latestRelease.license);
+      await expect(main.locator(".release-card").first()).toContainText(latestRelease.license);
     }
 
-    const firstReleaseStars = page.getByRole("main").locator(".release-card__stars").first();
+    const firstReleaseStars = main.locator(".release-card__stars").first();
     await expect(firstReleaseStars).toBeVisible();
     await expect(firstReleaseStars).toHaveCSS("display", "flex");
 
@@ -77,6 +80,27 @@ test.describe("home page", () => {
     });
     expect(firstReleaseStarIconWidth).toBeGreaterThan(8);
     expect(firstReleaseStarIconWidth).toBeLessThan(20);
+
+    const gamesHeading = page.getByRole("heading", { level: 2, name: "Games" });
+    await expect(gamesHeading).toBeVisible();
+    await expect(page.getByRole("link", { name: "View Games", exact: true })).toHaveAttribute("href", "/games/");
+    const homeGameCard = main.locator(".game-card").first();
+    await expect(homeGameCard).toBeVisible();
+    await expect(homeGameCard).toContainText("Treasure Rogue");
+    await expect(homeGameCard).toContainText("アーカイブ済み");
+    await expect(homeGameCard.getByRole("link", { name: "Treasure Rogue", exact: true })).toHaveAttribute(
+      "href",
+      "/games/treasure-rogue/",
+    );
+
+    const latestReleasesHeadingBox = await latestReleasesHeading.boundingBox();
+    const gamesHeadingBox = await gamesHeading.boundingBox();
+
+    if (!latestReleasesHeadingBox || !gamesHeadingBox) {
+      throw new Error("home page section headings must be visible before order assertions");
+    }
+
+    expect(latestReleasesHeadingBox.y).toBeLessThan(gamesHeadingBox.y);
   });
 
   test("redirects the first root visit to /en/ when English is preferred", async ({ page }) => {
@@ -97,7 +121,10 @@ test.describe("home page", () => {
     await expect(page).toHaveURL(/\/en\/$/);
     await expect(page.locator("html")).toHaveAttribute("data-ui-locale", "en");
     await expect(page.getByRole("heading", { level: 2, name: "Latest Articles" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Games" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View Games", exact: true })).toHaveAttribute("href", "/en/games/");
+    await expect(page.getByRole("main").locator(".game-card").first()).toContainText("Treasure Rogue");
     await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgba(255, 252, 246, 0.78)");
     await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(245, 241, 232, 0.9)");
   });
