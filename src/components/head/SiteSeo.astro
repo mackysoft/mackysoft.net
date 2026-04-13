@@ -7,14 +7,22 @@ type AlternateLocaleLink = {
 };
 
 type Props = {
+  title: string;
+  description: string;
+  siteName: string;
   canonicalUrl: string;
   alternateLocaleUrls?: AlternateLocaleLink[];
 };
 
-const { canonicalUrl, alternateLocaleUrls = [] } = Astro.props as Props;
+const { title, description, siteName, canonicalUrl, alternateLocaleUrls = [] } = Astro.props as Props;
 ---
 
 <link rel="canonical" href={canonicalUrl} />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
 {alternateLocaleUrls.map((entry) => (
   <link rel="alternate" hreflang={toLanguageTag(entry.locale)} href={entry.href} />
 ))}
