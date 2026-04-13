@@ -65,7 +65,13 @@ function isCurrentNavItem(itemHref: string, path: string) {
     <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <SiteSeo canonicalUrl={canonicalUrl} alternateLocaleUrls={alternateLocaleUrls} />
+    <SiteSeo
+      title={pageTitle}
+      description={description}
+      siteName={siteMeta.name}
+      canonicalUrl={canonicalUrl}
+      alternateLocaleUrls={alternateLocaleUrls}
+    />
     <ThemeBootstrap />
     <RootLocaleRedirect enabled={enableLocaleRedirectOnRoot} />
     <SiteAnalytics />
