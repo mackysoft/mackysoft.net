@@ -1,6 +1,40 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
+
+async function getScrollMetrics(page: Page) {
+  return page.evaluate(() => {
+    const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+    const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+
+    return {
+      scrollY: window.scrollY,
+      maxScroll,
+      progress: maxScroll === 0 ? 0 : window.scrollY / maxScroll,
+    };
+  });
+}
+
+async function scrollToProgress(page: Page, progress: number) {
+  await page.evaluate((targetProgress) => {
+    const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+    const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+    const nextScrollTop = Math.max(Math.min(Math.round(maxScroll * targetProgress), maxScroll), 0);
+
+    window.scrollTo(0, nextScrollTop);
+  }, progress);
+
+  await page.waitForFunction((targetProgress) => {
+    const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+    const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+    const expectedScrollTop = Math.max(Math.min(Math.round(maxScroll * targetProgress), maxScroll), 0);
+
+    return Math.abs(window.scrollY - expectedScrollTop) <= 2;
+  }, progress);
+
+  return getScrollMetrics(page);
+}
 
 test.describe("site header", () => {
   test("shows static header tools after navigation on desktop", { tag: "@size:medium" }, async ({ page }) => {
@@ -119,6 +153,57 @@ test.describe("site header", () => {
     await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
     await expect(page.getByRole("heading", { level: 1, name: translatedVisionTitle })).toBeVisible();
     expect(await page.evaluate(() => window.localStorage.getItem("mackysoft-locale"))).toBe("en");
+  });
+
+  test("restores scroll progress when switching article detail routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/articles/how-to-complete-game-development/");
+
+    const beforeNavigation = await scrollToProgress(page, 0.48);
+    expect(beforeNavigation.maxScroll).toBeGreaterThan(1000);
+
+    await page.locator("[data-site-language-toggle]").click();
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL("/en/articles/how-to-complete-game-development/");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await page.waitForLoadState("load");
+    await page.waitForFunction((expectedProgress) => {
+      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
+
+      return Math.abs(progress - expectedProgress) <= 0.08;
+    }, beforeNavigation.progress);
+
+    const afterNavigation = await getScrollMetrics(page);
+
+    expect(afterNavigation.scrollY).toBeGreaterThan(200);
+    expect(Math.abs(afterNavigation.progress - beforeNavigation.progress)).toBeLessThanOrEqual(0.08);
+  });
+
+  test("restores scroll progress when switching article index routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/articles/");
+
+    const beforeNavigation = await scrollToProgress(page, 0.58);
+    expect(beforeNavigation.maxScroll).toBeGreaterThan(800);
+
+    await page.locator("[data-site-language-toggle]").click();
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL("/en/articles/");
+    await page.waitForLoadState("load");
+    await page.waitForFunction((expectedProgress) => {
+      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
+
+      return Math.abs(progress - expectedProgress) <= 0.12;
+    }, beforeNavigation.progress);
+
+    const afterNavigation = await getScrollMetrics(page);
+
+    expect(afterNavigation.scrollY).toBeGreaterThan(200);
+    expect(Math.abs(afterNavigation.progress - beforeNavigation.progress)).toBeLessThanOrEqual(0.12);
   });
 
   test("shows the translated article locale as both selected and current", { tag: "@size:medium" }, async ({ page }) => {
