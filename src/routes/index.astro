@@ -3,6 +3,7 @@ import ArticleCard from "../components/ArticleCard.astro";
 import GameCard from "../components/GameCard.astro";
 import ReleaseCard from "../components/ReleaseCard.astro";
 import { getHomePageContent } from "../features/home/content";
+import HomeHero from "../features/home/HomeHero.astro";
 import { getArticleItems } from "../lib/articles";
 import { getLocalizedGames } from "../lib/game-repository";
 import { createAlternateLocaleLinks, defaultLocale, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
@@ -29,6 +30,7 @@ const localizedHomePath = localizePath("/", locale);
   enableLocaleRedirectOnRoot={locale === defaultLocale}
 >
   <h1 class="visually-hidden">{content.homeHeading}</h1>
+  <HomeHero locale={locale} ctaLabel={content.aboutCta} />
 
   <section class="content-panel">
     <div class="section-head">

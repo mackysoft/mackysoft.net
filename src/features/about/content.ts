@@ -1,6 +1,7 @@
 import { formatBreadcrumb } from "../../lib/breadcrumb";
 import type { ExternalLinkId } from "../../lib/site";
 import type { SiteLocale } from "../../lib/i18n";
+import { getProfileContent } from "../profile/content";
 
 const aboutPageContentMap = {
   ja: {
@@ -10,16 +11,6 @@ const aboutPageContentMap = {
     hero: {
       eyebrow: formatBreadcrumb("Home", "About"),
       title: "About",
-    },
-    profile: {
-      name: "Hiroya Aramaki（荒牧裕也）/ Makihiro",
-      summary: "ゲームと開発アセットを作っている個人開発者です。ゲーム開発を軸に、技術・アセット制作・発信を続けています。",
-      avatarLinkAriaLabel: "Twitter を開く",
-      avatar: {
-        src: "https://github.com/mackysoft.png",
-        alt: "Makihiro のアイコン",
-      },
-      primaryExternalLinkId: "twitter" as ExternalLinkId,
     },
     whatIDo: {
       heading: "何をしている人か",
@@ -97,16 +88,6 @@ const aboutPageContentMap = {
       eyebrow: formatBreadcrumb("Home", "About"),
       title: "About",
     },
-    profile: {
-      name: "Hiroya Aramaki / Makihiro",
-      summary: "I am an indie developer building games and development assets, and I keep publishing what I learn along the way.",
-      avatarLinkAriaLabel: "Open Twitter",
-      avatar: {
-        src: "https://github.com/mackysoft.png",
-        alt: "Makihiro avatar",
-      },
-      primaryExternalLinkId: "twitter" as ExternalLinkId,
-    },
     whatIDo: {
       heading: "What I Do",
       paragraphs: [
@@ -178,5 +159,16 @@ const aboutPageContentMap = {
 } as const;
 
 export function getAboutPageContent(locale: SiteLocale) {
-  return aboutPageContentMap[locale];
+  const profile = getProfileContent(locale);
+
+  return {
+    ...aboutPageContentMap[locale],
+    profile: {
+      name: profile.about.name,
+      summary: profile.about.summary,
+      avatarLinkAriaLabel: profile.avatarLinkAriaLabel,
+      avatar: profile.avatar,
+      primaryExternalLinkId: profile.primaryExternalLinkId,
+    },
+  };
 }

@@ -4,6 +4,7 @@ import path from "node:path";
 import { expect, test } from "@playwright/test";
 
 import { formatContentDate } from "../../src/lib/content-date";
+import { getProfileContent } from "../../src/features/profile/content";
 
 const activityData = JSON.parse(
   readFileSync(path.resolve(import.meta.dirname, "../../src/generated/activity.json"), "utf8"),
@@ -30,6 +31,9 @@ const latestZennArticleJa = latestZennArticle.locales.ja;
 const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.locales.ja;
 const latestRelease = activityData.releases[0]!;
 const latestReleaseRepoName = latestRelease.repo.split("/").at(-1)!;
+const homeHeroJa = getProfileContent("ja").home;
+const homeHeroEn = getProfileContent("en").home;
+
 test.describe("home page", () => {
   test("renders the home page as an activity hub", async ({ page }) => {
     await page.addInitScript(() => {
@@ -42,7 +46,15 @@ test.describe("home page", () => {
     await expect(page).toHaveTitle("mackysoft.net");
     await expect(page.getByRole("banner").getByRole("link", { name: "mackysoft.net", exact: true })).toBeVisible();
     await expect(page.locator("main > h1.visually-hidden")).toHaveText("Home");
-    await expect(page.getByRole("heading", { level: 2, name: "最新の記事" })).toBeVisible();
+    const homeHero = main.locator("[data-home-hero]");
+    const latestArticlesHeading = page.getByRole("heading", { level: 2, name: "最新の記事" });
+
+    await expect(homeHero).toBeVisible();
+    await expect(homeHero.getByRole("img", { name: "Makihiro のアイコン" })).toBeVisible();
+    await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroJa.name);
+    await expect(homeHero).toContainText(homeHeroJa.summary);
+    await expect(homeHero.getByRole("link", { name: "About", exact: true })).toHaveAttribute("href", "/about/");
+    await expect(latestArticlesHeading).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
     const latestArticleCard = main.locator(".article-card").filter({ hasText: "Zenn" }).first();
     await expect(latestArticleCard).toBeVisible();
@@ -95,11 +107,14 @@ test.describe("home page", () => {
 
     const latestReleasesHeadingBox = await latestReleasesHeading.boundingBox();
     const gamesHeadingBox = await gamesHeading.boundingBox();
+    const homeHeroBox = await homeHero.boundingBox();
+    const latestArticlesHeadingBox = await latestArticlesHeading.boundingBox();
 
-    if (!latestReleasesHeadingBox || !gamesHeadingBox) {
+    if (!latestReleasesHeadingBox || !gamesHeadingBox || !homeHeroBox || !latestArticlesHeadingBox) {
       throw new Error("home page section headings must be visible before order assertions");
     }
 
+    expect(homeHeroBox.y).toBeLessThan(latestArticlesHeadingBox.y);
     expect(latestReleasesHeadingBox.y).toBeLessThan(gamesHeadingBox.y);
   });
 
@@ -118,8 +133,15 @@ test.describe("home page", () => {
 
     await page.goto("/");
 
+    const homeHero = page.getByRole("main").locator("[data-home-hero]");
+
     await expect(page).toHaveURL(/\/en\/$/);
     await expect(page.locator("html")).toHaveAttribute("data-ui-locale", "en");
+    await expect(homeHero).toBeVisible();
+    await expect(homeHero.getByRole("img", { name: "Makihiro avatar" })).toBeVisible();
+    await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroEn.name);
+    await expect(homeHero).toContainText(homeHeroEn.summary);
+    await expect(homeHero.getByRole("link", { name: "About", exact: true })).toHaveAttribute("href", "/en/about/");
     await expect(page.getByRole("heading", { level: 2, name: "Latest Articles" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Games" })).toBeVisible();
     await expect(page.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toBeVisible();

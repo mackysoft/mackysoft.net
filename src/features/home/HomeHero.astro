@@ -1,0 +1,82 @@
+---
+import { localizePath, type SiteLocale } from "../../lib/i18n";
+import { getProfileContent } from "../profile/content";
+
+type Props = {
+  locale: SiteLocale;
+  ctaLabel: string;
+};
+
+const { locale, ctaLabel } = Astro.props as Props;
+const profile = getProfileContent(locale);
+---
+
+<section class="content-panel home-hero" data-home-hero>
+  <img
+    src={profile.avatar.src}
+    alt={profile.avatar.alt}
+    class="home-hero__avatar"
+    loading="eager"
+    decoding="async"
+  />
+  <div class="home-hero__copy">
+    <p class="home-hero__name">{profile.home.name}</p>
+    <p class="home-hero__summary">{profile.home.summary}</p>
+  </div>
+  <a href={localizePath("/about/", locale)} class="button-link home-hero__cta">{ctaLabel}</a>
+</section>
+
+<style>
+  .home-hero {
+    display: grid;
+    gap: 0.9rem;
+    align-items: center;
+    padding: 1.2rem 1.3rem;
+  }
+
+  .home-hero__avatar {
+    display: block;
+    width: clamp(3.5rem, 10vw, 4.5rem);
+    height: clamp(3.5rem, 10vw, 4.5rem);
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--surface-raised-strong-color);
+    object-fit: cover;
+  }
+
+  .home-hero__copy {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .home-hero__name,
+  .home-hero__summary {
+    margin: 0;
+  }
+
+  .home-hero__name {
+    font-size: clamp(1.18rem, 1.05rem + 0.65vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .home-hero__summary {
+    color: var(--muted-color);
+  }
+
+  .home-hero__cta {
+    justify-self: start;
+  }
+
+  @media (min-width: 720px) {
+    .home-hero {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 1rem 1.3rem;
+    }
+
+    .home-hero__cta {
+      justify-self: end;
+    }
+  }
+</style>
