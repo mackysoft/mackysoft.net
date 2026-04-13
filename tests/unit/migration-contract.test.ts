@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 
 import { parseUrlMapCsv } from "../../scripts/migration/url-map.mjs";
+import { getContentYear, getContentYearMonth } from "../../src/lib/content-date";
 
 type ArticleRecord = {
   slug: string;
@@ -42,13 +43,13 @@ const urlMapPath = path.join(repoRoot, "docs/migration/url-map.csv");
 const taxonomyMapPath = path.join(repoRoot, "docs/migration/taxonomy-map.yaml");
 
 function readFrontmatter(markdown: string) {
-  const match = markdown.match(/^---\n([\s\S]*?)\n---/);
+  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---/);
 
   if (!match) {
     throw new Error("Markdown file is missing frontmatter.");
   }
 
-  return match[1];
+  return match[1].replace(/\r\n/g, "\n");
 }
 
 function parseArticleRecord(slug: string): ArticleRecord {
@@ -171,12 +172,12 @@ function camelizeTaxonomyKey(key: string) {
 }
 
 function toYearLegacyPath(date: Date) {
-  return `/${date.getFullYear()}/`;
+  return `/${getContentYear(date)}/`;
 }
 
 function toMonthLegacyPath(date: Date) {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  return `/${date.getFullYear()}/${month}/`;
+  const { year, month } = getContentYearMonth(date);
+  return `/${year}/${month}/`;
 }
 
 function toSortedValues(values: Iterable<string>) {
