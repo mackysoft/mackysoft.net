@@ -42,7 +42,7 @@ describe("static redirects", () => {
 
       const redirects = await buildStaticRedirects({ csvPath, distPath });
 
-      expect(redirects.map((redirect) => redirect.legacyPath)).toEqual([
+      expect(redirects.map((redirect: { legacyPath: string }) => redirect.legacyPath)).toEqual([
         "/legacy-article/",
         "/treasure-rogue/",
       ]);
