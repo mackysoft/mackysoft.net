@@ -65,7 +65,7 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
       tags={article.data.tags}
     />
     <section class="page-header article-page-header">
-      <p class="eyebrow">{formatBreadcrumb(uiText.common.home, uiText.common.articles)}</p>
+      <p class="eyebrow">{formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.articles)}</p>
     </section>
 
     {article.isFallback && locale !== defaultLocale && (

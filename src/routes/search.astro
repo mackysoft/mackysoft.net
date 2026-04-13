@@ -24,7 +24,7 @@ const initialQuery = Astro.url.searchParams.get("q") ?? "";
   canonicalPath={searchPath}
   alternateLocales={createAlternateLocaleLinks("/search/")}
 >
-  <PageHeader title={uiText.common.search} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.search)} />
+  <PageHeader title={uiText.common.search} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.search)} />
 
   <SearchPanel locale={locale} mode="page" searchPath={searchPath} initialQuery={initialQuery} />
 </SiteLayout>

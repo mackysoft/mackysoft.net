@@ -10,15 +10,15 @@ test.describe("privacy policy page", () => {
   test("renders the Japanese privacy policy with the active data handling details", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/privacy-policy/");
 
-    await expect(page).toHaveTitle("Privacy Policy | mackysoft.net");
+    await expect(page).toHaveTitle("プライバシーポリシー | mackysoft.net");
 
     const main = page.getByRole("main");
 
     await expect(main.getByText("Home / Privacy Policy", { exact: true })).toBeVisible();
-    await expect(main.getByRole("heading", { level: 1, name: "Privacy Policy" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 1, name: "プライバシーポリシー" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "運営者情報と連絡先" })).toBeVisible();
     await expect(main).toContainText("Hiroya Aramaki（荒牧裕也）/ Makihiro");
-    await expect(main.getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact/");
+    await expect(main.getByRole("link", { name: "問い合わせ" })).toHaveAttribute("href", "/contact/");
     await expect(main.getByRole("link", { name: "mackysoft0129@gmail.com" })).toHaveCount(0);
     await expect(main.getByRole("heading", { level: 2, name: "アクセス解析" })).toBeVisible();
     await expect(main).toContainText("Google Analytics 4");

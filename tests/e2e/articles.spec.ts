@@ -37,7 +37,7 @@ test.describe("articles page", () => {
     await page.goto("/articles/");
 
     await expect(page.locator(".page-header .eyebrow")).toHaveText("Home / Articles");
-    await expect(page.getByRole("heading", { level: 1, name: "Articles" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "記事" })).toBeVisible();
     await expect(page.locator(".page-lead__summary")).toHaveCount(0);
     await expect(page.getByRole("link", { name: latestZennArticleJa.title, exact: true })).toBeVisible();
 

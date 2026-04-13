@@ -13,33 +13,50 @@ export type SiteVocabulary = {
   archive: string;
 };
 
-export const siteVocabularyMap: Record<SiteLocale, SiteVocabulary> = {
+type SiteVocabularyBundle = {
+  display: SiteVocabulary;
+  breadcrumb: SiteVocabulary;
+};
+
+const englishVocabulary: SiteVocabulary = {
+  home: "Home",
+  about: "About",
+  games: "Games",
+  assets: "Assets",
+  articles: "Articles",
+  search: "Search",
+  contact: "Contact",
+  privacyPolicy: "Privacy Policy",
+  tag: "Tag",
+  archive: "Archive",
+};
+
+export const siteVocabularyMap: Record<SiteLocale, SiteVocabularyBundle> = {
   ja: {
-    home: "Home",
-    about: "About",
-    games: "Games",
-    assets: "Assets",
-    articles: "Articles",
-    search: "Search",
-    contact: "Contact",
-    privacyPolicy: "Privacy Policy",
-    tag: "Tag",
-    archive: "Archive",
+    display: {
+      home: "ホーム",
+      about: "プロフィール",
+      games: "ゲーム",
+      assets: "アセット",
+      articles: "記事",
+      search: "検索",
+      contact: "問い合わせ",
+      privacyPolicy: "プライバシーポリシー",
+      tag: "タグ",
+      archive: "アーカイブ",
+    },
+    breadcrumb: englishVocabulary,
   },
   en: {
-    home: "Home",
-    about: "About",
-    games: "Games",
-    assets: "Assets",
-    articles: "Articles",
-    search: "Search",
-    contact: "Contact",
-    privacyPolicy: "Privacy Policy",
-    tag: "Tag",
-    archive: "Archive",
+    display: englishVocabulary,
+    breadcrumb: englishVocabulary,
   },
 };
 
 export function getSiteVocabulary(locale: SiteLocale) {
-  return siteVocabularyMap[locale];
+  return siteVocabularyMap[locale].display;
+}
+
+export function getBreadcrumbVocabulary(locale: SiteLocale) {
+  return siteVocabularyMap[locale].breadcrumb;
 }

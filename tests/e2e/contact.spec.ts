@@ -4,17 +4,17 @@ test.describe("contact page", () => {
   test("shows contact channels and the reply policy", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/contact/");
 
-    await expect(page).toHaveTitle("Contact | mackysoft.net");
+    await expect(page).toHaveTitle("問い合わせ | mackysoft.net");
 
     const main = page.getByRole("main");
 
     await expect(main.getByText("Home / Contact", { exact: true })).toBeVisible();
-    await expect(main.getByRole("heading", { level: 1, name: "Contact" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 1, name: "問い合わせ" })).toBeVisible();
 
     const contactCards = main.locator(".contact-card");
     await expect(contactCards).toHaveCount(2);
 
-    await expect(contactCards.first().getByRole("link", { name: "メールで連絡する" })).toHaveAttribute(
+    await expect(contactCards.first().getByRole("link", { name: "メールで問い合わせる" })).toHaveAttribute(
       "href",
       "mailto:mackysoft0129@gmail.com",
     );

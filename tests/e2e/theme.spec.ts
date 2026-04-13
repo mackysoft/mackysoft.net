@@ -16,7 +16,7 @@ test.describe("theme toggle", () => {
     await expect(html).toHaveAttribute("data-theme", "dark");
     await expect(themeToggle).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgba(28, 32, 31, 0.82)");
-    await expect(page.getByRole("link", { name: "View Articles", exact: true })).toHaveCSS(
+    await expect(page.getByRole("link", { name: "記事一覧を見る", exact: true })).toHaveCSS(
       "background-color",
       "rgba(243, 238, 230, 0.08)",
     );

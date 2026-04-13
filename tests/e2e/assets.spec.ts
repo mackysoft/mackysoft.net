@@ -29,7 +29,7 @@ test.describe("assets page", () => {
     await page.goto("/assets/");
 
     await expect(page.getByText("Home / Assets", { exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 1, name: "Assets" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "アセット" })).toBeVisible();
 
     const firstCard = page.locator(".asset-card").first();
 

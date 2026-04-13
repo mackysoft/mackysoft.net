@@ -44,7 +44,7 @@ const pageMeta = getArticlesTagPageMeta(locale, tag, {
   canonicalPath={localizePath(`/tags/${tag}/`, locale)}
   alternateLocales={createAlternateLocaleLinks(`/tags/${tag}/`)}
 >
-  <PageHeader title={tag} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.tag)} />
+  <PageHeader title={tag} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.articles, uiText.breadcrumb.tag)} />
 
   <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
     {articles.map((article) => (

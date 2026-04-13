@@ -53,7 +53,7 @@ const pageMeta = getArticlesArchiveMonthPageMeta(locale, year, month, {
   canonicalPath={localizePath(`/archive/${year}/${month}/`, locale)}
   alternateLocales={createAlternateLocaleLinks(`/archive/${year}/${month}/`)}
 >
-  <PageHeader title={`${year}/${month}`} eyebrow={formatBreadcrumb(uiText.common.home, uiText.common.articles, uiText.common.archive)} />
+  <PageHeader title={`${year}/${month}`} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.articles, uiText.breadcrumb.archive)} />
 
   <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
     {articles.map((article) => (
