@@ -5,6 +5,8 @@ import SiteSeo from "../components/head/SiteSeo.astro";
 import ThemeBootstrap from "../components/head/ThemeBootstrap.astro";
 import SiteHeaderOffsetSync from "../components/SiteHeaderOffsetSync.astro";
 import SiteHeaderTools from "../components/SiteHeaderTools.astro";
+import MobileNavMenu from "../components/header/MobileNavMenu.astro";
+import PrimaryNav from "../components/header/PrimaryNav.astro";
 import { getUiText } from "../lib/ui-text";
 import { localizePath, stripLocaleFromPath, toLanguageTag, type SiteLocale } from "../lib/i18n";
 import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
@@ -56,14 +58,6 @@ const { canonicalUrl, rssFeedUrl, alternateLocaleUrls } = buildSiteLayoutUrls(si
   alternateLocaleUrls: AlternateLocaleUrl[];
 };
 const enableSearchPanel = stripLocaleFromPath(currentPath) !== "/search/" && !(isFallback && locale !== contentLocale);
-
-function isCurrentNavItem(itemHref: string, path: string) {
-  if (itemHref === "/") {
-    return path === "/";
-  }
-
-  return path === itemHref || path.startsWith(itemHref);
-}
 ---
 
 <!doctype html>
@@ -97,23 +91,21 @@ function isCurrentNavItem(itemHref: string, path: string) {
     <header class="site-header" data-site-header>
       <div class="site-header__inner">
         <a href={localizePath("/", locale)} class="site-brand">{siteMeta.name}</a>
-        <nav class="site-header__nav" aria-label="Global">
-          <ul class="site-nav">
-            {primaryNav.map((item) => (
-              <li>
-                <a href={item.href} aria-current={isCurrentNavItem(item.href, currentPath) ? "page" : undefined}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div class="site-header__nav">
+          <PrimaryNav items={primaryNav} currentPath={currentPath} ariaLabel={uiText.header.primaryNavLabel} />
+        </div>
         <SiteHeaderTools
           locale={locale}
           contentLocale={contentLocale}
           isFallback={isFallback}
           currentPath={currentPath}
           enableSearchPanel={enableSearchPanel}
+        />
+        <MobileNavMenu
+          items={primaryNav}
+          currentPath={currentPath}
+          ariaLabel={uiText.header.primaryNavLabel}
+          toggleLabel={uiText.header.menuToggle}
         />
       </div>
     </header>
@@ -151,5 +143,10 @@ function isCurrentNavItem(itemHref: string, path: string) {
       </footer>
     </div>
     <SiteHeaderOffsetSync />
+    <script>
+      import { initSiteHeader } from "../scripts/site-header";
+
+      initSiteHeader();
+    </script>
   </body>
 </html>

@@ -1,0 +1,51 @@
+---
+type NavItem = {
+  href: string;
+  label: string;
+};
+
+type Props = {
+  items: NavItem[];
+  currentPath: string;
+  ariaLabel: string;
+  variant?: "desktop" | "mobile";
+};
+
+const {
+  items,
+  currentPath,
+  ariaLabel,
+  variant = "desktop",
+} = Astro.props as Props;
+
+function isCurrentNavItem(itemHref: string, path: string) {
+  if (itemHref === "/") {
+    return path === "/";
+  }
+
+  return path === itemHref || path.startsWith(itemHref);
+}
+---
+
+<nav
+  class:list={[
+    "site-primary-nav",
+    variant === "mobile" ? "site-primary-nav--mobile" : "site-primary-nav--desktop",
+  ]}
+  aria-label={ariaLabel}
+>
+  <ul
+    class:list={[
+      "site-nav",
+      variant === "mobile" && "site-nav--mobile",
+    ]}
+  >
+    {items.map((item) => (
+      <li>
+        <a href={item.href} aria-current={isCurrentNavItem(item.href, currentPath) ? "page" : undefined}>
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

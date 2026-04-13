@@ -9,7 +9,9 @@ type CommonUiText = SiteVocabulary & {
 
 type UiText = {
   header: {
+    primaryNavLabel: string;
     toolsLabel: string;
+    menuToggle: string;
     searchOpen: string;
     themeToggle: string;
     languageMenu: string;
@@ -89,7 +91,9 @@ const commonUiTextSupplementMap: Record<SiteLocale, Pick<CommonUiText, "rssFeed"
 const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
   ja: {
     header: {
+      primaryNavLabel: "グローバルナビゲーション",
       toolsLabel: "ヘッダーツール",
+      menuToggle: "メニューを開く",
       searchOpen: "検索を開く",
       themeToggle: "テーマを切り替え",
       languageMenu: "表示言語を切り替え",
@@ -156,7 +160,9 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
   },
   en: {
     header: {
+      primaryNavLabel: "Global navigation",
       toolsLabel: "Header tools",
+      menuToggle: "Open menu",
       searchOpen: "Open search",
       themeToggle: "Toggle theme",
       languageMenu: "Switch language",

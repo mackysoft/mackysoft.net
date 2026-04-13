@@ -49,6 +49,7 @@ test.describe("site header", () => {
     const brand = header.getByRole("link", { name: "mackysoft.net", exact: true });
     const tools = header.locator("[data-site-header-tools]");
     const nav = header.locator(".site-header__nav");
+    const menuToggle = header.locator('[data-site-tool="menu"]');
     const searchTool = tools.locator('[data-site-tool="search"]');
     const themeTool = tools.locator('[data-site-tool="theme"]');
     const languageTool = tools.locator('[data-site-tool="language"]');
@@ -57,6 +58,7 @@ test.describe("site header", () => {
     await expect(brand).toBeVisible();
     await expect(tools).toBeVisible();
     await expect(nav).toBeVisible();
+    await expect(menuToggle).toBeHidden();
     await expect(nav.getByRole("link", { name: "プロフィール", exact: true })).toHaveAttribute("href", "/about/");
     await expect(nav.getByRole("link", { name: "ゲーム", exact: true })).toHaveAttribute("href", "/games/");
     await expect(nav.getByRole("link", { name: "アセット", exact: true })).toHaveAttribute("href", "/assets/");
@@ -95,7 +97,57 @@ test.describe("site header", () => {
     expect(toolsBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width - 1);
   });
 
-  test("stacks header tools after navigation on narrow screens", { tag: "@size:medium" }, async ({ browser }) => {
+  test("hides the primary nav behind the mobile menu on narrow screens", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 375, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/articles/");
+
+    const header = page.locator(".site-header");
+    const brand = header.getByRole("link", { name: "mackysoft.net", exact: true });
+    const tools = header.locator("[data-site-header-tools]");
+    const nav = header.locator(".site-header__nav");
+    const mobileMenu = header.locator("[data-site-mobile-nav]");
+    const menuToggle = header.locator('[data-site-tool="menu"]');
+
+    await expect(brand).toBeVisible();
+    await expect(tools).toBeVisible();
+    await expect(nav).toBeHidden();
+    await expect(menuToggle).toBeVisible();
+    await expect(tools.locator('[data-site-tool="search"]')).toHaveAttribute("href", "/search/");
+    await expect(tools.locator('[data-site-tool="theme"]')).toBeEnabled();
+    await expect(tools.locator('[data-site-tool="language"]')).toContainText("JP");
+
+    await menuToggle.click();
+
+    await expect(mobileMenu).toHaveAttribute("open", "");
+    await expect(mobileMenu.getByRole("link", { name: "プロフィール", exact: true })).toHaveAttribute("href", "/about/");
+    await expect(mobileMenu.getByRole("link", { name: "ゲーム", exact: true })).toHaveAttribute("href", "/games/");
+    await expect(mobileMenu.getByRole("link", { name: "アセット", exact: true })).toHaveAttribute("href", "/assets/");
+    await expect(mobileMenu.getByRole("link", { name: "記事", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(mobileMenu.getByRole("link", { name: "問い合わせ", exact: true })).toHaveAttribute("href", "/contact/");
+
+    await page.keyboard.press("Escape");
+    await expect(mobileMenu).not.toHaveAttribute("open", "");
+
+    await menuToggle.click();
+    await expect(mobileMenu).toHaveAttribute("open", "");
+    const panelBox = await mobileMenu.locator(".site-mobile-nav__panel").boundingBox();
+
+    if (!panelBox) {
+      throw new Error("mobile menu panel must be visible before outside-click assertions");
+    }
+
+    await page.mouse.click(panelBox.x + 12, panelBox.y + panelBox.height + 24);
+    await expect(mobileMenu).not.toHaveAttribute("open", "");
+
+    await context.close();
+  });
+
+  test("closes the mobile menu after same-tab navigation on narrow screens", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 375, height: 812 }, colorScheme: "light" });
     await context.addInitScript(() => {
       window.localStorage.setItem("mackysoft-locale", "ja");
@@ -104,30 +156,36 @@ test.describe("site header", () => {
 
     await page.goto("/");
 
-    const header = page.locator(".site-header");
-    const brand = header.getByRole("link", { name: "mackysoft.net", exact: true });
-    const tools = header.locator("[data-site-header-tools]");
-    const nav = header.locator(".site-header__nav");
+    const mobileMenu = page.locator("[data-site-mobile-nav]");
+    const menuToggle = page.locator('[data-site-tool="menu"]');
 
-    await expect(brand).toBeVisible();
-    await expect(tools).toBeVisible();
-    await expect(nav).toBeVisible();
-    await expect(tools.locator('[data-site-tool="search"]')).toHaveAttribute("href", "/search/");
-    await expect(tools.locator('[data-site-tool="theme"]')).toBeEnabled();
+    await menuToggle.click();
+    await expect(mobileMenu).toHaveAttribute("open", "");
 
-    const headerBox = await header.boundingBox();
-    const brandBox = await brand.boundingBox();
-    const toolsBox = await tools.boundingBox();
-    const navBox = await nav.boundingBox();
+    await mobileMenu.getByRole("link", { name: "ゲーム", exact: true }).click();
 
-    if (!headerBox || !brandBox || !toolsBox || !navBox) {
-      throw new Error("header elements must be visible before layout assertions");
-    }
+    await expect(page).toHaveURL("/games/");
+    await expect(mobileMenu).not.toHaveAttribute("open", "");
 
-    expect(brandBox.y + brandBox.height).toBeLessThanOrEqual(navBox.y + 4);
-    expect(navBox.y + navBox.height).toBeLessThanOrEqual(toolsBox.y + 4);
-    expect(toolsBox.x + toolsBox.width).toBeLessThanOrEqual(headerBox.x + headerBox.width + 1);
-    expect(navBox.x + navBox.width).toBeLessThanOrEqual(headerBox.x + headerBox.width + 1);
+    await context.close();
+  });
+
+  test("keeps the mobile menu usable when JavaScript is unavailable", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 375, height: 812 },
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const mobileMenu = page.locator("[data-site-mobile-nav]");
+    const menuToggle = page.locator('[data-site-tool="menu"]');
+
+    await expect(mobileMenu).not.toHaveAttribute("open", "");
+    await menuToggle.click();
+    await expect(mobileMenu).toHaveAttribute("open", "");
+    await expect(mobileMenu.getByRole("link", { name: "プロフィール", exact: true })).toBeVisible();
 
     await context.close();
   });

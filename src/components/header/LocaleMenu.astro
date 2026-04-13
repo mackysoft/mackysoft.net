@@ -1,6 +1,6 @@
 ---
 import { getUiText } from "../../lib/ui-text";
-import { localeStorageKey, supportedLocales, switchLocalePath, type SiteLocale } from "../../lib/i18n";
+import { supportedLocales, switchLocalePath, type SiteLocale } from "../../lib/i18n";
 
 type Props = {
   locale: SiteLocale;
@@ -20,8 +20,15 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
 }));
 ---
 
-<details class="site-language-menu" data-site-tool="language">
-  <summary class="site-header-tool site-header-tool--language" aria-label={uiText.header.languageMenu} data-site-language-toggle>
+<details class="site-language-menu" data-site-disclosure data-site-tool="language">
+  <summary
+    class="site-header-tool site-header-tool--language"
+    aria-label={uiText.header.languageMenu}
+    aria-haspopup="menu"
+    aria-expanded="false"
+    data-site-disclosure-toggle
+    data-site-language-toggle
+  >
     <svg class="site-header-tool__symbol" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
       <path d="M3.5 12H20.5" fill="none" stroke="currentColor" stroke-width="1.8"></path>
@@ -45,7 +52,7 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
     </svg>
   </summary>
 
-  <div class="site-language-menu__popover" role="menu" aria-label={uiText.header.languageMenu}>
+  <div class="site-language-menu__popover" role="menu" aria-label={uiText.header.languageMenu} data-site-disclosure-panel>
     {localeLinks.map((entry) => (
       entry.isSelected ? (
         <span
@@ -79,174 +86,3 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
     ))}
   </div>
 </details>
-
-<script is:inline define:vars={{ storageKey: localeStorageKey }}>
-  (() => {
-    const scrollRestoreStorageKey = "mackysoft-locale-scroll";
-    const scrollRestoreMaxAgeMs = 15_000;
-
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-    const getDocumentHeight = () => Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
-    const getScrollableHeight = () => Math.max(getDocumentHeight() - window.innerHeight, 0);
-    const getScrollProgress = () => {
-      const scrollableHeight = getScrollableHeight();
-
-      if (scrollableHeight === 0) {
-        return 0;
-      }
-
-      return clamp(window.scrollY / scrollableHeight, 0, 1);
-    };
-    const clearScrollRestoreState = () => {
-      try {
-        window.sessionStorage.removeItem(scrollRestoreStorageKey);
-      } catch {
-        // Ignore storage failures and continue without restoration state.
-      }
-    };
-    const consumeScrollRestoreState = () => {
-      try {
-        const rawValue = window.sessionStorage.getItem(scrollRestoreStorageKey);
-
-        clearScrollRestoreState();
-
-        if (!rawValue) {
-          return null;
-        }
-
-        const parsedValue = JSON.parse(rawValue);
-
-        if (
-          typeof parsedValue !== "object"
-          || parsedValue === null
-          || typeof parsedValue.pathname !== "string"
-          || typeof parsedValue.progress !== "number"
-          || typeof parsedValue.timestamp !== "number"
-        ) {
-          return null;
-        }
-
-        if (!Number.isFinite(parsedValue.progress) || !Number.isFinite(parsedValue.timestamp)) {
-          return null;
-        }
-
-        if (Date.now() - parsedValue.timestamp > scrollRestoreMaxAgeMs) {
-          return null;
-        }
-
-        return {
-          pathname: parsedValue.pathname,
-          progress: clamp(parsedValue.progress, 0, 1),
-        };
-      } catch {
-        clearScrollRestoreState();
-        return null;
-      }
-    };
-    const applyScrollProgress = (progress) => {
-      const scrollableHeight = getScrollableHeight();
-      const nextScrollTop = clamp(Math.round(scrollableHeight * progress), 0, scrollableHeight);
-
-      window.scrollTo({
-        left: 0,
-        top: nextScrollTop,
-        behavior: "auto",
-      });
-    };
-    const scheduleScrollRestore = (progress) => {
-      window.requestAnimationFrame(() => {
-        applyScrollProgress(progress);
-      });
-      window.addEventListener("load", () => {
-        applyScrollProgress(progress);
-      }, { once: true });
-
-      if ("fonts" in document) {
-        document.fonts.ready.then(() => {
-          applyScrollProgress(progress);
-        });
-      }
-    };
-    const persistedScrollState = consumeScrollRestoreState();
-
-    if (persistedScrollState?.pathname === window.location.pathname) {
-      scheduleScrollRestore(persistedScrollState.progress);
-    }
-
-    const persistSelectedLocale = (link) => {
-      try {
-        window.localStorage.setItem(storageKey, link.dataset.localeSwitchLink ?? "");
-      } catch {
-        // Ignore storage failures and continue navigation.
-      }
-    };
-    const persistScrollRestoreState = (link) => {
-      try {
-        const nextUrl = new URL(link.href, window.location.href);
-
-        window.sessionStorage.setItem(scrollRestoreStorageKey, JSON.stringify({
-          pathname: nextUrl.pathname,
-          progress: getScrollProgress(),
-          timestamp: Date.now(),
-        }));
-      } catch {
-        clearScrollRestoreState();
-      }
-    };
-    const isSameTabNavigation = (link, event) => {
-      if (event.defaultPrevented) {
-        return false;
-      }
-
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-        return false;
-      }
-
-      if (link.target && link.target.toLowerCase() !== "_self") {
-        return false;
-      }
-
-      return !link.hasAttribute("download");
-    };
-
-    for (const link of document.querySelectorAll("[data-locale-switch-link]")) {
-      if (!(link instanceof HTMLAnchorElement)) {
-        continue;
-      }
-
-      link.addEventListener("click", (event) => {
-        persistSelectedLocale(link);
-
-        if (!isSameTabNavigation(link, event)) {
-          return;
-        }
-
-        persistScrollRestoreState(link);
-      });
-    }
-
-    for (const menu of document.querySelectorAll(".site-language-menu")) {
-      if (!(menu instanceof HTMLDetailsElement)) {
-        continue;
-      }
-
-      menu.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          menu.open = false;
-        }
-      });
-    }
-
-    window.addEventListener("click", (event) => {
-      for (const menu of document.querySelectorAll(".site-language-menu")) {
-        if (!(menu instanceof HTMLDetailsElement)) {
-          continue;
-        }
-
-        if (!menu.contains(event.target instanceof Node ? event.target : null)) {
-          menu.open = false;
-        }
-      }
-    });
-  })();
-</script>

@@ -6,6 +6,8 @@ describe("ui text", () => {
   test("uses Japanese labels for display text while keeping breadcrumb labels unchanged", () => {
     const uiText = getUiText("ja");
 
+    expect(uiText.header.primaryNavLabel).toBe("グローバルナビゲーション");
+    expect(uiText.header.menuToggle).toBe("メニューを開く");
     expect(uiText.common.home).toBe("ホーム");
     expect(uiText.common.about).toBe("プロフィール");
     expect(uiText.common.games).toBe("ゲーム");
@@ -29,6 +31,8 @@ describe("ui text", () => {
   test("keeps English display and breadcrumb labels aligned", () => {
     const uiText = getUiText("en");
 
+    expect(uiText.header.primaryNavLabel).toBe("Global navigation");
+    expect(uiText.header.menuToggle).toBe("Open menu");
     expect(uiText.common.home).toBe(uiText.breadcrumb.home);
     expect(uiText.common.about).toBe(uiText.breadcrumb.about);
     expect(uiText.common.games).toBe(uiText.breadcrumb.games);

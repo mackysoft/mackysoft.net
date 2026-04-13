@@ -469,17 +469,30 @@ function initSearchPanel(root: HTMLElement) {
   }
 }
 
-function closeInlinePanel(panel: HTMLElement) {
+function closeInlinePanel(panel: HTMLElement, restoreFocus = true) {
   panel.hidden = true;
   activeSearchTrigger?.setAttribute("aria-expanded", "false");
-  activeSearchTrigger?.focus();
+
+  if (restoreFocus) {
+    activeSearchTrigger?.focus();
+  }
+
   if (activeSearchPanel === panel) {
     activeSearchPanel = null;
   }
   activeSearchTrigger = null;
 }
 
+function closeActiveSearchPanel(restoreFocus = true) {
+  if (!activeSearchPanel) {
+    return;
+  }
+
+  closeInlinePanel(activeSearchPanel, restoreFocus);
+}
+
 function openInlinePanel(panel: HTMLElement, trigger: HTMLElement) {
+  document.dispatchEvent(new CustomEvent("site-header:close-disclosures"));
   panel.hidden = false;
   trigger.setAttribute("aria-expanded", "true");
   activeSearchTrigger = trigger;
@@ -545,6 +558,10 @@ export function initSiteSearch() {
   if (!searchInteractionsReady) {
     searchInteractionsReady = true;
 
+    document.addEventListener("site-header:close-search", () => {
+      closeActiveSearchPanel(false);
+    });
+
     document.addEventListener("pointerdown", (event) => {
       const target = event.target;
 
@@ -556,10 +573,7 @@ export function initSiteSearch() {
         return;
       }
 
-      activeSearchPanel.hidden = true;
-      activeSearchTrigger.setAttribute("aria-expanded", "false");
-      activeSearchPanel = null;
-      activeSearchTrigger = null;
+      closeActiveSearchPanel(false);
     });
   }
 
