@@ -88,8 +88,8 @@ src/content/articles/my-article/
 
 ```md
 ---
-title: ""
-description: ""
+title: "Title"
+description: "Description"
 publishedAt: "2026-04-14 13:37"
 tags: []
 draft: true

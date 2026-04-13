@@ -66,8 +66,8 @@ export function resolveArticlePaths(slug, { root = repoRoot } = {}) {
 }
 
 export function createArticleTemplate({
-  title = "",
-  description = "",
+  title = "Title",
+  description = "Description",
   publishedAt = formatDateTimeMinute(),
   draft = true,
 } = {}) {

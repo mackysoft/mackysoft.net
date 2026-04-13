@@ -41,8 +41,8 @@ describe("create article script", () => {
       publishedAt: "2026-04-14 13:37",
     });
 
-    expect(template).toContain('title: ""');
-    expect(template).toContain('description: ""');
+    expect(template).toContain('title: "Title"');
+    expect(template).toContain('description: "Description"');
     expect(template).toContain('publishedAt: "2026-04-14 13:37"');
     expect(template).toContain("tags: []");
     expect(template).toContain("draft: true");
