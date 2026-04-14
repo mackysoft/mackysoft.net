@@ -93,7 +93,9 @@ const uiText = getUiText(locale);
       }
     };
 
-    applyTheme(getCurrentTheme());
+    withoutThemeTransitions(() => {
+      applyTheme(getCurrentTheme());
+    });
 
     for (const button of themeButtons) {
       if (button.dataset.themeReady === "true") {
