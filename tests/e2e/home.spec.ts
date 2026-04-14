@@ -59,7 +59,7 @@ test.describe("home page", () => {
     await expect(homeHero.getByRole("link", { name: homePageContentJa.heroPrimaryCta, exact: true })).toHaveAttribute("href", "/about/");
     const homeHeroContactCta = homeHero.getByRole("link", { name: homePageContentJa.heroContactCta, exact: true });
     await expect(homeHeroContactCta).toHaveAttribute("href", "/contact/");
-    await expect(homeHeroContactCta).toHaveCSS("background-color", "rgb(238, 242, 247)");
+    await expect(homeHeroContactCta).toHaveCSS("background-color", "rgb(210, 235, 255)");
     await expect(page.getByRole("heading", { level: 2, name: "仕事・相談と OSS の窓口" })).toHaveCount(0);
     await expect(latestArticlesHeading).toBeVisible();
     await expect(latestArticlesHeading.locator("xpath=preceding-sibling::p[1]")).toHaveText("Latest Articles");
@@ -175,7 +175,7 @@ test.describe("home page", () => {
     await expect(page.getByRole("link", { name: "View Games", exact: true })).toHaveAttribute("href", "/en/games/");
     await expect(page.getByRole("main").locator(".game-card").first()).toContainText("Treasure Rogue");
     await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgb(255, 255, 255)");
-    await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(255, 255, 255, 0.94)");
+    await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(240, 249, 255, 0.94)");
   });
 
   test("tracks the redirected English root visit only once", async ({ page }) => {

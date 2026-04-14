@@ -55,6 +55,8 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
   isFallback={article.isFallback}
   canonicalPath={canonicalPath}
   alternateLocales={alternateLocales}
+  image={article.data.cover}
+  imageAlt={article.data.coverAlt}
 >
   <article class="article-page">
     <SearchMetadata

@@ -5,7 +5,6 @@ const profileContentMap = {
   ja: {
     avatarLinkAriaLabel: "Twitter を開く",
     avatar: {
-      src: "https://github.com/mackysoft.png",
       alt: "Makihiro のアイコン",
     },
     primaryExternalLinkId: "twitter" as ExternalLinkId,
@@ -21,7 +20,6 @@ const profileContentMap = {
   en: {
     avatarLinkAriaLabel: "Open Twitter",
     avatar: {
-      src: "https://github.com/mackysoft.png",
       alt: "Makihiro avatar",
     },
     primaryExternalLinkId: "twitter" as ExternalLinkId,

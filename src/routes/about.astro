@@ -4,6 +4,7 @@ import SearchMetadata from "../components/search/SearchMetadata.astro";
 import Stack from "../components/Stack.astro";
 import DescribedLinkList from "../features/about/DescribedLinkList.astro";
 import { getAboutPageContent } from "../features/about/content";
+import { getProfileAvatar } from "../features/profile/avatar";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../lib/i18n";
 import { getExternalLink } from "../lib/site";
 import SiteLayout from "../layouts/SiteLayout.astro";
@@ -15,6 +16,7 @@ type Props = {
 const { locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const aboutPageContent = getAboutPageContent(locale);
+const profileAvatar = getProfileAvatar(locale);
 const aboutExternalLinks = aboutPageContent.externalLinks.map((link) => {
   const externalLink = getExternalLink(link.id);
   return { ...link, href: externalLink.href, label: externalLink.label };
@@ -38,8 +40,8 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
       type="page"
       description={aboutPageContent.description}
       source="mackysoft.net"
-      image={aboutPageContent.profile.avatar.src}
-      imageAlt={aboutPageContent.profile.avatar.alt}
+      image={profileAvatar.src}
+      imageAlt={profileAvatar.alt}
     />
     <PageHeader title={aboutPageContent.hero.title} eyebrow={aboutPageContent.hero.eyebrow} />
 
@@ -55,7 +57,7 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
           data-analytics-label={profilePrimaryExternalLink.label}
           data-analytics-location="about-profile"
         >
-          <img src={aboutPageContent.profile.avatar.src} alt={aboutPageContent.profile.avatar.alt} class="avatar" loading="eager" />
+          <img src={profileAvatar.src.src} alt={profileAvatar.alt} class="avatar" loading="eager" />
         </a>
         <Stack class="profile-copy" gap="0.35rem">
           <p class="profile-name">{aboutPageContent.profile.name}</p>
