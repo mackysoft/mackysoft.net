@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { articleTagKeys, getArticleTagLabel, isArticleTagKey } from "../../src/lib/article-tags";
+import { articleTagDefinitions, getArticleTagLabel } from "../../src/lib/article-tags";
 
 describe("article tags", () => {
   test("returns localized labels for registered keys", () => {
@@ -13,9 +13,8 @@ describe("article tags", () => {
     expect(getArticleTagLabel("unknown-tag", "en")).toBe("unknown-tag");
   });
 
-  test("recognizes only registered keys", () => {
-    expect(articleTagKeys).toContain("completion-detection");
-    expect(isArticleTagKey("completion-detection")).toBe(true);
-    expect(isArticleTagKey("終了判定")).toBe(false);
+  test("keeps the localization dictionary addressable by arbitrary tag keys", () => {
+    expect(articleTagDefinitions["completion-detection"]?.label.ja).toBe("終了判定");
+    expect(articleTagDefinitions["custom-tag"]).toBeUndefined();
   });
 });

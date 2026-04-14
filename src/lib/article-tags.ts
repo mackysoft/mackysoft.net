@@ -4,37 +4,7 @@ type ArticleTagDefinition = {
   label: Partial<Record<SiteLocale, string>>;
 };
 
-export const articleTagKeys = [
-  "animationcurve",
-  "asset",
-  "cinemachine",
-  "completion-detection",
-  "csharp",
-  "cullinggroup",
-  "evaluate",
-  "game-design",
-  "keyframe",
-  "lod",
-  "misc",
-  "modiferty",
-  "particlesystem",
-  "play-memo",
-  "playfab",
-  "script",
-  "stopaction",
-  "textmesh-pro",
-  "treasure-rogue",
-  "tutorial",
-  "ugui",
-  "ui",
-  "unity",
-  "vision",
-  "wrapmode",
-] as const;
-
-export type ArticleTagKey = typeof articleTagKeys[number];
-
-export const articleTagDefinitions = {
+export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
   animationcurve: {
     label: {
       ja: "AnimationCurve",
@@ -185,18 +155,8 @@ export const articleTagDefinitions = {
       en: "WrapMode",
     },
   },
-} satisfies Record<ArticleTagKey, ArticleTagDefinition>;
-
-const articleTagKeySet = new Set<string>(articleTagKeys);
-
-export function isArticleTagKey(value: string): value is ArticleTagKey {
-  return articleTagKeySet.has(value);
-}
+};
 
 export function getArticleTagLabel(tagKey: string, locale: SiteLocale = defaultLocale) {
-  if (!isArticleTagKey(tagKey)) {
-    return tagKey;
-  }
-
-  return articleTagDefinitions[tagKey].label[locale] ?? tagKey;
+  return articleTagDefinitions[tagKey]?.label[locale] ?? tagKey;
 }
