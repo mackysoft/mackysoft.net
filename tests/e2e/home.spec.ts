@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 import { formatContentDate } from "../../src/lib/content-date";
 import { getHomePageContent } from "../../src/features/home/content";
@@ -36,8 +36,135 @@ const homePageContentJa = getHomePageContent("ja");
 const homePageContentEn = getHomePageContent("en");
 const homeHeroJa = getProfileContent("ja").home;
 const homeHeroEn = getProfileContent("en").home;
+const mobileViewport = { width: 375, height: 812 };
+
+async function setJapaneseLocale(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("mackysoft-locale", "ja");
+  });
+}
+
+async function expectMobileHomeGridFullWidth(page: Page, gridSelector: string, itemSelector: string) {
+  const grid = page.locator(gridSelector);
+  const items = page.locator(`${gridSelector} > ${itemSelector}`);
+
+  if (await items.count() === 0) {
+    return;
+  }
+
+  const gridBox = await grid.boundingBox();
+  const firstItemBox = await items.first().boundingBox();
+
+  if (!gridBox || !firstItemBox) {
+    throw new Error("home grid and first item must be visible before mobile width assertions");
+  }
+
+  expect(Math.abs(firstItemBox.x - gridBox.x)).toBeLessThanOrEqual(2);
+  expect(Math.abs(firstItemBox.width - gridBox.width)).toBeLessThanOrEqual(2);
+}
+
+async function expectTwoColumnHomeGrid(page: Page, gridSelector: string, itemSelector: string) {
+  const grid = page.locator(gridSelector);
+  const items = page.locator(`${gridSelector} > ${itemSelector}`);
+
+  if (await items.count() < 2) {
+    return;
+  }
+
+  const gridBox = await grid.boundingBox();
+  const firstItemBox = await items.first().boundingBox();
+  const secondItemBox = await items.nth(1).boundingBox();
+
+  if (!gridBox || !firstItemBox || !secondItemBox) {
+    throw new Error("home grid and first two items must be visible before two-column assertions");
+  }
+
+  expect(Math.abs(firstItemBox.x - gridBox.x)).toBeLessThanOrEqual(2);
+  expect(Math.abs(firstItemBox.y - secondItemBox.y)).toBeLessThanOrEqual(2);
+  expect(Math.abs(firstItemBox.width - secondItemBox.width)).toBeLessThanOrEqual(2);
+  expect(Math.abs((secondItemBox.x + secondItemBox.width) - (gridBox.x + gridBox.width))).toBeLessThanOrEqual(2);
+}
+
+async function expectUniformHomeGrid(page: Page, gridSelector: string, itemSelector: string) {
+  const grid = page.locator(gridSelector);
+  const items = page.locator(`${gridSelector} > ${itemSelector}`);
+  const count = await items.count();
+
+  if (count === 0) {
+    return;
+  }
+
+  const gridBox = await grid.boundingBox();
+  const firstItemBox = await items.first().boundingBox();
+
+  if (!gridBox || !firstItemBox) {
+    throw new Error("home grid and first item must be visible before layout assertions");
+  }
+
+  expect(Math.abs(firstItemBox.x - gridBox.x)).toBeLessThanOrEqual(2);
+
+  const referenceWidth = firstItemBox.width;
+
+  for (let index = 0; index < count; index += 1) {
+    const itemBox = await items.nth(index).boundingBox();
+
+    if (!itemBox) {
+      throw new Error("home grid item must be visible before width assertions");
+    }
+
+    expect(Math.abs(itemBox.width - referenceWidth)).toBeLessThanOrEqual(2);
+  }
+
+  if (count === 1) {
+    expect(firstItemBox.width).toBeLessThan(gridBox.width - 16);
+  }
+}
+
+async function expectTitleHeightsUseWholeLines(page: Page, selector: string) {
+  const titleMetrics = await page.locator(selector).evaluateAll((elements) => {
+    return elements.map((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        height: rect.height,
+        lineHeight: Number.parseFloat(style.lineHeight),
+      };
+    });
+  });
+
+  for (const { height, lineHeight } of titleMetrics) {
+    const renderedLines = height / lineHeight;
+    expect(Math.abs(renderedLines - Math.round(renderedLines))).toBeLessThanOrEqual(0.12);
+  }
+}
 
 test.describe("home page", () => {
+  test("keeps activity grids aligned from mobile through desktop", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+
+    await page.setViewportSize(mobileViewport);
+    await page.goto("/");
+
+    await expectMobileHomeGridFullWidth(page, ".latest-articles-grid", ".article-card");
+    await expectMobileHomeGridFullWidth(page, ".latest-releases-grid", ".release-card");
+    await expectMobileHomeGridFullWidth(page, ".latest-games-grid", ".game-card");
+
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.reload();
+
+    await expectTwoColumnHomeGrid(page, ".latest-articles-grid", ".article-card");
+    await expectTwoColumnHomeGrid(page, ".latest-releases-grid", ".release-card");
+    await expectTwoColumnHomeGrid(page, ".latest-games-grid", ".game-card");
+    await expectTitleHeightsUseWholeLines(page, ".latest-articles-grid .article-card h3");
+
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.reload();
+
+    await expectUniformHomeGrid(page, ".latest-articles-grid", ".article-card");
+    await expectUniformHomeGrid(page, ".latest-releases-grid", ".release-card");
+    await expectUniformHomeGrid(page, ".latest-games-grid", ".game-card");
+  });
+
   test("renders the home page as an activity hub", async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem("mackysoft-locale", "ja");

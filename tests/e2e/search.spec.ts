@@ -16,6 +16,7 @@ async function setJapaneseLocale(page: Page) {
 test.describe("site search", () => {
   test("opens the inline panel from the header and returns focus when it closes", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
+    await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
 
     const trigger = page.locator('[data-site-search-trigger]');
@@ -26,6 +27,27 @@ test.describe("site search", () => {
 
     await expect(panel).toBeVisible();
     await expect(input).toBeFocused();
+
+    const { scrollX, panelLeft, panelRight, triggerRight } = await page.evaluate(() => {
+      const panel = document.querySelector("[data-site-search-inline]");
+      const trigger = document.querySelector("[data-site-search-trigger]");
+      const rect = panel instanceof HTMLElement ? panel.getBoundingClientRect() : null;
+      const triggerRect = trigger instanceof HTMLElement ? trigger.getBoundingClientRect() : null;
+
+      return {
+        scrollX: window.scrollX,
+        panelLeft: rect?.left ?? null,
+        panelRight: rect?.right ?? null,
+        triggerRight: triggerRect?.right ?? null,
+      };
+    });
+
+    expect(scrollX).toBe(0);
+    expect(panelLeft).not.toBeNull();
+    expect(panelRight).not.toBeNull();
+    expect(triggerRight).not.toBeNull();
+    expect(panelLeft!).toBeGreaterThanOrEqual(-1);
+    expect(Math.abs(panelRight! - triggerRight!)).toBeLessThanOrEqual(1);
 
     await input.fill(localSearchQuery);
 
@@ -54,6 +76,42 @@ test.describe("site search", () => {
 
     await expect(page).toHaveURL(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
+  });
+
+  test("keeps the inline search width stable on tablet-sized viewports and only clamps when needed", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.setViewportSize({ width: 768, height: 900 });
+    await page.goto("/");
+
+    await page.locator('[data-site-search-trigger]').click();
+
+    const { panelWidth, headerWidth, scrollX, viewportWidth, panelRight, triggerRight } = await page.evaluate(() => {
+      const panel = document.querySelector("[data-site-search-inline]");
+      const header = document.querySelector(".site-header__inner");
+      const trigger = document.querySelector("[data-site-search-trigger]");
+      const panelRect = panel instanceof HTMLElement ? panel.getBoundingClientRect() : null;
+      const headerRect = header instanceof HTMLElement ? header.getBoundingClientRect() : null;
+      const triggerRect = trigger instanceof HTMLElement ? trigger.getBoundingClientRect() : null;
+
+      return {
+        panelWidth: panelRect?.width ?? null,
+        headerWidth: headerRect?.width ?? null,
+        scrollX: window.scrollX,
+        viewportWidth: window.innerWidth,
+        panelRight: panelRect?.right ?? null,
+        triggerRight: triggerRect?.right ?? null,
+      };
+    });
+
+    expect(scrollX).toBe(0);
+    expect(panelWidth).not.toBeNull();
+    expect(headerWidth).not.toBeNull();
+    expect(panelRight).not.toBeNull();
+    expect(triggerRight).not.toBeNull();
+    expect(panelWidth!).toBeCloseTo(480, 1);
+    expect(panelWidth!).toBeLessThan(viewportWidth);
+    expect(headerWidth!).toBeGreaterThan(panelWidth! + 200);
+    expect(Math.abs(panelRight! - triggerRight!)).toBeLessThanOrEqual(1);
   });
 
   test("renders local article hits as cards with an excerpt on the search page", { tag: "@size:medium" }, async ({ page }) => {

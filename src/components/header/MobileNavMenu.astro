@@ -1,0 +1,49 @@
+---
+import PrimaryNav from "./PrimaryNav.astro";
+
+type NavItem = {
+  href: string;
+  label: string;
+};
+
+type Props = {
+  items: NavItem[];
+  currentPath: string;
+  ariaLabel: string;
+  toggleLabel: string;
+  panelId?: string;
+};
+
+const {
+  items,
+  currentPath,
+  ariaLabel,
+  toggleLabel,
+  panelId = "site-mobile-nav-panel",
+} = Astro.props as Props;
+---
+
+<details
+  class="site-mobile-nav"
+  data-site-disclosure
+  data-site-mobile-nav
+>
+  <summary
+    class="site-header-tool site-header-tool--icon site-header-tool--menu"
+    aria-label={toggleLabel}
+    aria-controls={panelId}
+    data-site-disclosure-toggle
+    data-site-tool="menu"
+  >
+    <span class="site-header-tool__menu-icon" aria-hidden="true">
+      <span class="site-header-tool__menu-line"></span>
+      <span class="site-header-tool__menu-line"></span>
+      <span class="site-header-tool__menu-line"></span>
+    </span>
+    <span class="visually-hidden">{toggleLabel}</span>
+  </summary>
+
+  <div class="site-mobile-nav__panel" id={panelId} data-site-disclosure-panel data-site-dropdown-panel>
+    <PrimaryNav items={items} currentPath={currentPath} ariaLabel={ariaLabel} variant="mobile" />
+  </div>
+</details>

@@ -2,6 +2,7 @@
 import ArticleCard from "../components/ArticleCard.astro";
 import GameCard from "../components/GameCard.astro";
 import ReleaseCard from "../components/ReleaseCard.astro";
+import HomeActivitySection from "../features/home/HomeActivitySection.astro";
 import { getHomePageContent } from "../features/home/content";
 import HomeHero from "../features/home/HomeHero.astro";
 import { getArticleItems } from "../lib/articles";
@@ -32,85 +33,43 @@ const localizedHomePath = localizePath("/", locale);
   <h1 class="visually-hidden">{content.homeHeading}</h1>
   <HomeHero locale={locale} primaryCtaLabel={content.heroPrimaryCta} contactCtaLabel={content.heroContactCta} />
 
-  <section class="content-panel">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">{content.latestArticlesEyebrow}</p>
-        <h2>{content.latestArticlesHeading}</h2>
-      </div>
-      <a href={localizePath("/articles/", locale)} class="button-link">{content.latestArticlesCta}</a>
-    </div>
-    <div class="content-grid latest-articles-grid">
-      {latestArticles.map((article) => (
-        <ArticleCard article={article} layout="vertical" locale={locale} />
-      ))}
-    </div>
-  </section>
+  <HomeActivitySection
+    eyebrow={content.latestArticlesEyebrow}
+    heading={content.latestArticlesHeading}
+    ctaHref={localizePath("/articles/", locale)}
+    ctaLabel={content.latestArticlesCta}
+    gridClass="latest-articles-grid"
+  >
+    {latestArticles.map((article) => (
+      <ArticleCard article={article} layout="vertical" locale={locale} />
+    ))}
+  </HomeActivitySection>
 
   {latestReleases.length > 0 && (
-    <section class="content-panel">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">{content.latestReleasesEyebrow}</p>
-          <h2>{content.latestReleasesHeading}</h2>
-        </div>
-        <a href={localizePath("/assets/", locale)} class="button-link">{content.latestReleasesCta}</a>
-      </div>
-      <div class="content-grid latest-releases-grid">
-        {latestReleases.map((release) => (
-          <ReleaseCard release={release} locale={locale} />
-        ))}
-      </div>
-    </section>
+    <HomeActivitySection
+      eyebrow={content.latestReleasesEyebrow}
+      heading={content.latestReleasesHeading}
+      ctaHref={localizePath("/assets/", locale)}
+      ctaLabel={content.latestReleasesCta}
+      gridClass="latest-releases-grid"
+    >
+      {latestReleases.map((release) => (
+        <ReleaseCard release={release} locale={locale} />
+      ))}
+    </HomeActivitySection>
   )}
 
   {homeGames.length > 0 && (
-    <section class="content-panel">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">{content.gamesEyebrow}</p>
-          <h2>{content.gamesHeading}</h2>
-        </div>
-        <a href={localizePath("/games/", locale)} class="button-link">{content.gamesCta}</a>
-      </div>
-      <div class="content-grid latest-games-grid">
-        {homeGames.map((game) => (
-          <GameCard game={game} layout="compact" locale={locale} />
-        ))}
-      </div>
-    </section>
+    <HomeActivitySection
+      eyebrow={content.gamesEyebrow}
+      heading={content.gamesHeading}
+      ctaHref={localizePath("/games/", locale)}
+      ctaLabel={content.gamesCta}
+      gridClass="latest-games-grid"
+    >
+      {homeGames.map((game) => (
+        <GameCard game={game} layout="compact" locale={locale} />
+      ))}
+    </HomeActivitySection>
   )}
 </SiteLayout>
-
-<style>
-  h2 {
-    margin: 0;
-    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  }
-
-  .section-head {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: space-between;
-    align-items: end;
-    margin-bottom: 1rem;
-  }
-
-  .latest-articles-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
-
-  .latest-releases-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
-
-  .latest-games-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
-
-  .latest-games-grid > :global(.game-card) {
-    justify-self: start;
-    width: min(100%, 19.5rem);
-  }
-</style>

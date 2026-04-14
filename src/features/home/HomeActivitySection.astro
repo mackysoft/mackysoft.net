@@ -1,0 +1,60 @@
+---
+type Props = {
+  eyebrow: string;
+  heading: string;
+  ctaHref: string;
+  ctaLabel: string;
+  gridClass?: string;
+};
+
+const { eyebrow, heading, ctaHref, ctaLabel, gridClass } = Astro.props as Props;
+---
+
+<section class="content-panel home-activity-section">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2>{heading}</h2>
+    </div>
+    <a href={ctaHref} class="button-link">{ctaLabel}</a>
+  </div>
+  <div class:list={["content-grid", "home-activity-grid", gridClass]}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+
+  .home-activity-section {
+    container-type: inline-size;
+  }
+
+  .home-activity-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  @container (min-width: 40rem) {
+    .home-activity-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 60rem) {
+    .home-activity-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

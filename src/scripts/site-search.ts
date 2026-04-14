@@ -14,6 +14,11 @@ import {
   getUiText,
 } from "../lib/ui-text";
 import { isSiteLocale, type SiteLocale } from "../lib/i18n";
+import {
+  closeDropdownPanel,
+  openDropdownPanel,
+  prepareDropdownPanel,
+} from "./site-dropdown";
 
 type PagefindResult = {
   data: () => Promise<PagefindSearchResultData>;
@@ -61,6 +66,7 @@ let activeSearchTrigger: HTMLElement | null = null;
 let activeSearchPanel: HTMLElement | null = null;
 let searchInteractionsReady = false;
 const pagefindBundlePath = "/pagefind/pagefind.js";
+const searchInlineViewportPadding = 16;
 
 async function importPagefindBundle(bundlePath: string) {
   return new Function("path", "return import(path)")(bundlePath) as Promise<PagefindModule>;
@@ -469,21 +475,47 @@ function initSearchPanel(root: HTMLElement) {
   }
 }
 
-function closeInlinePanel(panel: HTMLElement) {
-  panel.hidden = true;
+function closeInlinePanel(panel: HTMLElement, restoreFocus = true) {
+  closeDropdownPanel(panel);
   activeSearchTrigger?.setAttribute("aria-expanded", "false");
-  activeSearchTrigger?.focus();
+
+  if (restoreFocus) {
+    activeSearchTrigger?.focus();
+  }
+
   if (activeSearchPanel === panel) {
     activeSearchPanel = null;
   }
   activeSearchTrigger = null;
 }
 
+function closeActiveSearchPanel(restoreFocus = true) {
+  if (!activeSearchPanel) {
+    return;
+  }
+
+  closeInlinePanel(activeSearchPanel, restoreFocus);
+}
+
+function syncInlinePanelWidth(panel: HTMLElement) {
+  panel.style.removeProperty("width");
+
+  const rect = panel.getBoundingClientRect();
+  const minLeft = searchInlineViewportPadding;
+
+  if (rect.left < minLeft) {
+    const nextWidth = Math.max(rect.right - minLeft, 0);
+    panel.style.width = `${nextWidth}px`;
+  }
+}
+
 function openInlinePanel(panel: HTMLElement, trigger: HTMLElement) {
-  panel.hidden = false;
+  document.dispatchEvent(new CustomEvent("site-header:close-disclosures"));
+  openDropdownPanel(panel);
   trigger.setAttribute("aria-expanded", "true");
   activeSearchTrigger = trigger;
   activeSearchPanel = panel;
+  syncInlinePanelWidth(panel);
   focusSearchInput(panel);
 }
 
@@ -493,6 +525,7 @@ function initSearchInlinePanel(panel: HTMLElement) {
   }
 
   panel.dataset.searchInlineReady = "true";
+  prepareDropdownPanel(panel, !panel.hidden);
 
   panel.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -545,6 +578,10 @@ export function initSiteSearch() {
   if (!searchInteractionsReady) {
     searchInteractionsReady = true;
 
+    document.addEventListener("site-header:close-search", () => {
+      closeActiveSearchPanel(false);
+    });
+
     document.addEventListener("pointerdown", (event) => {
       const target = event.target;
 
@@ -556,11 +593,14 @@ export function initSiteSearch() {
         return;
       }
 
-      activeSearchPanel.hidden = true;
-      activeSearchTrigger.setAttribute("aria-expanded", "false");
-      activeSearchPanel = null;
-      activeSearchTrigger = null;
+      closeActiveSearchPanel(false);
     });
+
+    window.addEventListener("resize", () => {
+      if (activeSearchPanel) {
+        syncInlinePanelWidth(activeSearchPanel);
+      }
+    }, { passive: true });
   }
 
   for (const panel of document.querySelectorAll("[data-site-search-panel]")) {
