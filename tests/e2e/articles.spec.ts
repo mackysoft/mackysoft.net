@@ -131,6 +131,8 @@ test.describe("articles page", () => {
     await expect(hero.locator(".tags")).toHaveCount(0);
     await expect(bodyTags).toBeVisible();
     expect(await bodyTags.getByRole("link").count()).toBeGreaterThan(0);
+    await expect(bodyTags.getByRole("link", { name: "アセット", exact: true })).toHaveAttribute("href", "/tags/asset/");
+    await expect(bodyTags.getByRole("link", { name: "チュートリアル", exact: true })).toHaveAttribute("href", "/tags/tutorial/");
     await expect(shareSection.getByRole("heading", { level: 2 })).toBeVisible();
     await expect(copyLinkButton).toBeVisible();
     await expect(twitterButton).toBeVisible();
@@ -303,6 +305,26 @@ test.describe("articles page", () => {
     await expect(page.getByRole("heading", { level: 1, name: translatedVisionTitle })).toBeVisible();
     await expect(breadcrumb).toHaveText("Home / Articles");
     await expect(page.locator(".article-content")).toContainText("What is the CullingGroup API?");
+    await expect(page.locator(".article-content__tags").getByRole("link", { name: "Asset", exact: true })).toHaveAttribute(
+      "href",
+      "/en/tags/asset/",
+    );
+    await expect(page.locator(".article-content__tags").getByRole("link", { name: "Tutorial", exact: true })).toHaveAttribute(
+      "href",
+      "/en/tags/tutorial/",
+    );
+  });
+
+  test("renders localized tag pages while keeping key-based URLs", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/tags/game-design/");
+
+    await expect(page).toHaveURL("/tags/game-design/");
+    await expect(page.getByRole("heading", { level: 1, name: "ゲームデザイン" })).toBeVisible();
+
+    await page.goto("/en/tags/game-design/");
+
+    await expect(page).toHaveURL("/en/tags/game-design/");
+    await expect(page.getByRole("heading", { level: 1, name: "Game Design" })).toBeVisible();
   });
 
   test("keeps localized internal links inside English article content", { tag: "@size:medium" }, async ({ page }) => {

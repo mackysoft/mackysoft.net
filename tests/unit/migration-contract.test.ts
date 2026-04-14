@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 
 import { parseUrlMapCsv } from "../../scripts/migration/url-map.mjs";
+import { isArticleTagKey } from "../../src/lib/article-tags";
 import { getContentYear, getContentYearMonth, parseContentDateInput } from "../../src/lib/content-date";
 
 type ArticleRecord = {
@@ -247,6 +248,14 @@ describe("migration contract", () => {
       expect(row?.redirectKind).toBe("archive");
       expect(row?.status).toBe(shouldBeMapped ? "mapped" : "excluded");
       expect(row?.newPath).toBe(shouldBeMapped ? `/archive${legacyPath}` : "");
+    }
+  });
+
+  test("keeps article tags aligned with the central tag registry", () => {
+    for (const article of articles) {
+      for (const tag of article.tags) {
+        expect(isArticleTagKey(tag), `Article "${article.slug}" uses an unknown tag key: ${tag}`).toBe(true);
+      }
     }
   });
 

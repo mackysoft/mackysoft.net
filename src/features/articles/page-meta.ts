@@ -21,9 +21,9 @@ const articlesArchiveMonthDescriptionMap: Record<SiteLocale, (year: string, mont
   en: (year, month) => `Articles published in ${year}/${month}.`,
 };
 
-const articlesTagDescriptionMap: Record<SiteLocale, (tag: string) => string> = {
-  ja: (tag) => `${tag} に紐づく記事一覧です。`,
-  en: (tag) => `Articles tagged with ${tag}.`,
+const articlesTagDescriptionMap: Record<SiteLocale, (tagLabel: string) => string> = {
+  ja: (tagLabel) => `${tagLabel} に紐づく記事一覧です。`,
+  en: (tagLabel) => `Articles tagged with ${tagLabel}.`,
 };
 
 export function getArticlesIndexPageMeta(locale: SiteLocale, labels: Pick<ArticleListLabels, "articles">) {
@@ -52,9 +52,9 @@ export function getArticlesArchiveMonthPageMeta(
   };
 }
 
-export function getArticlesTagPageMeta(locale: SiteLocale, tag: string, labels: Pick<ArticleListLabels, "tag">) {
+export function getArticlesTagPageMeta(locale: SiteLocale, tagLabel: string, labels: Pick<ArticleListLabels, "tag">) {
   return {
-    title: `${labels.tag}: ${tag}`,
-    description: articlesTagDescriptionMap[locale](tag),
+    title: `${labels.tag}: ${tagLabel}`,
+    description: articlesTagDescriptionMap[locale](tagLabel),
   };
 }

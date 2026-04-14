@@ -2,6 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
+import { articleTagKeys } from "./lib/article-tags";
 import { coerceContentDateInput } from "./lib/content-date";
 import { isValidActionHref } from "./lib/safe-href";
 import { isSupportedYouTubeUrl } from "./lib/youtube";
@@ -25,7 +26,7 @@ const articles = defineCollection({
         description: z.string().min(1),
         publishedAt: contentDateSchema,
         updatedAt: contentDateSchema.optional(),
-        tags: z.array(z.string().min(1)).default([]),
+        tags: z.array(z.enum(articleTagKeys)).default([]),
         cover: image().optional(),
         coverAlt: z.string().optional(),
         draft: z.boolean().default(false),

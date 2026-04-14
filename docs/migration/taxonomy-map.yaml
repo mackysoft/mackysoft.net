@@ -164,7 +164,7 @@ tags:
   - legacy_path: "/tag/%e7%b5%82%e4%ba%86%e5%88%a4%e5%ae%9a/"
     legacy_slug: "終了判定"
     legacy_name: "終了判定"
-    new_tag: "終了判定"
+    new_tag: "completion-detection"
     new_path: ""
     status: "excluded"
     notes: ""
