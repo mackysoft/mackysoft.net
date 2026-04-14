@@ -9,6 +9,7 @@ import { getGeneratedRedirectRows, loadUrlMap, urlMapPath } from "./migration/ur
 
 export const redirectDistPath = path.join(repoRoot, "dist");
 export const redirectSite = requireSiteUrl(astroConfig.site, "Astro site must be configured to build static redirects.");
+export const redirectsFileName = "_redirects";
 
 function escapeHtml(value) {
   return String(value)
@@ -27,6 +28,14 @@ export function resolveRedirectOutputPath(distPath, legacyPath) {
   }
 
   return path.join(distPath, ...segments, "index.html");
+}
+
+export function resolveRedirectsFilePath(distPath) {
+  return path.join(distPath, redirectsFileName);
+}
+
+export function createStaticRedirectRules(redirects, statusCode = 301) {
+  return `${redirects.map((redirect) => `${redirect.legacyPath} ${redirect.newPath} ${statusCode}`).join("\n")}\n`;
 }
 
 export function createStaticRedirectHtml({ legacyPath, newPath, site = redirectSite }) {
@@ -65,6 +74,7 @@ export async function buildStaticRedirects({ csvPath = urlMapPath, distPath = re
   const redirects = getGeneratedRedirectRows(rows, { source: csvPath });
 
   await mkdir(distPath, { recursive: true });
+  await writeFile(resolveRedirectsFilePath(distPath), createStaticRedirectRules(redirects), "utf8");
 
   for (const redirect of redirects) {
     const outputPath = resolveRedirectOutputPath(distPath, redirect.legacyPath);

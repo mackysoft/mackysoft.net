@@ -7,7 +7,9 @@ import { describe, expect, test } from "vitest";
 
 import {
   buildStaticRedirects,
+  createStaticRedirectRules,
   createStaticRedirectHtml,
+  resolveRedirectsFilePath,
   resolveRedirectOutputPath,
 } from "../../scripts/build-static-redirects.mjs";
 import {
@@ -50,6 +52,13 @@ describe("static redirects", () => {
         "/treasure-rogue/",
       ]);
 
+      const redirectsFile = await readFile(resolveRedirectsFilePath(distPath), "utf8");
+      expect(redirectsFile).toBe([
+        "/legacy-article/ /articles/new-article/ 301",
+        "/treasure-rogue/ /games/treasure-rogue/ 301",
+        "",
+      ].join("\n"));
+
       const outputPath = resolveRedirectOutputPath(distPath, "/legacy-article/");
       const html = await readFile(outputPath, "utf8");
 
@@ -66,6 +75,19 @@ describe("static redirects", () => {
     });
   });
 
+  test("formats Cloudflare _redirects rules as permanent redirects", () => {
+    const rules = createStaticRedirectRules([
+      { legacyPath: "/legacy-article/", newPath: "/articles/new-article/" },
+      { legacyPath: "/treasure-rogue/", newPath: "/games/treasure-rogue/" },
+    ]);
+
+    expect(rules).toBe([
+      "/legacy-article/ /articles/new-article/ 301",
+      "/treasure-rogue/ /games/treasure-rogue/ 301",
+      "",
+    ].join("\n"));
+  });
+
   test("uses the injected site for redirect canonical URLs", () => {
     const html = createStaticRedirectHtml({
       legacyPath: "/legacy-article/",
@@ -73,10 +95,10 @@ describe("static redirects", () => {
       site: new URL("https://preview.example.com"),
     });
 
-    expect(html).toContain('<meta http-equiv="refresh" content="0;url=/articles/new-article/" />');
-    expect(html).toContain('<link rel="canonical" href="https://preview.example.com/articles/new-article/" />');
-    expect(html).toContain("window.location.hash");
-  });
+      expect(html).toContain('<meta http-equiv="refresh" content="0;url=/articles/new-article/" />');
+      expect(html).toContain('<link rel="canonical" href="https://preview.example.com/articles/new-article/" />');
+      expect(html).toContain("window.location.hash");
+    });
 
   test("rejects CSV files without required headers", () => {
     expect(() => parseUrlMapCsv([
