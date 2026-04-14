@@ -1,4 +1,9 @@
 import { localeStorageKey } from "../lib/i18n";
+import {
+  closeDropdownPanel,
+  openDropdownPanel,
+  prepareDropdownPanel,
+} from "./site-dropdown";
 
 const scrollRestoreStorageKey = "mackysoft-locale-scroll";
 const scrollRestoreMaxAgeMs = 15_000;
@@ -152,6 +157,11 @@ function getDisclosureToggle(disclosure: HTMLDetailsElement) {
   return toggle instanceof HTMLElement ? toggle : null;
 }
 
+function getDisclosurePanel(disclosure: HTMLDetailsElement) {
+  const panel = disclosure.querySelector("[data-site-disclosure-panel]");
+  return panel instanceof HTMLElement ? panel : null;
+}
+
 function syncDisclosureState(disclosure: HTMLDetailsElement) {
   const toggle = getDisclosureToggle(disclosure);
 
@@ -161,12 +171,13 @@ function syncDisclosureState(disclosure: HTMLDetailsElement) {
 }
 
 function closeDisclosure(disclosure: HTMLDetailsElement, restoreFocus = false) {
-  if (!disclosure.open) {
-    syncDisclosureState(disclosure);
-    return;
+  disclosure.open = false;
+  const panel = getDisclosurePanel(disclosure);
+
+  if (panel) {
+    closeDropdownPanel(panel);
   }
 
-  disclosure.open = false;
   syncDisclosureState(disclosure);
 
   if (restoreFocus) {
@@ -217,15 +228,27 @@ function initHeaderDisclosures() {
     }
 
     disclosure.dataset.siteDisclosureReady = "true";
+    const panel = getDisclosurePanel(disclosure);
+
+    if (panel) {
+      prepareDropdownPanel(panel, disclosure.open);
+    }
+
     syncDisclosureState(disclosure);
 
     disclosure.addEventListener("toggle", () => {
       syncDisclosureState(disclosure);
 
-      if (!disclosure.open) {
+      if (!panel) {
         return;
       }
 
+      if (!disclosure.open) {
+        closeDropdownPanel(panel);
+        return;
+      }
+
+      openDropdownPanel(panel);
       closeDisclosures(disclosure);
       document.dispatchEvent(new CustomEvent("site-header:close-search"));
     });

@@ -14,6 +14,11 @@ import {
   getUiText,
 } from "../lib/ui-text";
 import { isSiteLocale, type SiteLocale } from "../lib/i18n";
+import {
+  closeDropdownPanel,
+  openDropdownPanel,
+  prepareDropdownPanel,
+} from "./site-dropdown";
 
 type PagefindResult = {
   data: () => Promise<PagefindSearchResultData>;
@@ -471,7 +476,7 @@ function initSearchPanel(root: HTMLElement) {
 }
 
 function closeInlinePanel(panel: HTMLElement, restoreFocus = true) {
-  panel.hidden = true;
+  closeDropdownPanel(panel);
   activeSearchTrigger?.setAttribute("aria-expanded", "false");
 
   if (restoreFocus) {
@@ -506,7 +511,7 @@ function syncInlinePanelWidth(panel: HTMLElement) {
 
 function openInlinePanel(panel: HTMLElement, trigger: HTMLElement) {
   document.dispatchEvent(new CustomEvent("site-header:close-disclosures"));
-  panel.hidden = false;
+  openDropdownPanel(panel);
   trigger.setAttribute("aria-expanded", "true");
   activeSearchTrigger = trigger;
   activeSearchPanel = panel;
@@ -520,6 +525,7 @@ function initSearchInlinePanel(panel: HTMLElement) {
   }
 
   panel.dataset.searchInlineReady = "true";
+  prepareDropdownPanel(panel, !panel.hidden);
 
   panel.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {

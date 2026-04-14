@@ -52,7 +52,13 @@ const localeLinks = supportedLocales.map((targetLocale) => ({
     </svg>
   </summary>
 
-  <div class="site-language-menu__popover" role="menu" aria-label={uiText.header.languageMenu} data-site-disclosure-panel>
+  <div
+    class="site-language-menu__popover"
+    role="menu"
+    aria-label={uiText.header.languageMenu}
+    data-site-disclosure-panel
+    data-site-dropdown-panel
+  >
     {localeLinks.map((entry) => (
       entry.isSelected ? (
         <span

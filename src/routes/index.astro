@@ -40,7 +40,7 @@ const localizedHomePath = localizePath("/", locale);
       </div>
       <a href={localizePath("/articles/", locale)} class="button-link">{content.latestArticlesCta}</a>
     </div>
-    <div class="content-grid latest-articles-grid">
+    <div class="content-grid latest-activity-grid latest-articles-grid">
       {latestArticles.map((article) => (
         <ArticleCard article={article} layout="vertical" locale={locale} />
       ))}
@@ -56,7 +56,7 @@ const localizedHomePath = localizePath("/", locale);
         </div>
         <a href={localizePath("/assets/", locale)} class="button-link">{content.latestReleasesCta}</a>
       </div>
-      <div class="content-grid latest-releases-grid">
+      <div class="content-grid latest-activity-grid latest-releases-grid">
         {latestReleases.map((release) => (
           <ReleaseCard release={release} locale={locale} />
         ))}
@@ -73,7 +73,7 @@ const localizedHomePath = localizePath("/", locale);
         </div>
         <a href={localizePath("/games/", locale)} class="button-link">{content.gamesCta}</a>
       </div>
-      <div class="content-grid latest-games-grid">
+      <div class="content-grid latest-activity-grid latest-games-grid">
         {homeGames.map((game) => (
           <GameCard game={game} layout="compact" locale={locale} />
         ))}
@@ -97,20 +97,14 @@ const localizedHomePath = localizePath("/", locale);
     margin-bottom: 1rem;
   }
 
-  .latest-articles-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  .latest-activity-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19.5rem), 19.5rem));
+    justify-content: start;
   }
 
-  .latest-releases-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
-
-  .latest-games-grid {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  }
-
-  .latest-games-grid > :global(.game-card) {
-    justify-self: start;
-    width: min(100%, 19.5rem);
+  @media (max-width: 759px) {
+    .latest-activity-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
