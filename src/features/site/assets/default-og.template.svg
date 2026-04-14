@@ -1,0 +1,38 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="avatar-clip">
+      <circle cx="940" cy="315" r="102" />
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="630" fill="#EEF8FF" />
+  <path
+    fill="#3FAFEE"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M0 0H1200V630H0V0ZM32 96C32 60.654 60.654 32 96 32H1104C1139.35 32 1168 60.654 1168 96V534C1168 569.346 1139.35 598 1104 598H96C60.654 598 32 569.346 32 534V96Z"
+  />
+  <rect x="48" y="48" width="1104" height="534" rx="48" fill="none" stroke="#79D4F8" stroke-opacity="0.9" stroke-width="4" />
+  <text
+    x="760"
+    y="340"
+    text-anchor="end"
+    fill="#12314D"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="94"
+    font-weight="800"
+  >
+    mackysoft.net
+  </text>
+
+  <circle cx="940" cy="315" r="110" fill="#DCF3FF" stroke="#3FAFEE" stroke-opacity="0.28" stroke-width="2" />
+  <image
+    href="__AVATAR_DATA_URI__"
+    x="838"
+    y="213"
+    width="204"
+    height="204"
+    preserveAspectRatio="xMidYMid slice"
+    clip-path="url(#avatar-clip)"
+  />
+</svg>
