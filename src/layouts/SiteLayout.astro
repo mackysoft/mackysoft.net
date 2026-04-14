@@ -58,6 +58,16 @@ const { canonicalUrl, rssFeedUrl, alternateLocaleUrls } = buildSiteLayoutUrls(si
   alternateLocaleUrls: AlternateLocaleUrl[];
 };
 const enableSearchPanel = stripLocaleFromPath(currentPath) !== "/search/" && !(isFallback && locale !== contentLocale);
+const footerColumns = [
+  {
+    heading: uiText.footer.linksHeading,
+    links: [...externalLinks.map((link) => ({ ...link, isExternal: true }))],
+  },
+  {
+    heading: uiText.footer.legalHeading,
+    links: [{ href: localizePath("/privacy-policy/", locale), label: uiText.common.privacyPolicy, isExternal: false }],
+  },
+] as const;
 ---
 
 <!doctype html>
@@ -115,23 +125,29 @@ const enableSearchPanel = stripLocaleFromPath(currentPath) !== "/search/" && !(i
       </main>
       <footer class="site-footer">
         <div class="site-footer__inner">
-          <ul class="footer-links">
-            {externalLinks.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  data-analytics-event="external_link_click"
-                  data-analytics-label={link.label}
-                  data-analytics-location="site-footer"
-                >
-                  {link.label}
-                </a>
-              </li>
+          <div class="site-footer__columns">
+            {footerColumns.map((column) => (
+              <section class="site-footer__column" aria-label={column.heading}>
+                <p class="site-footer__heading">{column.heading}</p>
+                <ul class="site-footer__link-list">
+                  {column.links.map((link) => (
+                    <li>
+                      <a
+                        href={link.href}
+                        target={link.isExternal ? "_blank" : undefined}
+                        rel={link.isExternal ? "noreferrer" : undefined}
+                        data-analytics-event={link.isExternal ? "external_link_click" : undefined}
+                        data-analytics-label={link.isExternal ? link.label : undefined}
+                        data-analytics-location={link.isExternal ? "site-footer" : undefined}
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
             ))}
-            <li><a href={localizePath("/privacy-policy/", locale)}>{uiText.common.privacyPolicy}</a></li>
-          </ul>
+          </div>
           <a href="/feed.xml" class="site-footer__rss-link" aria-label={uiText.common.rssFeed} title={uiText.common.rssFeed}>
             <svg class="site-footer__rss-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <circle cx="6" cy="18" r="1.7" fill="currentColor"></circle>

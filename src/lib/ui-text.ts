@@ -18,6 +18,10 @@ type UiText = {
     languageShortLabel: Record<SiteLocale, string>;
     languageName: Record<SiteLocale, string>;
   };
+  footer: {
+    linksHeading: string;
+    legalHeading: string;
+  };
   common: CommonUiText;
   article: {
     publishedAt: string;
@@ -106,6 +110,10 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
         en: "English",
       },
     },
+    footer: {
+      linksHeading: "外部リンク",
+      legalHeading: "ポリシー",
+    },
     article: {
       publishedAt: "公開日",
       updatedAt: "更新日",
@@ -174,6 +182,10 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
         ja: "Japanese",
         en: "English",
       },
+    },
+    footer: {
+      linksHeading: "External Links",
+      legalHeading: "Policy",
     },
     article: {
       publishedAt: "Published",
