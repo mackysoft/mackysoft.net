@@ -17,7 +17,7 @@ permissions:
 
 env:
   GH_REPO: ${{ github.repository }}
-  GH_TOKEN: ${{ github.token }}
+  GH_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
   SYNC_BRANCH: automation/sync-activity
 
 jobs:
