@@ -15,7 +15,7 @@ permissions:
 
 env:
   GH_REPO: ${{ github.repository }}
-  GH_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
+  GH_TOKEN: ${{ github.token }}
   SYNC_BRANCH: automation/sync-activity
   SYNC_COMMIT_MESSAGE: "chore(activity): sync external activity"
   SYNC_PR_TITLE: "chore(activity): sync external activity"
@@ -30,7 +30,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          token: ${{ secrets.ACTIONS_BOT_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
