@@ -79,6 +79,7 @@ const uiText = getUiText(locale);
   .article-card--vertical {
     align-content: stretch;
     height: auto;
+    min-height: 0;
   }
 
   .article-card__cover-placeholder {
@@ -153,10 +154,6 @@ const uiText = getUiText(locale);
   }
 
   @media (min-width: 760px) {
-    .article-card--vertical {
-      height: 19.75rem;
-    }
-
     .article-card--horizontal {
       grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
       align-items: start;
