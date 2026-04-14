@@ -1,11 +1,11 @@
 ---
-title: "[Tsukuru UOZU] Organizing Osho's Mentoring Notes [BOOT CAMP 2020 Part 1]"
-description: "UOZU GAME BOOT CAMP is a game creator training program that is part of the Tsukuru UOZU project, where professional creators mentor game development. In this article, I organize the feedback Osho gave me on Treasure Rogue's game design."
+title: "[Tsukuru UOZU] Notes from Osho's Mentoring Session [BOOT CAMP 2020 Part 1]"
+description: "UOZU GAME BOOT CAMP is a game creator training program run as part of the Tsukuru UOZU project, where professional creators mentor aspiring game developers. In this article, I organize Osho's feedback on Treasure Rogue's game design."
 ---
 
 ## Introduction
 
-[BOOT CAMP](https://www.uozugame.com/) is a game creator training program that is part of the "Tsukuru UOZU" project, and it gives game developers mentoring from professional creators.
+[BOOT CAMP](https://www.uozugame.com/) is a game creator training program run as part of the Tsukuru UOZU project, where professional creators mentor aspiring game developers.
 
 As with the previous boot camp, Osho ([@Kumanbow](https://twitter.com/Kumanbow)) mentored [Treasure Rogue](https://play.google.com/store/apps/details?id=com.MackySoft.TreasureRogue).
 
@@ -13,7 +13,7 @@ In this article, I organize the feedback he gave me on the game's overall design
 
 ## Three Responses
 
-During this mentoring session, I brought up my vague concerns that the game was becoming repetitive and that I did not feel like playing again, and Osho gave me three main responses:
+During this mentoring session, I brought up my vague concerns that the game was becoming repetitive and that I did not feel like coming back to it, and Osho gave me three main takeaways:
 
 -   The pacing is too flat
 -   There is no progression to build on
@@ -29,7 +29,7 @@ Since then, I have been working on [a system that adds pacing to enemy strength]
 
 ## No Structure for Replayability
 
-**"There is no structure that makes you want to replay."** That was his other point.
+**"There is no structure that makes you want to replay it."** That was another of his points.
 
 One example Osho gave was "progression that accumulates over time."
 
@@ -43,7 +43,7 @@ He told me I could feel this kind of progression by playing _Battle Dash_, so I 
 
 ### The Structure of Battle Dash
 
-What I learned from playing it was that it has a structure that makes you want to try things out.
+What I learned from playing it was that it has a structure that makes you think, "I want to try that."
 
 1.  Play
 2.  Accumulate currency
@@ -88,4 +88,4 @@ He said that having a goal like that inside the game's world helps motivate the 
 
 It was another really useful mentoring session. Thanks, Osho!
 
-I want to have fixed everything he pointed out by the next mentoring session on 08/27.
+I want to have fixed everything he pointed out by the next mentoring session on August 27.

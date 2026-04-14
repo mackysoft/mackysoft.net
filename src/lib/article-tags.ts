@@ -83,10 +83,10 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       en: "ParticleSystem",
     },
   },
-  "play-memo": {
+  "play-review": {
     label: {
-      ja: "プレイメモ",
-      en: "Play Memo",
+      ja: "プレイレビュー",
+      en: "Play Review",
     },
   },
   playfab: {
@@ -123,6 +123,12 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "チュートリアル",
       en: "Tutorial",
+    },
+  },
+  "tsukuru-uozu": {
+    label: {
+      ja: "つくるUOZU",
+      en: "Tsukuru UOZU",
     },
   },
   ugui: {

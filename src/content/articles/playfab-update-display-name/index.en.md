@@ -1,8 +1,8 @@
 ---
-title: "[PlayFab] Registering and Updating the Player Display Name [Unity]"
+title: "[PlayFab] Registering and Updating DisplayName [Unity]"
 description: "This article covers how to register and update a player's display name in PlayFab. Since players need to be logged in first, please see the login article if you need that context."
 cover: "./cover.png"
-coverAlt: "Article image for [PlayFab] Registering and Updating the Player Display Name [Unity]"
+coverAlt: "Article image for [PlayFab] Registering and Updating DisplayName [Unity]"
 ---
 
 Version used in this article
@@ -13,7 +13,7 @@ Version used in this article
 
 Since players need to be logged in first, please see the following article if you want to learn about login.
 
-[PlayFab: Generating an ID and Logging In [Unity]](/articles/playfab-login/)
+[PlayFab: Generating IDs and Logging In [Unity]](/articles/playfab-login/)
 
 ## Registering and Updating the Player Display Name
 
@@ -31,7 +31,7 @@ public void SetPlayerDisplayName (string displayName) {
 			DisplayName = displayName
 		},
 		result => {
-			Debug.Log("Set display name was succeeded.);
+			Debug.Log("Display name was set successfully.");
 		},
 		error => {
 			Debug.LogError(error.GenerateErrorReport());
@@ -58,6 +58,6 @@ Open `Title settings` from the gear icon in the PlayFab dashboard. You should se
 
 -   [Account Management – Update User Title Display Name](https://docs.microsoft.com/en-us/rest/api/playfab/client/account-management/updateusertitledisplayname?view=playfab-rest)
 
-## Closing thoughts
+## Closing Thoughts
 
 Registering a player name is surprisingly easy.

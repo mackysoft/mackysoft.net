@@ -216,6 +216,16 @@ const { social: articleImage, search: searchImage } = resolveLocalArticlePageIma
     margin-bottom: 0;
   }
 
+  .article-content :global(p > img),
+  .article-content :global(p > a:only-child > img) {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: min(70vh, 42rem);
+    margin-inline: auto;
+  }
+
   @media (min-width: 960px) {
     .article-layout--with-toc {
       grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);

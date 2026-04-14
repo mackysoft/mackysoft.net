@@ -1,8 +1,8 @@
 ---
-title: "Implementing Weighted Random Selection [C#]"
-description: "Sometimes you want random selection where each item has a different chance of being chosen based on its weight, such as gacha or item drop rates. This article shows one way to implement that with WeightedRandom."
+title: "Implementing Weighted Random Selection in C#"
+description: "Sometimes you want random selection where each item has a different chance of being chosen based on its weight, such as gacha or item drop rates. This article shows one way to implement WeightedRandom in C#."
 cover: "./cover.jpg"
-coverAlt: "Article image for Implementing Weighted Random Selection [C#]"
+coverAlt: "Article image for Implementing Weighted Random Selection in C#"
 ---
 
 ## Introduction
@@ -33,7 +33,7 @@ public class WeightedSelector : MonoBehaviour {
 }
 ```
 
-Weighted random can be written in a single line.
+Weighted random selection can be implemented in a single line.
 
 ## WeightedRandom Code
 

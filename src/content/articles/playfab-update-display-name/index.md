@@ -3,7 +3,6 @@ title: "【PlayFab】プレイヤー名（DisplayName）を登録・更新【Uni
 description: "この記事でのバージョン PlayFab SDK: 2.86.2005 18 はじめに 前提条件としてプレイヤーがログインしている必要があるので、ログインについて知りたい方は以下の記事を見てもらえると幸いです。 【Play … 【PlayFab】プレイヤー名（DisplayName）を登録・更新【Unity】"
 publishedAt: "2020-06-08T21:36:07+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
-draft: true
 tags:
   - "playfab"
   - "unity"

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 
 import { parseUrlMapCsv } from "../../scripts/migration/url-map.mjs";
+import { assetsPagePath, getReleasedAssetKeys, resolveTaxonomyEntryPath } from "../../scripts/migration/taxonomy-targets.mjs";
 import { getContentYear, getContentYearMonth, parseContentDateInput } from "../../src/lib/content-date";
 
 type ArticleRecord = {
@@ -41,6 +42,7 @@ const articlesRoot = path.join(repoRoot, "src/content/articles");
 const gamesRoot = path.join(repoRoot, "src/content/games");
 const urlMapPath = path.join(repoRoot, "docs/migration/url-map.csv");
 const taxonomyMapPath = path.join(repoRoot, "docs/migration/taxonomy-map.yaml");
+const activityDataPath = path.join(repoRoot, "src/generated/activity.json");
 
 function readFrontmatter(markdown: string) {
   const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -197,6 +199,7 @@ const articles = readArticleRecords();
 const publicArticles = articles.filter((article) => !article.draft);
 const urlMapRows = parseUrlMapCsv(readFileSync(urlMapPath, "utf8"), { source: urlMapPath });
 const taxonomyMapEntries = parseTaxonomyMap(readFileSync(taxonomyMapPath, "utf8"));
+const releasedAssetKeys = getReleasedAssetKeys(JSON.parse(readFileSync(activityDataPath, "utf8")));
 
 describe("migration contract", () => {
   test("keeps article redirects aligned with current local articles", () => {
@@ -263,6 +266,9 @@ describe("migration contract", () => {
     const gameRows = urlMapRows.filter((row) => row.contentType === "game");
     const pageRows = urlMapRows.filter((row) => row.contentType === "page");
     const taxonomyRows = urlMapRows.filter((row) => row.contentType === "category" || row.contentType === "tag");
+    const taxonomyEntriesByKey = new Map(
+      taxonomyMapEntries.map((entry) => [`${entry.kind}:${entry.legacyPath}`, entry]),
+    );
 
     for (const row of gameRows) {
       expect(row.status).toBe("mapped");
@@ -281,6 +287,23 @@ describe("migration contract", () => {
 
       if (row.status === "excluded") {
         expect(row.newPath).toBe("");
+        continue;
+      }
+
+      const kind = row.contentType === "category" ? "category" : "tag";
+      const taxonomyEntry = taxonomyEntriesByKey.get(`${kind}:${row.legacyPath}`);
+
+      expect(taxonomyEntry, `Missing taxonomy entry for ${row.legacyPath}`).toBeDefined();
+
+      const expectedPath = resolveTaxonomyEntryPath(taxonomyEntry, {
+        publicTags: new Set(publicArticles.flatMap((article) => article.tags)),
+        releasedAssetKeys,
+      });
+
+      expect(row.newPath).toBe(expectedPath);
+
+      if (row.newPath === assetsPagePath) {
+        expect(pageRoutes.has(row.newPath)).toBe(true);
         continue;
       }
 
@@ -313,7 +336,17 @@ describe("migration contract", () => {
         continue;
       }
 
-      expect(entry.newPath).toBe(`/tags/${entry.newTag}/`);
+      const expectedPath = resolveTaxonomyEntryPath(entry, {
+        publicTags,
+        releasedAssetKeys,
+      });
+
+      expect(entry.newPath).toBe(expectedPath);
+
+      if (entry.newPath === assetsPagePath) {
+        continue;
+      }
+
       expect(publicTags.has(entry.newTag)).toBe(true);
     }
   });

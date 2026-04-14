@@ -5,7 +5,7 @@ publishedAt: "2020-06-15T20:32:46+09:00"
 updatedAt: "2020-06-15T20:32:47+09:00"
 tags:
   - "game-design"
-  - "play-memo"
+  - "play-review"
 cover: "./cover.png"
 coverAlt: "Article image for Why Is Slay the Spire So Fun? [From a Roguelike Developer's Perspective]"
 ---

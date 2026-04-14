@@ -153,5 +153,3 @@ public class TurnManager : SingletonMonoBehaviour<TurnManager> {
 ```
 
 AddCommander関数を持っているので、ターン制のループに取り込みたいCommanderを追加します。（CommanderはOnEnable時に自動でAddCommanderを呼びます）
-
-## おわりに

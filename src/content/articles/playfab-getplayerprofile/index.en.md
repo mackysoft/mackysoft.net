@@ -1,8 +1,8 @@
 ---
-title: "【PlayFab】Getting a Player Profile【Unity】"
+title: "[PlayFab] Getting a Player Profile [Unity]"
 description: "This article uses PlayFab SDK 2.86.2005 18. The feature covered here requires the player to be logged in first, so if you want to learn about logging in, please see the article below."
 cover: "./cover.png"
-coverAlt: "Article image for 【PlayFab】Getting a Player Profile【Unity】"
+coverAlt: "Article image for [PlayFab] Getting a Player Profile [Unity]"
 ---
 
 Version used in this article
@@ -13,9 +13,9 @@ Version used in this article
 
 The feature in this article requires the player to be logged in first, so if you want to learn about login, please see the article below.
 
-[【PlayFab】Generating IDs and Logging In【Unity】](/articles/playfab-login/)
+[PlayFab: Generating IDs and Logging In [Unity]](/articles/playfab-login/)
 
-## Allow Profile Access
+## Allow Access to Profile Data
 
 First, you need to configure PlayFab so the API can access the player's profile.
 
@@ -89,7 +89,7 @@ PlayFabId is the ID used to identify a player in PlayFab.
 
 If you want to learn more, I wrote about it in the article below.
 
-[【PlayFab】What Is PlayFabAuthenticationContext?【Unity】](/articles/playfab-authenticationcontext/)
+[PlayFab: What Is PlayFabAuthenticationContext? [Unity]](/articles/playfab-authenticationcontext/)
 
 ### PlayerProfileViewConstraints
 

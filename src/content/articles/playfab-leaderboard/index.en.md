@@ -1,8 +1,8 @@
 ---
-title: "[PlayFab] Implementing a Leaderboard with Unity"
+title: "[PlayFab] Implementing a Leaderboard [Unity]"
 description: "This article covers PlayFab's leaderboard-related APIs. Since players need to be logged in first, please see the login article if you need that context."
 cover: "./cover.png"
-coverAlt: "Article image for [PlayFab] Implementing a Leaderboard with Unity"
+coverAlt: "Article image for [PlayFab] Implementing a Leaderboard [Unity]"
 ---
 
 Version used in this article
@@ -13,7 +13,7 @@ Version used in this article
 
 This article uses PlayFab's leaderboard-related APIs. Since players need to be logged in first, please see the following article if you want to learn about login.
 
-[PlayFab: Generating an ID and Logging In [Unity]](/articles/playfab-login/)
+[PlayFab: Generating IDs and Logging In [Unity]](/articles/playfab-login/)
 
 ## Creating a Leaderboard
 
@@ -70,7 +70,7 @@ public void SetPlayerDisplayName (string displayName) {
 			DisplayName = displayName
 		},
 		result => {
-			Debug.Log("Set display name was succeeded.);
+			Debug.Log("Display name was set successfully.");
 		},
 		error => {
 			Debug.LogError(error.GenerateErrorReport());
@@ -109,7 +109,7 @@ public void SendStatisticUpdate (string leaderboardName,int score) {
 			Statistics = statisticUpdates
 		},
 		result => {
-			Debug.Log("Send score was succeeded.");
+			Debug.Log("Score was submitted successfully.");
 		},
 		error => {
 			Debug.LogError(error.GenerateErrorReport());
@@ -159,7 +159,7 @@ There are several ways to retrieve leaderboard data.
 | [GetLeaderboard](https://docs.microsoft.com/en-us/rest/api/playfab/client/player-data-management/getleaderboard?view=playfab-rest) | Retrieves a list of users from a specified position in the leaderboard, for the specified number of users. (There is also GetFriendLeaderboard, which is limited to friends.) |
 | [GetLeaderboardAroundPlayer](https://docs.microsoft.com/en-us/rest/api/playfab/client/player-data-management/getleaderboardaroundplayer?view=playfab-rest) | Retrieves a ranked list of users centered on the currently logged-in player, or a specified player. (There is also GetFriendLeaderboardAroundPlayer, which is limited to friends.) |
 
-## Closing thoughts
+## Closing Thoughts
 
 I am still in the middle of introducing PlayFab into a project, so I am still learning.
 

@@ -8,7 +8,7 @@ tags:
   - "csharp"
 ---
 
-和集合や差集合と云った、いわゆる「集合演算」を調べていたのですが、**「そんな専門用語使われても分かんねーよ！」**となったので、自分なりに分かりやすい言葉で解説します。
+和集合や差集合と云った、いわゆる「集合演算」を調べていたのですが、 **「そんな専門用語使われても分かんねーよ！」** となったので、自分なりに分かりやすい言葉で解説します。
 
 | 演算 | 説明 |
 | --- | --- |
@@ -79,3 +79,4 @@ IEnumerable<int> distinctEnumerable= collectionA.Distinct();
 -   [LINQの集合演算](https://qiita.com/kazuhirox/items/afa154232e636c9ca415)
 -   [和集合、積集合、差集合を求める](https://qiita.com/nkojima/items/575a1e5879d62441662d)
 -   [Linq, 集合の計算](http://blog.livedoor.jp/nanoris/archives/51883318.html)
+

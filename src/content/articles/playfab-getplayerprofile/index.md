@@ -3,7 +3,6 @@ title: "【PlayFab】プレイヤーのプロフィールを取得する【Unity
 description: "この記事でのバージョン PlayFab SDK: 2.86.2005 18 はじめに この記事で紹介する機能では、前提条件としてプレイヤーがログインしている必要があるので、ログインについて知りたい方は以下の記事を見てもら … 【PlayFab】プレイヤーのプロフィールを取得する【Unity】"
 publishedAt: "2020-05-30T20:00:46+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
-draft: true
 tags:
   - "playfab"
   - "unity"

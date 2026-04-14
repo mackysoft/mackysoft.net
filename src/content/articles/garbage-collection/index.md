@@ -31,7 +31,7 @@ GC周りの用語について、簡単にまとめました。
 var hoge = new HogeObject();
 ```
 
-このメモリ割り当てでよく起こる問題が、**「一見オブジェクトを生成していないように見えて、実はオブジェクトを生成している」**です。
+このメモリ割り当てでよく起こる問題が、 **「一見オブジェクトを生成していないように見えて、実はオブジェクトを生成している」** です。
 
 「GC Allocを減らす方法」的な記事で書かれていることは、こういった状況に対する対策です。以下の記事はその状況の例です。
 
@@ -53,3 +53,4 @@ var hoge = new HogeObject();
 -   [ガベージ コレクションの基礎](https://docs.microsoft.com/ja-jp/dotnet/standard/garbage-collection/fundamentals)
 -   [Understanding the managed heap](https://docs.unity3d.com/Manual/BestPracticeUnderstandingPerformanceInUnity4-1.html)
 -   [.NETメモリ管理の概念](https://pleiades.io/help/dotmemory/NET_Memory_Management_Concepts.html#)
+

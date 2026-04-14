@@ -1,8 +1,8 @@
 ---
-title: "【PlayFab】Generating IDs and Logging In【Unity】"
-description: "This article uses PlayFab SDK 2.86.2005 18. PlayFab has many features, but the first thing you need to do before using them is log in. This article explains the two login types: anonymous login and recoverable login."
+title: "[PlayFab] Generating IDs and Logging In [Unity]"
+description: "This article uses PlayFab SDK 2.86.2005 18. PlayFab has many features, but the first thing you need to do before using any of them is log in. This article explains anonymous login and login methods that support account recovery."
 cover: "./cover.png"
-coverAlt: "Article image for 【PlayFab】Generating IDs and Logging In【Unity】"
+coverAlt: "Article image for [PlayFab] Generating IDs and Logging In [Unity]"
 ---
 
 Version used in this article
@@ -13,7 +13,7 @@ Version used in this article
 
 PlayFab has many features, but the first thing you need to do to use them is log in.
 
-## There are two types of login: "anonymous login" and "recoverable login"
+## Two Types of Login: Anonymous Login and Login Methods That Support Account Recovery
 
 Broadly speaking, PlayFab offers two login methods.
 
@@ -67,20 +67,20 @@ string CreateNewId () {
 }
 ```
 
-### Recoverable login
+### Login Methods That Support Account Recovery
 
-This is a login method that lets the account be recovered if something happens to the device.
+These are login methods that let players recover their account if something happens to their device.
 
 However, it requires the player to provide information such as the following:
 
 -   Authenticate through an external provider (Facebook, iOS, Google, and so on)
 -   Enter a username or email address and a password
 
-For that reason, if you ask the player to use this login method right after installing the game, you will get **"Logging in is such a hassle, I might as well quit."** Be careful when you use it.
+For that reason, if you ask the player to use one of these login methods right after installing the game, you risk hearing, **"Logging in is such a hassle, I might as well quit."** Be careful about when you introduce them.
 
-If you combine it with anonymous login, you can let players start anonymously and later guide them toward a recoverable login. (See: [Quickstart for account linking](https://docs.microsoft.com/ja-jp/gaming/playfab/features/authentication/login/quickstart))
+If you combine them with anonymous login, you can let players start anonymously and then prompt them to add a login method that supports account recovery later. (See: [Quickstart for account linking](https://docs.microsoft.com/ja-jp/gaming/playfab/features/authentication/login/quickstart))
 
-#### Functions for recoverable login
+#### Functions for Login Methods That Support Account Recovery
 
 -   [LoginWithPlayFab](https://docs.microsoft.com/ja-jp/rest/api/playfab/client/authentication/loginwithplayfab)
 -   [LoginWithEmailAddress](https://docs.microsoft.com/ja-jp/rest/api/playfab/client/authentication/loginwithemailaddress)

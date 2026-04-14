@@ -153,5 +153,3 @@ public class TurnManager : SingletonMonoBehaviour<TurnManager> {
 ```
 
 `AddCommander` lets you add any Commander you want to bring into the turn-based loop. (Commanders call `AddCommander` automatically from `OnEnable`.)
-
-## Conclusion

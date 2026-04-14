@@ -1,13 +1,13 @@
 ---
-title: "【PlayFab】What Is PlayFabAuthenticationContext?【Unity】"
-description: "When I was using PlayFab, I wondered what PlayFabAuthenticationContext was whenever I saw it passed to various ○○Request types, so I looked into it. From here on, I will just call it AuthenticationContext."
+title: "[PlayFab] What Is PlayFabAuthenticationContext? [Unity]"
+description: "While using PlayFab, I started wondering what PlayFabAuthenticationContext actually was whenever I saw it attached to various request types, so I dug into it. From here on, I will simply call it AuthenticationContext."
 cover: "./cover.png"
-coverAlt: "Article image for 【PlayFab】What Is PlayFabAuthenticationContext?【Unity】"
+coverAlt: "Article image for [PlayFab] What Is PlayFabAuthenticationContext? [Unity]"
 ---
 
 ## Introduction
 
-When I was using PlayFab, I found myself wondering what `PlayFabAuthenticationContext` was when it could be passed to various `○○Request` types, so I looked into it.
+While using PlayFab, I found myself wondering what `PlayFabAuthenticationContext` actually was whenever I saw it attached to various request types, so I looked into it.
 
 Since PlayFabAuthenticationContext is a bit long, I will call it AuthenticationContext from here on.
 
@@ -78,15 +78,15 @@ PlayFabClientAPI.IsClientLoggedIn();
 
 In many cases, PlayFab uses this `staticPlayer`.
 
-## ○○Request Can Accept AuthenticationContext
+## Request Types Can Accept AuthenticationContext
 
-PlayFab makes heavy use of `○○Request` types, and AuthenticationContext can actually be assigned to them.
+PlayFab makes heavy use of request objects, and AuthenticationContext can actually be assigned to them.
 
-Let's look at the definition of a `○○Request`.
+Let's look at the definition of one of those request objects.
 
 ```cs
 
-// In PlayFab, all ○○Request types inherit from PlayFabRequestCommon
+// In PlayFab, all request types inherit from PlayFabRequestCommon
 public class PlayFabRequestCommon : PlayFabBaseModel
 {
 	public PlayFabAuthenticationContext AuthenticationContext;
@@ -100,13 +100,13 @@ public class GetLeaderboardAroundPlayerRequest : PlayFabRequestCommon
 }
 ```
 
-If you do not specify AuthenticationContext on a `○○Request`, PlayFabSettings.staticPlayer will be used instead.
+If you do not specify AuthenticationContext on a request object, PlayFabSettings.staticPlayer will be used instead.
 
 In most cases, you do not need to specify AuthenticationContext.
 
 ## Closing Thoughts
 
-At this point I still do not know enough about PlayFab to say more than that the useful uses of AuthenticationContext seem to be checking the ID and checking the login status.
+At this point I still do not know enough about PlayFab to say much more than that the main uses of AuthenticationContext seem to be checking the player's ID and login status.
 
 However, while researching it I found a few APIs that use AuthenticationContext, so I plan to look into them another time.
 

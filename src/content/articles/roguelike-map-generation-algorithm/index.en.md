@@ -149,5 +149,3 @@ The same code is used as in "Generate accessible objects." However, path securin
 * * *
 
 That concludes the explanation of the map generation system.
-
-## Conclusion

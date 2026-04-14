@@ -7,6 +7,8 @@ describe("article tags", () => {
     expect(getArticleTagLabel("asset", "ja")).toBe("アセット");
     expect(getArticleTagLabel("game-design", "en")).toBe("Game Design");
     expect(getArticleTagLabel("completion-detection", "ja")).toBe("終了判定");
+    expect(getArticleTagLabel("play-review", "en")).toBe("Play Review");
+    expect(getArticleTagLabel("tsukuru-uozu", "ja")).toBe("つくるUOZU");
   });
 
   test("falls back to the key when no localization is defined", () => {
