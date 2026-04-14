@@ -6,6 +6,7 @@ import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
 import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
 import SearchMetadata from "../../components/search/SearchMetadata.astro";
+import { resolveLocalArticlePageImages } from "../../features/site/social-image";
 import { getUiText } from "../../lib/ui-text";
 import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
@@ -45,6 +46,13 @@ const articlePath = `/articles/${slug}/`;
 const shareUrl = toAbsoluteSiteUrl(siteUrl, article.href);
 const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
 const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
+const { social: articleImage, search: searchImage } = resolveLocalArticlePageImages({
+  slug,
+  title: article.data.title,
+  contentLocale: article.contentLocale,
+  cover: article.data.cover,
+  coverAlt: article.data.coverAlt,
+});
 ---
 
 <SiteLayout
@@ -55,8 +63,10 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
   isFallback={article.isFallback}
   canonicalPath={canonicalPath}
   alternateLocales={alternateLocales}
-  image={article.data.cover}
-  imageAlt={article.data.coverAlt}
+  image={articleImage.src}
+  imageAlt={articleImage.alt}
+  imageWidth={articleImage.width}
+  imageHeight={articleImage.height}
 >
   <article class="article-page">
     <SearchMetadata
@@ -64,8 +74,8 @@ const alternateLocales = createAlternateLocaleLinks(articlePath, article.availab
       description={article.data.description}
       source={siteName}
       updatedAt={article.data.updatedAt ?? article.data.publishedAt}
-      image={article.data.cover}
-      imageAlt={article.data.coverAlt}
+      image={searchImage.src}
+      imageAlt={searchImage.alt}
       tags={article.data.tags}
     />
     <section class="page-header article-page-header">

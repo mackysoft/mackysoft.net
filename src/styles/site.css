@@ -24,6 +24,7 @@
   --header-tool-bg-color: rgba(247, 252, 255, 0.96);
   --header-tool-hover-bg-color: rgba(31, 146, 213, 0.1);
   --header-tool-active-bg-color: rgba(31, 146, 213, 0.14);
+  --warm-accent-color: #a86a00;
   --code-bg-color: #12314d;
   --code-text-color: #eef8ff;
   --overlay-bg-color: rgba(18, 49, 77, 0.94);
@@ -33,7 +34,6 @@
   --panel-shadow-hover-color: rgba(18, 49, 77, 0.1);
   --media-frame-bg-color: #12314d;
   --media-surface-color: rgba(18, 49, 77, 0.06);
-  --star-color: #a86a00;
   --status-neutral-border-color: rgba(15, 23, 42, 0.1);
   --status-neutral-bg-color: rgba(15, 23, 42, 0.04);
   --status-archived-border-color: rgba(180, 83, 9, 0.24);
@@ -84,6 +84,7 @@ html[data-theme="dark"] {
   --header-tool-bg-color: rgba(16, 36, 51, 0.96);
   --header-tool-hover-bg-color: rgba(103, 207, 255, 0.12);
   --header-tool-active-bg-color: rgba(103, 207, 255, 0.16);
+  --warm-accent-color: #f1c15b;
   --code-bg-color: #07131d;
   --code-text-color: #eef9ff;
   --overlay-bg-color: rgba(5, 16, 24, 0.96);
@@ -93,7 +94,6 @@ html[data-theme="dark"] {
   --panel-shadow-hover-color: rgba(4, 13, 20, 0.36);
   --media-frame-bg-color: #06111a;
   --media-surface-color: rgba(189, 232, 255, 0.08);
-  --star-color: #f1c15b;
   --status-neutral-border-color: rgba(159, 177, 202, 0.16);
   --status-neutral-bg-color: rgba(159, 177, 202, 0.08);
   --status-archived-border-color: rgba(214, 141, 76, 0.28);
@@ -411,7 +411,7 @@ blockquote {
 
 html[data-theme="light"] [data-site-tool="theme"] [data-theme-value="light"],
 html[data-theme="dark"] [data-site-tool="theme"] [data-theme-value="dark"] {
-  color: var(--accent-color);
+  color: var(--warm-accent-color);
   opacity: 1;
   transform: scale(1);
 }

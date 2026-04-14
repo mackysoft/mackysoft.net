@@ -2,6 +2,7 @@ import type { ImageMetadata } from "astro";
 import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
+import { resolveLocalArticleCardImage, type SocialImage } from "../features/site/social-image";
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
 import {
   createTranslationMap,
@@ -46,11 +47,31 @@ export type ArticleItem = {
   updatedAt?: Date;
   tags: string[];
   source: string;
-  cover?: ImageMetadata | string;
-  coverAlt?: string;
+  cover?: ArticleCardCover;
   contentLocale: SiteLocale;
   isFallback: boolean;
 };
+
+export type ArticleCardCover =
+  | {
+    kind: "generated";
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+  }
+  | {
+    kind: "remote";
+    src: string;
+    alt: string;
+  }
+  | {
+    kind: "local";
+    src: ImageMetadata;
+    alt: string;
+    width: number;
+    height: number;
+  };
 
 export type LocalizedArticleEntry = {
   slug: string;
@@ -115,6 +136,44 @@ export function sortArticleItems(articleItems: ArticleItem[]) {
   return articleItems.sort((left, right) => right.publishedAt.valueOf() - left.publishedAt.valueOf());
 }
 
+function createRemoteArticleCardCover(src: string, alt?: string): ArticleCardCover {
+  return {
+    kind: "remote",
+    src,
+    alt: alt ?? "",
+  };
+}
+
+function createLocalArticleCardCover(image: { src: ImageMetadata; alt: string; width: number; height: number }): ArticleCardCover {
+  return {
+    kind: "local",
+    src: image.src,
+    alt: image.alt,
+    width: image.width,
+    height: image.height,
+  };
+}
+
+function createGeneratedArticleCardCover(image: { src: string; alt: string; width: number; height: number }): ArticleCardCover {
+  return {
+    kind: "generated",
+    src: image.src,
+    alt: image.alt,
+    width: image.width,
+    height: image.height,
+  };
+}
+
+function createArticleCardCover(image: SocialImage): ArticleCardCover {
+  const { src, alt, width, height } = image;
+
+  if (typeof src === "string") {
+    return createGeneratedArticleCardCover({ src, alt, width, height });
+  }
+
+  return createLocalArticleCardCover({ src, alt, width, height });
+}
+
 export function toExternalArticleItem(article: ArticleActivity, locale: SiteLocale = defaultLocale): ArticleItem {
   const { variant, contentLocale, isFallback } = getArticleVariant(article, locale);
 
@@ -127,8 +186,7 @@ export function toExternalArticleItem(article: ArticleActivity, locale: SiteLoca
     publishedAt: new Date(article.publishedAt),
     tags: [],
     source: article.source,
-    cover: variant.coverUrl,
-    coverAlt: variant.coverAlt,
+    cover: variant.coverUrl ? createRemoteArticleCardCover(variant.coverUrl, variant.coverAlt) : undefined,
     contentLocale,
     isFallback,
   };
@@ -176,6 +234,14 @@ export async function getLocalizedLocalArticles(locale: SiteLocale = defaultLoca
 }
 
 export function toLocalizedLocalArticleItem(article: LocalizedArticleEntry): ArticleItem {
+  const socialImage = resolveLocalArticleCardImage({
+    slug: article.slug,
+    title: article.data.title,
+    contentLocale: article.contentLocale,
+    cover: article.data.cover,
+    coverAlt: article.data.coverAlt,
+  });
+
   return {
     id: article.slug,
     kind: "local",
@@ -186,8 +252,7 @@ export function toLocalizedLocalArticleItem(article: LocalizedArticleEntry): Art
     updatedAt: article.data.updatedAt,
     tags: article.data.tags,
     source: getSiteMeta(defaultLocale).name,
-    cover: article.data.cover,
-    coverAlt: article.data.coverAlt,
+    cover: createArticleCardCover(socialImage),
     contentLocale: article.contentLocale,
     isFallback: article.isFallback,
   };

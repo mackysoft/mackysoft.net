@@ -168,6 +168,18 @@ test.describe("articles page", () => {
     expect(tocBox.x).toBeGreaterThan(proseBox.x);
   });
 
+  test("shows the generated title card on local article cards when a custom cover is missing", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/articles/");
+
+    const articleCard = page.locator(".article-card").filter({ hasText: "ターン制のゲームループを実装する方法【C#】" }).first();
+    const cover = articleCard.locator(".article-card__cover img");
+
+    await expect(articleCard).not.toHaveClass(/article-card--no-cover/);
+    await expect(cover).toBeVisible();
+    await expect(cover).toHaveAttribute("src", "/og/articles/cards/turnbased-gameloop.png");
+    await expect(cover).toHaveAttribute("alt", "ターン制のゲームループを実装する方法【C#】 の記事タイトル画像");
+  });
+
   test("keeps fragment targets below the sticky header on small screens", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 320, height: 800 } });
     const page = await context.newPage();

@@ -5,7 +5,7 @@ const assetsPageContentMap = {
     description: "GitHub Releases として公開しているアセットの一覧です。",
     support: {
       ariaLabel: "GitHub Sponsors",
-      body: "アセットや OSS が役に立ったら、GitHub Sponsors から支援できます。開発の資金源として役立ちます。",
+      body: "GitHub Sponsors で支援を受け付けています。継続的な開発資金として役立ちます。",
       ctaLabel: "GitHub Sponsors で支援する",
     },
   },
@@ -14,7 +14,7 @@ const assetsPageContentMap = {
     support: {
       ariaLabel: "GitHub Sponsors",
       body:
-        "If these assets or OSS projects are useful to you, you can support them through GitHub Sponsors. It helps with ongoing maintenance and improvements.",
+        "Support is available through GitHub Sponsors. It helps fund ongoing development.",
       ctaLabel: "Support on GitHub Sponsors",
     },
   },

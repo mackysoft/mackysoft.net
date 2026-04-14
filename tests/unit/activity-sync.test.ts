@@ -391,7 +391,7 @@ describe("sync-activity", () => {
 
     expect(articleItems.length).toBeGreaterThan(0);
     expect(articleItems[0]?.source).toBe("Zenn");
-    expect(typeof articleItems[0]?.cover).toBe("string");
+    expect(articleItems[0]?.cover?.kind).toBe("remote");
     expect(articleItems.every((article) => article.source === "Zenn")).toBe(true);
     expect(articleItems.every((article) => article.tags.length === 0)).toBe(true);
 

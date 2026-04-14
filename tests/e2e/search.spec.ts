@@ -128,6 +128,21 @@ test.describe("site search", () => {
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
   });
 
+  test("uses the generated card-sized image for no-cover local article search hits", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.goto(`/search/?q=${encodeURIComponent("ターン制")}`);
+
+    const card = page.locator(".site-search-card").filter({
+      has: page.locator('.activity-card__link-layer[href*="turnbased-gameloop"]'),
+    }).first();
+    const cover = card.locator(".site-search-card__cover img");
+
+    await expect(card).toBeVisible();
+    await expect(cover).toBeVisible();
+    await expect(cover).toHaveAttribute("src", "/og/articles/cards/turnbased-gameloop.png");
+    await expect(cover).toHaveAttribute("alt", "ターン制のゲームループを実装する方法【C#】 の記事タイトル画像");
+  });
+
   test("does not index article share UI labels as searchable content", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent(articleUiQuery)}`);
@@ -137,17 +152,20 @@ test.describe("site search", () => {
     await expect(pagePanel.locator('.activity-card__link-layer[href*="#article-share-title"]')).toHaveCount(0);
   });
 
-  test("keeps the same card structure when a result does not have a thumbnail", { tag: "@size:medium" }, async ({ page }) => {
+  test("uses the generated card-sized image for another no-cover local article search hit", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent(localArticleWithoutCoverQuery)}`);
 
     const card = page.locator(".site-search-card").filter({
       has: page.locator('.activity-card__link-layer[href*="gamedesign-contrast-cedec2018"]'),
     }).first();
+    const cover = card.locator(".site-search-card__cover img");
 
     await expect(card).toBeVisible();
     await expect(card.locator(".site-search-card__cover")).toBeVisible();
-    await expect(card.locator(".site-search-card__cover img")).toHaveCount(0);
+    await expect(cover).toBeVisible();
+    await expect(cover).toHaveAttribute("src", "/og/articles/cards/gamedesign-contrast-cedec2018.png");
+    await expect(cover).toHaveAttribute("alt", "ゲームを面白くする「コントラスト」【ゲームデザイン】 の記事タイトル画像");
   });
 
   test("includes external article and release records in the search results", { tag: "@size:medium" }, async ({ page }) => {
