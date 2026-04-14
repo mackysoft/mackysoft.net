@@ -192,8 +192,10 @@ test.describe("site header", () => {
     const menuToggle = page.locator('[data-site-tool="menu"]');
 
     await expect(mobileMenu).not.toHaveAttribute("open", "");
+    await expect(menuToggle).not.toHaveAttribute("aria-expanded", "false");
     await menuToggle.click();
     await expect(mobileMenu).toHaveAttribute("open", "");
+    await expect(menuToggle).not.toHaveAttribute("aria-expanded", "false");
     await expect(mobileMenu.getByRole("link", { name: "プロフィール", exact: true })).toBeVisible();
 
     await context.close();
