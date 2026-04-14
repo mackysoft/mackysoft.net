@@ -55,14 +55,12 @@ npm run test:unit
 npm run test:e2e
 npm run test
 npm run sync:activity
-npm run import:wordpress
 npm run deploy:workers
 ```
 
 - `npm run check`: Astro と TypeScript の整合性を確認します。
 - `npm run test:e2e`: ビルド後に Playwright で E2E テストを実行します。初回は Chromium のセットアップを含みます。
 - `npm run sync:activity`: GitHub と Zenn の活動データを `src/generated/activity.json` に同期します。
-- `npm run import:wordpress`: 旧 WordPress 記事を `src/content/articles` 配下へ取り込みます。
 
 ## 記事の追加方法
 

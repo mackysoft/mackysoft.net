@@ -28,4 +28,3 @@ Cloudflare Workers へ公開する前後で、URL 契約と主要導線を確認
 ## メモ
 
 - canonical host を切り替える場合、変更箇所は `astro.config.mjs` の `site` のみとする
-- `scripts/import-wordpress.mjs` の URL 定数は移行入力の正規化用であり、このチェックリストの canonical host 契約対象外とする
