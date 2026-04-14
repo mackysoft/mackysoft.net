@@ -64,6 +64,20 @@ npm run deploy:workers
 - `npm run sync:activity`: GitHub と Zenn の活動データを `src/generated/activity.json` に同期します。
 - `npm run import:wordpress`: 旧 WordPress 記事を `src/content/articles` 配下へ取り込みます。
 
+## 日次活動同期
+
+GitHub Actions の `Sync Activity` workflow が毎日 `06:00 JST` に実行され、Zenn と GitHub Releases の外部更新を `src/generated/activity.json` へ同期します。
+
+- 差分が無い場合は、そのまま成功終了します。
+- 差分がある場合は `automation/sync-activity` branch へ自動 commit し、`master` 向け PR を作成または更新します。
+- `CI` が `quality` と `e2e` を通過すると、`Merge Sync Activity` workflow が PR を squash merge します。
+- merge 後は既存の `master` 向け CI と `Deploy Workers` workflow が流れ、Cloudflare Workers へ反映されます。
+
+この自動化には、GitHub Actions の repository secret `ACTIONS_BOT_TOKEN` が必要です。
+
+- fine-grained PAT を使う場合は `Contents: Read and write`、`Pull requests: Read and write`、`Actions: Read and write` を付与します。
+- classic PAT を使う場合は `repo` と `workflow` を付与します。
+
 ## 記事の追加方法
 
 新規記事の最低限の雛形を作るときは次を実行します。
