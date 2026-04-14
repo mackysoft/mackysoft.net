@@ -1,0 +1,76 @@
+name: Merge Sync Activity
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+
+concurrency:
+  group: merge-sync-activity
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  GH_REPO: ${{ github.repository }}
+  GH_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
+  SYNC_BRANCH: automation/sync-activity
+
+jobs:
+  merge:
+    name: merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'automation/sync-activity'
+    steps:
+      - name: Merge sync pull request
+        run: |
+          pr_number="$(gh pr list --state open --head "$SYNC_BRANCH" --base master --json number --jq '.[0].number')"
+
+          if [ -z "$pr_number" ]; then
+            echo "No open sync pull request found."
+            exit 0
+          fi
+
+          merge_state=""
+          for _ in 1 2 3 4 5 6; do
+            merge_state="$(gh pr view "$pr_number" --json mergeStateStatus --jq '.mergeStateStatus')"
+            if [ "$merge_state" != "UNKNOWN" ] && [ -n "$merge_state" ]; then
+              break
+            fi
+            sleep 5
+          done
+
+          if [ -z "$merge_state" ] || [ "$merge_state" = "UNKNOWN" ]; then
+            echo "Unable to resolve merge state for PR #$pr_number." >&2
+            exit 1
+          fi
+
+          if [ "$merge_state" = "BEHIND" ]; then
+            gh pr update-branch "$pr_number"
+            exit 0
+          fi
+
+          if [ "$merge_state" != "CLEAN" ] && [ "$merge_state" != "HAS_HOOKS" ] && [ "$merge_state" != "UNSTABLE" ]; then
+            echo "PR #$pr_number is not mergeable in current state: $merge_state" >&2
+            exit 1
+          fi
+
+          if gh pr merge "$pr_number" --squash --delete-branch; then
+            exit 0
+          fi
+
+          refreshed_state="$(gh pr view "$pr_number" --json mergeStateStatus --jq '.mergeStateStatus')"
+          if [ "$refreshed_state" = "BEHIND" ]; then
+            gh pr update-branch "$pr_number"
+            exit 0
+          fi
+
+          echo "Failed to merge PR #$pr_number in state: $refreshed_state" >&2
+          exit 1
