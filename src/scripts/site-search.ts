@@ -1,5 +1,7 @@
 import {
+  createSearchQueryVariants,
   formatSearchResultDate,
+  getSearchMatchPriority,
   getSearchContentType,
   isExternalSearchUrl,
   selectSearchExcerpt,
@@ -21,6 +23,8 @@ import {
 } from "./site-dropdown";
 
 type PagefindResult = {
+  id: string;
+  score: number;
   data: () => Promise<PagefindSearchResultData>;
 };
 
@@ -407,6 +411,51 @@ function initSearchPanel(root: HTMLElement) {
     elements.input.value = initialQueryFromUrl;
   }
 
+  const searchPagefind = async (pagefind: PagefindModule, rawQuery: string, immediate: boolean) => {
+    const queryVariants = createSearchQueryVariants(rawQuery, elements.locale);
+
+    if (queryVariants.length === 0) {
+      return [];
+    }
+
+    const [primaryQuery, fallbackQuery] = queryVariants;
+    const primaryResponse = immediate
+      ? await pagefind.search(primaryQuery.value)
+      : await pagefind.debouncedSearch(primaryQuery.value, {}, 250);
+
+    if (primaryResponse === null) {
+      return null;
+    }
+
+    const mergedEntries = new Map<string, { entry: PagefindResult; variantOrder: number; resultOrder: number }>();
+
+    for (const [variantOrder, response] of [primaryResponse].entries()) {
+      for (const [resultOrder, entry] of response.results.entries()) {
+        mergedEntries.set(entry.id, {
+          entry,
+          variantOrder,
+          resultOrder,
+        });
+      }
+    }
+
+    if (fallbackQuery) {
+      const fallbackResponse = await pagefind.search(fallbackQuery.value);
+
+      for (const [resultOrder, entry] of fallbackResponse.results.entries()) {
+        if (!mergedEntries.has(entry.id)) {
+          mergedEntries.set(entry.id, {
+            entry,
+            variantOrder: 1,
+            resultOrder,
+          });
+        }
+      }
+    }
+
+    return [...mergedEntries.values()];
+  };
+
   const runSearch = async (rawQuery: string, immediate = false) => {
     const query = rawQuery.trim();
     currentRequestId += 1;
@@ -422,23 +471,46 @@ function initSearchPanel(root: HTMLElement) {
 
     try {
       const pagefind = await loadPagefind();
-      const response = immediate ? await pagefind.search(query) : await pagefind.debouncedSearch(query, {}, 250);
+      const responseEntries = await searchPagefind(pagefind, query, immediate);
 
-      if (response === null || requestId !== currentRequestId) {
+      if (responseEntries === null || requestId !== currentRequestId) {
         return;
       }
 
-      const totalCount = response.results.length;
-      const resultEntries = elements.mode === "inline"
-        ? response.results.slice(0, 20)
-        : response.results;
-      const results = await Promise.all(resultEntries.map((entry) => entry.data()));
+      const totalCount = responseEntries.length;
+      const limitedEntries = elements.mode === "inline"
+        ? responseEntries.slice(0, 20)
+        : responseEntries;
+      const results = await Promise.all(limitedEntries.map(async ({ entry, variantOrder, resultOrder }) => ({
+        data: await entry.data(),
+        variantOrder,
+        resultOrder,
+        score: entry.score,
+      })));
 
       if (requestId !== currentRequestId) {
         return;
       }
 
-      renderResults(elements, results, totalCount);
+      results.sort((left, right) => {
+        const priorityDelta = getSearchMatchPriority(right.data, query) - getSearchMatchPriority(left.data, query);
+
+        if (priorityDelta !== 0) {
+          return priorityDelta;
+        }
+
+        if (left.variantOrder !== right.variantOrder) {
+          return left.variantOrder - right.variantOrder;
+        }
+
+        if (right.score !== left.score) {
+          return right.score - left.score;
+        }
+
+        return left.resultOrder - right.resultOrder;
+      });
+
+      renderResults(elements, results.map((result) => result.data), totalCount);
     } catch {
       if (requestId !== currentRequestId) {
         return;

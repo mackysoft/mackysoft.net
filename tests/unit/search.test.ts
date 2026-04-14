@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  createSearchQueryVariants,
   getSearchContentType,
+  getSearchMatchPriority,
   selectSearchExcerpt,
   selectSearchTargetUrl,
 } from "../../src/lib/search";
@@ -75,5 +77,56 @@ describe("search helpers", () => {
     expect(getSearchContentType("article")).toBe("article");
     expect(getSearchContentType("unknown")).toBe("page");
     expect(getSearchContentType(undefined)).toBe("page");
+  });
+
+  test("creates an exact-first variant for Japanese compound queries", () => {
+    const variants = createSearchQueryVariants(
+      "ゲームデザイン",
+      "ja",
+      () => ({
+        segment: () => [
+          { segment: "ゲーム", isWordLike: true },
+          { segment: "デザイン", isWordLike: true },
+        ],
+      }),
+    );
+
+    expect(variants).toEqual([
+      { value: "\"ゲーム デザイン\"", strategy: "exact" },
+      { value: "ゲームデザイン", strategy: "broad" },
+    ]);
+  });
+
+  test("does not create an exact variant for single-token Japanese queries", () => {
+    const variants = createSearchQueryVariants(
+      "ローグライク",
+      "ja",
+      () => ({
+        segment: () => [
+          { segment: "ローグライク", isWordLike: true },
+        ],
+      }),
+    );
+
+    expect(variants).toEqual([
+      { value: "ローグライク", strategy: "broad" },
+    ]);
+  });
+
+  test("prioritizes exact matches in titles over body-only matches", () => {
+    expect(getSearchMatchPriority({
+      url: "/articles/gamedesign-contrast-cedec2018/",
+      meta: {
+        title: "ゲームを面白くする「コントラスト」【ゲームデザイン】",
+      },
+    }, "ゲームデザイン")).toBe(400);
+
+    expect(getSearchMatchPriority({
+      url: "/articles/slay-the-spire-review/",
+      excerpt: "参考: ゲームを面白くする「コントラスト」【ゲームデザイン】",
+      meta: {
+        title: "『Slay the Spire』はなぜ面白いのか",
+      },
+    }, "ゲームデザイン")).toBe(200);
   });
 });
