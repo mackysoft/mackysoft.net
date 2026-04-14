@@ -15,7 +15,10 @@ type Props = {
 const { article, layout = "horizontal", locale = "ja" } = Astro.props as Props;
 const isExternal = article.kind === "external";
 const cover = article.cover;
-const isRemoteCover = typeof cover === "string";
+const isStringCover = typeof cover === "string";
+const isPublicCover = isStringCover && cover.startsWith("/");
+const isRemoteCover = isStringCover && !isPublicCover;
+const localCover = isStringCover ? undefined : cover;
 const showDescription = layout === "horizontal";
 const coverWidth = typeof cover === "string" ? undefined : cover?.width;
 const coverHeight = typeof cover === "string" ? undefined : cover?.height;
@@ -42,10 +45,12 @@ const uiText = getUiText(locale);
       class="article-card__cover activity-card__cover"
       style={verticalCoverStyle}
     >
-      {isRemoteCover ? (
+      {isPublicCover ? (
+        <img src={cover} alt={article.coverAlt ?? ""} loading="lazy" decoding="async" />
+      ) : isRemoteCover ? (
         <Image src={cover} alt={article.coverAlt ?? ""} widths={[480]} sizes={coverSizes} inferSize />
       ) : (
-        <Image src={cover} alt={article.coverAlt ?? ""} widths={[480]} sizes={coverSizes} />
+        <Image src={localCover!} alt={article.coverAlt ?? ""} widths={[480]} sizes={coverSizes} />
       )}
     </div>
   ) : (

@@ -13,6 +13,8 @@ const sharedSiteName = "mackysoft.net";
 const defaultImageUrl = "https://mackysoft.net/og/default.png";
 const defaultImageAltJa = "mackysoft.net のカバー画像";
 const defaultImageAltEn = "mackysoft.net cover image";
+const generatedArticleImageJa = "https://mackysoft.net/og/articles/turnbased-gameloop.png";
+const generatedArticleImageEn = "https://mackysoft.net/en/og/articles/turnbased-gameloop.png";
 
 const seoExpectations: SeoExpectation[] = [
   {
@@ -127,13 +129,31 @@ test.describe("SEO metadata", () => {
     );
   });
 
-  test("falls back to the default cover when a local article has no cover", { tag: "@size:medium" }, async ({ page }) => {
+  test("uses a generated title card when a local article has no cover", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/articles/turnbased-gameloop/");
 
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", defaultImageUrl);
-    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute("content", defaultImageAltJa);
-    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", defaultImageUrl);
-    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute("content", defaultImageAltJa);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", generatedArticleImageJa);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute("content", "ターン制のゲームループを実装する方法【C#】 の記事タイトル画像");
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", generatedArticleImageJa);
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+      "content",
+      "ターン制のゲームループを実装する方法【C#】 の記事タイトル画像",
+    );
+  });
+
+  test("uses a localized generated title card when an English article has no cover", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/en/articles/turnbased-gameloop/");
+
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", generatedArticleImageEn);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      "Title card for How to Implement a Turn-Based Game Loop [C#]",
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", generatedArticleImageEn);
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+      "content",
+      "Title card for How to Implement a Turn-Based Game Loop [C#]",
+    );
   });
 
   test("uses the game cover on game detail pages", { tag: "@size:medium" }, async ({ page }) => {

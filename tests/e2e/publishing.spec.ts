@@ -70,4 +70,12 @@ test.describe("publishing endpoints", () => {
     expect(body).toContain("https://mackysoft.net/games/treasure-rogue/");
     expect(body).not.toContain("https://mackysoft.net/en/articles/debug-context/");
   });
+
+  test("serves generated article OGP PNG endpoints", { tag: "@size:medium" }, async ({ request }) => {
+    const response = await request.get("/og/articles/turnbased-gameloop.png");
+
+    expect(response.ok()).toBeTruthy();
+    expect(response.headers()["content-type"]).toContain("image/png");
+    expect((await response.body()).byteLength).toBeGreaterThan(0);
+  });
 });
