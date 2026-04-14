@@ -73,9 +73,14 @@ test.describe("publishing endpoints", () => {
 
   test("serves generated article OGP PNG endpoints", { tag: "@size:medium" }, async ({ request }) => {
     const response = await request.get("/og/articles/turnbased-gameloop.png");
+    const localizedResponse = await request.get("/en/og/articles/turnbased-gameloop.png");
 
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"]).toContain("image/png");
     expect((await response.body()).byteLength).toBeGreaterThan(0);
+
+    expect(localizedResponse.ok()).toBeTruthy();
+    expect(localizedResponse.headers()["content-type"]).toContain("image/png");
+    expect((await localizedResponse.body()).byteLength).toBeGreaterThan(0);
   });
 });

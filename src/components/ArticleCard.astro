@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 
+import { defaultSocialImageHeight, defaultSocialImageWidth } from "../features/site/social-image";
 import { getUiText } from "../lib/ui-text";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import { formatContentDate } from "../lib/content-date";
@@ -46,7 +47,14 @@ const uiText = getUiText(locale);
       style={verticalCoverStyle}
     >
       {isPublicCover ? (
-        <img src={cover} alt={article.coverAlt ?? ""} loading="lazy" decoding="async" />
+        <img
+          src={cover}
+          alt={article.coverAlt ?? ""}
+          width={defaultSocialImageWidth}
+          height={defaultSocialImageHeight}
+          loading="lazy"
+          decoding="async"
+        />
       ) : isRemoteCover ? (
         <Image src={cover} alt={article.coverAlt ?? ""} widths={[480]} sizes={coverSizes} inferSize />
       ) : (
