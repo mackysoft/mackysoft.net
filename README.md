@@ -68,16 +68,16 @@ npm run deploy:workers
 
 GitHub Actions の `Sync Activity` workflow が毎日 `06:00 JST` に実行され、Zenn と GitHub Releases の外部更新を `src/generated/activity.json` へ同期します。
 
-- 差分が無い場合は、そのまま成功終了します。
+- 差分が無い場合は、既存の `automation/sync-activity` PR や branch が残っていれば自動で片付けたうえで成功終了します。
 - 差分がある場合は `automation/sync-activity` branch へ自動 commit し、`master` 向け PR を作成または更新します。
-- `CI` が `quality` と `e2e` を通過すると、`Merge Sync Activity` workflow が PR を squash merge します。
+- `CI` が `quality` と `e2e` を通過すると、`Merge Sync Activity` workflow が PR を squash merge します。`master` が先に進んでいた場合は branch を追従させて再検証します。
 - merge 後は既存の `master` 向け CI と `Deploy Workers` workflow が流れ、Cloudflare Workers へ反映されます。
 
 この自動化には、GitHub Actions の repository secret `ACTIONS_BOT_TOKEN` が必要です。
 
-- fine-grained PAT を使う場合は `Contents: Read and write`、`Pull requests: Read and write`、`Actions: Read and write` を付与します。
-- classic PAT を使う場合は `repo` と `workflow` を付与します。
-- token が失効すると `Sync Activity` または `Merge Sync Activity` が `gh` 実行時の認証エラーで失敗します。
+- fine-grained PAT を使う場合は `Contents: Read and write` と `Pull requests: Read and write` を付与します。
+- classic PAT を使う場合は `repo` を付与します。
+- token が失効すると `Sync Activity` または `Merge Sync Activity` が GitHub API の認証エラーで失敗します。
 - 失効した場合は GitHub で新しい token を発行し、repository secret `ACTIONS_BOT_TOKEN` を更新してから `Sync Activity` を手動実行してください。
 - 失効中に開いた `automation/sync-activity` PR が残っている場合は、secret 更新後に workflow を再実行して状態を同期します。
 
