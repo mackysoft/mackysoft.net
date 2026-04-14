@@ -25,6 +25,19 @@ export type SocialImage = {
   height: number;
 };
 
+export type LocalArticleImageInput = {
+  slug: string;
+  title: string;
+  contentLocale: SiteLocale;
+  cover?: ImageMetadata;
+  coverAlt?: string;
+};
+
+export type ResolvedLocalArticlePageImages = {
+  social: SocialImage;
+  search: SocialImage;
+};
+
 export function getDefaultSocialImage(locale: SiteLocale) {
   return {
     src: defaultSocialImagePath,
@@ -92,11 +105,7 @@ export function getGeneratedLocalArticleSocialImage({
   slug,
   title,
   contentLocale,
-}: {
-  slug: string;
-  title: string;
-  contentLocale: SiteLocale;
-}) {
+}: Pick<LocalArticleImageInput, "slug" | "title" | "contentLocale">) {
   return createGeneratedLocalArticleImage({
     title,
     contentLocale,
@@ -110,11 +119,7 @@ export function getGeneratedLocalArticleCardImage({
   slug,
   title,
   contentLocale,
-}: {
-  slug: string;
-  title: string;
-  contentLocale: SiteLocale;
-}) {
+}: Pick<LocalArticleImageInput, "slug" | "title" | "contentLocale">) {
   return createGeneratedLocalArticleImage({
     title,
     contentLocale,
@@ -130,13 +135,7 @@ export function resolveLocalArticleSocialImage({
   contentLocale,
   cover,
   coverAlt,
-}: {
-  slug: string;
-  title: string;
-  contentLocale: SiteLocale;
-  cover?: ImageMetadata;
-  coverAlt?: string;
-}) {
+}: LocalArticleImageInput) {
   return resolveLocalArticleImage({
     cover,
     coverAlt,
@@ -154,13 +153,7 @@ export function resolveLocalArticleCardImage({
   contentLocale,
   cover,
   coverAlt,
-}: {
-  slug: string;
-  title: string;
-  contentLocale: SiteLocale;
-  cover?: ImageMetadata;
-  coverAlt?: string;
-}) {
+}: LocalArticleImageInput) {
   return resolveLocalArticleImage({
     cover,
     coverAlt,
@@ -170,4 +163,11 @@ export function resolveLocalArticleCardImage({
       contentLocale,
     }),
   });
+}
+
+export function resolveLocalArticlePageImages(input: LocalArticleImageInput): ResolvedLocalArticlePageImages {
+  return {
+    social: resolveLocalArticleSocialImage(input),
+    search: resolveLocalArticleCardImage(input),
+  };
 }

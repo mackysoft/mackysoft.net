@@ -6,7 +6,7 @@ import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
 import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
 import SearchMetadata from "../../components/search/SearchMetadata.astro";
-import { resolveLocalArticleSocialImage } from "../../features/site/social-image";
+import { resolveLocalArticlePageImages } from "../../features/site/social-image";
 import { getUiText } from "../../lib/ui-text";
 import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
@@ -46,7 +46,7 @@ const articlePath = `/articles/${slug}/`;
 const shareUrl = toAbsoluteSiteUrl(siteUrl, article.href);
 const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
 const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
-const articleImage = resolveLocalArticleSocialImage({
+const { social: articleImage, search: searchImage } = resolveLocalArticlePageImages({
   slug,
   title: article.data.title,
   contentLocale: article.contentLocale,
@@ -74,8 +74,8 @@ const articleImage = resolveLocalArticleSocialImage({
       description={article.data.description}
       source={siteName}
       updatedAt={article.data.updatedAt ?? article.data.publishedAt}
-      image={articleImage.src}
-      imageAlt={articleImage.alt}
+      image={searchImage.src}
+      imageAlt={searchImage.alt}
       tags={article.data.tags}
     />
     <section class="page-header article-page-header">
