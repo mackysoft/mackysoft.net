@@ -47,11 +47,11 @@ async function getOgAssets() {
   return ogAssetsPromise;
 }
 
-function renderSvgToPng(svg) {
+function renderSvgToPng(svg, width = ogImageWidth) {
   const resvg = new Resvg(svg, {
     fitTo: {
       mode: "width",
-      value: ogImageWidth,
+      value: width,
     },
     font: {
       fontFiles: [fontPath],
@@ -68,7 +68,7 @@ export async function renderDefaultSocialImagePng() {
   return renderSvgToPng(createDefaultSocialImageSvg(avatarDataUri));
 }
 
-export async function renderArticleTitleSocialImagePng({ title, locale }) {
+export async function renderArticleTitleSocialImagePng({ title, locale, width = ogImageWidth }) {
   const { avatarDataUri } = await getOgAssets();
-  return renderSvgToPng(createArticleSocialImageSvg({ avatarDataUri, title, locale }));
+  return renderSvgToPng(createArticleSocialImageSvg({ avatarDataUri, title, locale }), width);
 }

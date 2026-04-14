@@ -74,6 +74,8 @@ test.describe("publishing endpoints", () => {
   test("serves generated article OGP PNG endpoints", { tag: "@size:medium" }, async ({ request }) => {
     const response = await request.get("/og/articles/turnbased-gameloop.png");
     const localizedResponse = await request.get("/en/og/articles/turnbased-gameloop.png");
+    const cardResponse = await request.get("/og/articles/cards/turnbased-gameloop.png");
+    const localizedCardResponse = await request.get("/en/og/articles/cards/turnbased-gameloop.png");
 
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"]).toContain("image/png");
@@ -82,5 +84,13 @@ test.describe("publishing endpoints", () => {
     expect(localizedResponse.ok()).toBeTruthy();
     expect(localizedResponse.headers()["content-type"]).toContain("image/png");
     expect((await localizedResponse.body()).byteLength).toBeGreaterThan(0);
+
+    expect(cardResponse.ok()).toBeTruthy();
+    expect(cardResponse.headers()["content-type"]).toContain("image/png");
+    expect((await cardResponse.body()).byteLength).toBeGreaterThan(0);
+
+    expect(localizedCardResponse.ok()).toBeTruthy();
+    expect(localizedCardResponse.headers()["content-type"]).toContain("image/png");
+    expect((await localizedCardResponse.body()).byteLength).toBeGreaterThan(0);
   });
 });

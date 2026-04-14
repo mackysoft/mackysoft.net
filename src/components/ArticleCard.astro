@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 
-import { defaultSocialImageHeight, defaultSocialImageWidth } from "../features/site/social-image";
+import { articleTitleCardImageHeight, articleTitleCardImageWidth } from "../features/site/social-image";
 import { getUiText } from "../lib/ui-text";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import { formatContentDate } from "../lib/content-date";
@@ -50,8 +50,8 @@ const uiText = getUiText(locale);
         <img
           src={cover}
           alt={article.coverAlt ?? ""}
-          width={defaultSocialImageWidth}
-          height={defaultSocialImageHeight}
+          width={articleTitleCardImageWidth}
+          height={articleTitleCardImageHeight}
           loading="lazy"
           decoding="async"
         />

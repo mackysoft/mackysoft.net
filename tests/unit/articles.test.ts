@@ -41,7 +41,7 @@ describe("article item helpers", () => {
   test("uses the generated title card for local article cards when a custom cover is missing", () => {
     const articleItem = toLocalizedLocalArticleItem(createLocalizedArticleEntry());
 
-    expect(articleItem.cover).toBe("/og/articles/turnbased-gameloop.png");
+    expect(articleItem.cover).toBe("/og/articles/cards/turnbased-gameloop.png");
     expect(articleItem.coverAlt).toBe("ターン制のゲームループを実装する方法【C#】 の記事タイトル画像");
   });
 

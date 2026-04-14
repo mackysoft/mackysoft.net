@@ -176,7 +176,7 @@ test.describe("articles page", () => {
 
     await expect(articleCard).not.toHaveClass(/article-card--no-cover/);
     await expect(cover).toBeVisible();
-    await expect(cover).toHaveAttribute("src", "/og/articles/turnbased-gameloop.png");
+    await expect(cover).toHaveAttribute("src", "/og/articles/cards/turnbased-gameloop.png");
     await expect(cover).toHaveAttribute("alt", "ターン制のゲームループを実装する方法【C#】 の記事タイトル画像");
   });
 

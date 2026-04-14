@@ -8,7 +8,12 @@ import {
   articleTitleMaxWidth,
   calculateArticleTitleLayout,
 } from "../../src/features/site/og-image.mjs";
-import { resolveLocalArticleSocialImage } from "../../src/features/site/social-image";
+import {
+  articleTitleCardImageHeight,
+  articleTitleCardImageWidth,
+  resolveLocalArticleCardImage,
+  resolveLocalArticleSocialImage,
+} from "../../src/features/site/social-image";
 
 describe("social image helpers", () => {
   test("keeps a short Japanese article title readable without breaking embedded English words", () => {
@@ -102,6 +107,17 @@ describe("social image helpers", () => {
       height: 630,
     });
 
+    expect(resolveLocalArticleCardImage({
+      slug: "turnbased-gameloop",
+      title: "How to Implement a Turn-Based Game Loop [C#]",
+      contentLocale: "en",
+    })).toEqual({
+      src: "/en/og/articles/cards/turnbased-gameloop.png",
+      alt: "Title card for How to Implement a Turn-Based Game Loop [C#]",
+      width: articleTitleCardImageWidth,
+      height: articleTitleCardImageHeight,
+    });
+
     const authoredCover = {
       src: "/_astro/authored-cover.webp",
       width: 1200,
@@ -110,6 +126,19 @@ describe("social image helpers", () => {
     };
 
     expect(resolveLocalArticleSocialImage({
+      slug: "vision-introduction",
+      title: "[Unity] Implementing CullingGroup More Easily [Vision]",
+      contentLocale: "en",
+      cover: authoredCover as never,
+      coverAlt: "著者指定カバー",
+    })).toEqual({
+      src: authoredCover,
+      alt: "著者指定カバー",
+      width: 1200,
+      height: 630,
+    });
+
+    expect(resolveLocalArticleCardImage({
       slug: "vision-introduction",
       title: "[Unity] Implementing CullingGroup More Easily [Vision]",
       contentLocale: "en",

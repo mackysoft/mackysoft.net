@@ -15,6 +15,8 @@ const articleTitleSocialImageAltMap: Record<SiteLocale, (title: string) => strin
 export const defaultSocialImagePath = "/og/default.png";
 export const defaultSocialImageWidth = 1200;
 export const defaultSocialImageHeight = 630;
+export const articleTitleCardImageWidth = 480;
+export const articleTitleCardImageHeight = 252;
 
 export type SocialImage = {
   src: string | ImageMetadata;
@@ -36,8 +38,54 @@ export function getArticleTitleSocialImagePath(slug: string, locale: SiteLocale)
   return localizePath(`/og/articles/${slug}.png`, locale);
 }
 
+export function getArticleTitleCardImagePath(slug: string, locale: SiteLocale) {
+  return localizePath(`/og/articles/cards/${slug}.png`, locale);
+}
+
 export function getArticleTitleSocialImageAlt(title: string, locale: SiteLocale) {
   return articleTitleSocialImageAltMap[locale](title);
+}
+
+function createGeneratedLocalArticleImage({
+  title,
+  contentLocale,
+  imagePath,
+  width,
+  height,
+}: {
+  title: string;
+  contentLocale: SiteLocale;
+  imagePath: string;
+  width: number;
+  height: number;
+}) {
+  return {
+    src: imagePath,
+    alt: getArticleTitleSocialImageAlt(title, contentLocale),
+    width,
+    height,
+  } satisfies SocialImage;
+}
+
+function resolveLocalArticleImage({
+  cover,
+  coverAlt,
+  generatedImage,
+}: {
+  cover?: ImageMetadata;
+  coverAlt?: string;
+  generatedImage: SocialImage;
+}) {
+  if (cover) {
+    return {
+      src: cover,
+      alt: coverAlt ?? "",
+      width: cover.width,
+      height: cover.height,
+    } satisfies SocialImage;
+  }
+
+  return generatedImage;
 }
 
 export function getGeneratedLocalArticleSocialImage({
@@ -49,12 +97,31 @@ export function getGeneratedLocalArticleSocialImage({
   title: string;
   contentLocale: SiteLocale;
 }) {
-  return {
-    src: getArticleTitleSocialImagePath(slug, contentLocale),
-    alt: getArticleTitleSocialImageAlt(title, contentLocale),
+  return createGeneratedLocalArticleImage({
+    title,
+    contentLocale,
+    imagePath: getArticleTitleSocialImagePath(slug, contentLocale),
     width: defaultSocialImageWidth,
     height: defaultSocialImageHeight,
-  } satisfies SocialImage;
+  });
+}
+
+export function getGeneratedLocalArticleCardImage({
+  slug,
+  title,
+  contentLocale,
+}: {
+  slug: string;
+  title: string;
+  contentLocale: SiteLocale;
+}) {
+  return createGeneratedLocalArticleImage({
+    title,
+    contentLocale,
+    imagePath: getArticleTitleCardImagePath(slug, contentLocale),
+    width: articleTitleCardImageWidth,
+    height: articleTitleCardImageHeight,
+  });
 }
 
 export function resolveLocalArticleSocialImage({
@@ -70,18 +137,37 @@ export function resolveLocalArticleSocialImage({
   cover?: ImageMetadata;
   coverAlt?: string;
 }) {
-  if (cover) {
-    return {
-      src: cover,
-      alt: coverAlt ?? "",
-      width: cover.width,
-      height: cover.height,
-    } satisfies SocialImage;
-  }
+  return resolveLocalArticleImage({
+    cover,
+    coverAlt,
+    generatedImage: getGeneratedLocalArticleSocialImage({
+      slug,
+      title,
+      contentLocale,
+    }),
+  });
+}
 
-  return getGeneratedLocalArticleSocialImage({
-    slug,
-    title,
-    contentLocale,
+export function resolveLocalArticleCardImage({
+  slug,
+  title,
+  contentLocale,
+  cover,
+  coverAlt,
+}: {
+  slug: string;
+  title: string;
+  contentLocale: SiteLocale;
+  cover?: ImageMetadata;
+  coverAlt?: string;
+}) {
+  return resolveLocalArticleImage({
+    cover,
+    coverAlt,
+    generatedImage: getGeneratedLocalArticleCardImage({
+      slug,
+      title,
+      contentLocale,
+    }),
   });
 }

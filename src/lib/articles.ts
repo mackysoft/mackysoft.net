@@ -2,7 +2,7 @@ import type { ImageMetadata } from "astro";
 import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
-import { resolveLocalArticleSocialImage } from "../features/site/social-image";
+import { resolveLocalArticleCardImage } from "../features/site/social-image";
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
 import {
   createTranslationMap,
@@ -177,7 +177,7 @@ export async function getLocalizedLocalArticles(locale: SiteLocale = defaultLoca
 }
 
 export function toLocalizedLocalArticleItem(article: LocalizedArticleEntry): ArticleItem {
-  const socialImage = resolveLocalArticleSocialImage({
+  const socialImage = resolveLocalArticleCardImage({
     slug: article.slug,
     title: article.data.title,
     contentLocale: article.contentLocale,
