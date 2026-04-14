@@ -1,4 +1,7 @@
 ---
+import type { ImageMetadata } from "astro";
+
+import { getDefaultSocialImage } from "../features/site/social-image";
 import RootLocaleRedirect from "../components/head/RootLocaleRedirect.astro";
 import SiteAnalytics from "../components/head/SiteAnalytics.astro";
 import SiteSeo from "../components/head/SiteSeo.astro";
@@ -10,7 +13,7 @@ import PrimaryNav from "../components/header/PrimaryNav.astro";
 import { getUiText } from "../lib/ui-text";
 import { localizePath, stripLocaleFromPath, toLanguageTag, type SiteLocale } from "../lib/i18n";
 import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
-import { buildSiteLayoutUrls, requireSiteUrl } from "../lib/site-url.mjs";
+import { buildSiteLayoutUrls } from "../lib/site-url.mjs";
 import "../styles/site.css";
 
 type AlternateLocaleLink = {
@@ -31,6 +34,10 @@ type Props = {
   alternateLocales?: AlternateLocaleLink[];
   isFallback?: boolean;
   enableLocaleRedirectOnRoot?: boolean;
+  image?: ImageMetadata | string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
 const {
@@ -41,6 +48,10 @@ const {
   alternateLocales = [],
   isFallback = false,
   enableLocaleRedirectOnRoot = false,
+  image,
+  imageAlt,
+  imageWidth,
+  imageHeight,
 } = Astro.props as Props;
 const siteMeta = getSiteMeta(locale);
 const uiText = getUiText(locale);
@@ -48,7 +59,7 @@ const description = Astro.props.description ?? siteMeta.description;
 const pageTitle = title ? `${title} | ${siteMeta.name}` : siteMeta.name;
 const currentPath = Astro.url.pathname;
 const primaryNav = getPrimaryNav(locale);
-const siteUrl = requireSiteUrl(Astro.site, "Astro site must be configured to build public URLs.");
+const siteUrl = Astro.url;
 const { canonicalUrl, rssFeedUrl, alternateLocaleUrls } = buildSiteLayoutUrls(siteUrl, {
   canonicalPath,
   alternateLocales,
@@ -68,6 +79,11 @@ const footerColumns = [
     links: [{ href: localizePath("/privacy-policy/", locale), label: uiText.common.privacyPolicy, isExternal: false }],
   },
 ] as const;
+const defaultSocialImage = getDefaultSocialImage(locale);
+const socialImage = image ?? defaultSocialImage.src;
+const socialImageAlt = imageAlt ?? defaultSocialImage.alt;
+const socialImageWidth = imageWidth ?? (typeof image === "object" ? image.width : undefined) ?? defaultSocialImage.width;
+const socialImageHeight = imageHeight ?? (typeof image === "object" ? image.height : undefined) ?? defaultSocialImage.height;
 ---
 
 <!doctype html>
@@ -86,6 +102,10 @@ const footerColumns = [
       rssFeedUrl={rssFeedUrl}
       rssFeedTitle={`${siteMeta.name} - ${uiText.common.rssFeed}`}
       alternateLocaleUrls={alternateLocaleUrls}
+      image={new URL(typeof socialImage === "string" ? socialImage : socialImage.src, siteUrl).toString()}
+      imageAlt={socialImageAlt}
+      imageWidth={socialImageWidth}
+      imageHeight={socialImageHeight}
     />
     <ThemeBootstrap />
     <RootLocaleRedirect enabled={enableLocaleRedirectOnRoot} />

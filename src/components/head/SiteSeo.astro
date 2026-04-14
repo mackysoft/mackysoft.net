@@ -1,4 +1,6 @@
 ---
+import type { ImageMetadata } from "astro";
+
 import { toLanguageTag, type SiteLocale } from "../../lib/i18n";
 
 type AlternateLocaleLink = {
@@ -14,9 +16,28 @@ type Props = {
   alternateLocaleUrls?: AlternateLocaleLink[];
   rssFeedUrl?: string;
   rssFeedTitle?: string;
+  image?: ImageMetadata | string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
-const { title, description, siteName, canonicalUrl, alternateLocaleUrls = [], rssFeedUrl, rssFeedTitle } = Astro.props as Props;
+const {
+  title,
+  description,
+  siteName,
+  canonicalUrl,
+  alternateLocaleUrls = [],
+  rssFeedUrl,
+  rssFeedTitle,
+  image,
+  imageAlt,
+  imageWidth,
+  imageHeight,
+} = Astro.props as Props;
+const imageSrc = image ? (typeof image === "string" ? image : image.src) : undefined;
+const resolvedImageWidth = imageWidth ?? (typeof image === "object" ? image.width : undefined);
+const resolvedImageHeight = imageHeight ?? (typeof image === "object" ? image.height : undefined);
 ---
 
 <link rel="canonical" href={canonicalUrl} />
@@ -25,6 +46,13 @@ const { title, description, siteName, canonicalUrl, alternateLocaleUrls = [], rs
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonicalUrl} />
+{imageSrc && <meta property="og:image" content={imageSrc} />}
+{imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+{resolvedImageWidth && <meta property="og:image:width" content={String(resolvedImageWidth)} />}
+{resolvedImageHeight && <meta property="og:image:height" content={String(resolvedImageHeight)} />}
+<meta name="twitter:card" content={imageSrc ? "summary_large_image" : "summary"} />
+{imageSrc && <meta name="twitter:image" content={imageSrc} />}
+{imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
 {rssFeedUrl && <link rel="alternate" type="application/rss+xml" title={rssFeedTitle ?? siteName} href={rssFeedUrl} />}
 {alternateLocaleUrls.map((entry) => (
   <link rel="alternate" hreflang={toLanguageTag(entry.locale)} href={entry.href} />

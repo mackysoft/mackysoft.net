@@ -1,0 +1,59 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="frame-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="630">
+      <rect width="1200" height="630" fill="white" />
+      <rect x="32" y="32" width="1136" height="566" rx="64" fill="black" />
+    </mask>
+    <radialGradient id="frame-gradient-primary" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(236 142) scale(812 652)">
+      <stop offset="0" stop-color="#8BD8F4" />
+      <stop offset="0.28" stop-color="#79D1F0" />
+      <stop offset="0.58" stop-color="#67C9EB" />
+      <stop offset="1" stop-color="#67C9EB" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="frame-gradient-secondary" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(960 456) scale(824 664)">
+      <stop offset="0" stop-color="#7DD4F1" />
+      <stop offset="0.28" stop-color="#69C9EA" />
+      <stop offset="0.6" stop-color="#58BFE5" />
+      <stop offset="1" stop-color="#58BFE5" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="frame-gradient-soft" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(704 196) scale(1036 836)">
+      <stop offset="0" stop-color="#AEE4F8" stop-opacity="0.1" />
+      <stop offset="0.34" stop-color="#90DAF3" stop-opacity="0.05" />
+      <stop offset="1" stop-color="#90DAF3" stop-opacity="0" />
+    </radialGradient>
+    <clipPath id="avatar-clip">
+      <circle cx="940" cy="315" r="102" />
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="630" fill="#EEF8FF" />
+  <g mask="url(#frame-mask)">
+    <rect width="1200" height="630" fill="#63C6EA" />
+    <rect width="1200" height="630" fill="url(#frame-gradient-primary)" />
+    <rect width="1200" height="630" fill="url(#frame-gradient-soft)" />
+    <rect width="1200" height="630" fill="url(#frame-gradient-secondary)" />
+  </g>
+  <rect x="48" y="48" width="1104" height="534" rx="48" fill="none" stroke="#79D4F8" stroke-opacity="0.9" stroke-width="4" />
+  <text
+    x="760"
+    y="340"
+    text-anchor="end"
+    fill="#12314D"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="94"
+    font-weight="800"
+  >
+    mackysoft.net
+  </text>
+
+  <circle cx="940" cy="315" r="110" fill="#DCF3FF" stroke="#3FAFEE" stroke-opacity="0.28" stroke-width="2" />
+  <image
+    href="__AVATAR_DATA_URI__"
+    x="838"
+    y="213"
+    width="204"
+    height="204"
+    preserveAspectRatio="xMidYMid slice"
+    clip-path="url(#avatar-clip)"
+  />
+</svg>
