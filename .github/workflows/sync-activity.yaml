@@ -74,7 +74,7 @@ jobs:
       - name: Create or update pull request
         if: ${{ steps.diff.outputs.has_diff == 'true' }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
         run: |
           body_file="$(mktemp)"
           cat <<'EOF' > "$body_file"
