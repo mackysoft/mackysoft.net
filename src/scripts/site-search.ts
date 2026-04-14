@@ -61,6 +61,7 @@ let activeSearchTrigger: HTMLElement | null = null;
 let activeSearchPanel: HTMLElement | null = null;
 let searchInteractionsReady = false;
 const pagefindBundlePath = "/pagefind/pagefind.js";
+const searchInlineViewportPadding = 16;
 
 async function importPagefindBundle(bundlePath: string) {
   return new Function("path", "return import(path)")(bundlePath) as Promise<PagefindModule>;
@@ -491,12 +492,25 @@ function closeActiveSearchPanel(restoreFocus = true) {
   closeInlinePanel(activeSearchPanel, restoreFocus);
 }
 
+function syncInlinePanelWidth(panel: HTMLElement) {
+  panel.style.removeProperty("width");
+
+  const rect = panel.getBoundingClientRect();
+  const minLeft = searchInlineViewportPadding;
+
+  if (rect.left < minLeft) {
+    const nextWidth = Math.max(rect.right - minLeft, 0);
+    panel.style.width = `${nextWidth}px`;
+  }
+}
+
 function openInlinePanel(panel: HTMLElement, trigger: HTMLElement) {
   document.dispatchEvent(new CustomEvent("site-header:close-disclosures"));
   panel.hidden = false;
   trigger.setAttribute("aria-expanded", "true");
   activeSearchTrigger = trigger;
   activeSearchPanel = panel;
+  syncInlinePanelWidth(panel);
   focusSearchInput(panel);
 }
 
@@ -575,6 +589,12 @@ export function initSiteSearch() {
 
       closeActiveSearchPanel(false);
     });
+
+    window.addEventListener("resize", () => {
+      if (activeSearchPanel) {
+        syncInlinePanelWidth(activeSearchPanel);
+      }
+    }, { passive: true });
   }
 
   for (const panel of document.querySelectorAll("[data-site-search-panel]")) {

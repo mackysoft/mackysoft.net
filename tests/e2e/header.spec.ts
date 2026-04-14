@@ -130,6 +130,15 @@ test.describe("site header", () => {
     await expect(mobileMenu.getByRole("link", { name: "記事", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(mobileMenu.getByRole("link", { name: "問い合わせ", exact: true })).toHaveAttribute("href", "/contact/");
 
+    const aboutLinkBox = await mobileMenu.getByRole("link", { name: "プロフィール", exact: true }).boundingBox();
+    const gamesLinkBox = await mobileMenu.getByRole("link", { name: "ゲーム", exact: true }).boundingBox();
+
+    if (!aboutLinkBox || !gamesLinkBox) {
+      throw new Error("mobile navigation links must be visible before vertical layout assertions");
+    }
+
+    expect(gamesLinkBox.y).toBeGreaterThanOrEqual(aboutLinkBox.y + aboutLinkBox.height - 1);
+
     await page.keyboard.press("Escape");
     await expect(mobileMenu).not.toHaveAttribute("open", "");
 
