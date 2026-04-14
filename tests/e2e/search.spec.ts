@@ -128,6 +128,15 @@ test.describe("site search", () => {
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
   });
 
+  test("prioritizes exact Japanese title matches over broader body matches", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.goto(`/search/?q=${encodeURIComponent("ゲームデザイン")}`);
+
+    const firstCard = page.locator(".site-search-card").first();
+    await expect(firstCard).toBeVisible();
+    await expect(firstCard.locator(".activity-card__link-layer")).toHaveAttribute("href", "/articles/gamedesign-contrast-cedec2018/");
+  });
+
   test("uses the generated card-sized image for no-cover local article search hits", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent("ターン制")}`);
