@@ -16,6 +16,8 @@ permissions:
   pull-requests: write
 
 env:
+  GH_REPO: ${{ github.repository }}
+  GH_TOKEN: ${{ secrets.ACTIONS_BOT_TOKEN }}
   SYNC_BRANCH: automation/sync-activity
 
 jobs:
@@ -28,106 +30,47 @@ jobs:
       github.event.workflow_run.head_branch == 'automation/sync-activity'
     steps:
       - name: Merge sync pull request
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.ACTIONS_BOT_TOKEN }}
-          script: |
-            const headBranch = process.env.SYNC_BRANCH;
-            const { owner, repo } = context.repo;
+        run: |
+          pr_number="$(gh pr list --state open --head "$SYNC_BRANCH" --base master --json number --jq '.[0].number')"
 
-            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          if [ -z "$pr_number" ]; then
+            echo "No open sync pull request found."
+            exit 0
+          fi
 
-            const { data: pulls } = await github.rest.pulls.list({
-              owner,
-              repo,
-              state: "open",
-              base: "master",
-              head: `${owner}:${headBranch}`,
-              per_page: 1,
-            });
+          merge_state=""
+          for _ in 1 2 3 4 5 6; do
+            merge_state="$(gh pr view "$pr_number" --json mergeStateStatus --jq '.mergeStateStatus')"
+            if [ "$merge_state" != "UNKNOWN" ] && [ -n "$merge_state" ]; then
+              break
+            fi
+            sleep 5
+          done
 
-            if (!pulls.length) {
-              core.info("No open sync pull request found.");
-              return;
-            }
+          if [ -z "$merge_state" ] || [ "$merge_state" = "UNKNOWN" ]; then
+            echo "Unable to resolve merge state for PR #$pr_number." >&2
+            exit 1
+          fi
 
-            const pullNumber = pulls[0].number;
-            let pull;
+          if [ "$merge_state" = "BEHIND" ]; then
+            gh pr update-branch "$pr_number"
+            exit 0
+          fi
 
-            for (let attempt = 0; attempt < 6; attempt += 1) {
-              const response = await github.rest.pulls.get({
-                owner,
-                repo,
-                pull_number: pullNumber,
-              });
-              pull = response.data;
+          if [ "$merge_state" != "CLEAN" ] && [ "$merge_state" != "HAS_HOOKS" ] && [ "$merge_state" != "UNSTABLE" ]; then
+            echo "PR #$pr_number is not mergeable in current state: $merge_state" >&2
+            exit 1
+          fi
 
-              if (pull.mergeable_state && pull.mergeable_state !== "unknown") {
-                break;
-              }
+          if gh pr merge "$pr_number" --squash --delete-branch; then
+            exit 0
+          fi
 
-              await sleep(5000);
-            }
+          refreshed_state="$(gh pr view "$pr_number" --json mergeStateStatus --jq '.mergeStateStatus')"
+          if [ "$refreshed_state" = "BEHIND" ]; then
+            gh pr update-branch "$pr_number"
+            exit 0
+          fi
 
-            if (!pull?.mergeable_state || pull.mergeable_state === "unknown") {
-              core.setFailed(`Unable to resolve mergeable state for #${pullNumber}.`);
-              return;
-            }
-
-            if (pull.mergeable_state === "behind") {
-              await github.rest.pulls.updateBranch({
-                owner,
-                repo,
-                pull_number: pullNumber,
-                expected_head_sha: pull.head.sha,
-              });
-              core.info(`Updated sync pull request #${pullNumber} with the latest master branch.`);
-              return;
-            }
-
-            try {
-              await github.rest.pulls.merge({
-                owner,
-                repo,
-                pull_number: pullNumber,
-                merge_method: "squash",
-                sha: pull.head.sha,
-              });
-            } catch (error) {
-              if (error.status === 405 || error.status === 409) {
-                const refreshed = (await github.rest.pulls.get({
-                  owner,
-                  repo,
-                  pull_number: pullNumber,
-                })).data;
-
-                if (refreshed.mergeable_state === "behind") {
-                  await github.rest.pulls.updateBranch({
-                    owner,
-                    repo,
-                    pull_number: pullNumber,
-                    expected_head_sha: refreshed.head.sha,
-                  });
-                  core.info(`Sync pull request #${pullNumber} fell behind master and was updated.`);
-                  return;
-                }
-              }
-
-              throw error;
-            }
-
-            try {
-              await github.rest.git.deleteRef({
-                owner,
-                repo,
-                ref: `heads/${headBranch}`,
-              });
-              core.info(`Deleted remote branch ${headBranch}.`);
-            } catch (error) {
-              if (error.status === 404 || error.status === 422) {
-                core.info(`Remote branch ${headBranch} was already removed.`);
-                return;
-              }
-
-              throw error;
-            }
+          echo "Failed to merge PR #$pr_number in state: $refreshed_state" >&2
+          exit 1
