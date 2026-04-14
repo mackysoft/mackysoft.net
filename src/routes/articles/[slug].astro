@@ -6,7 +6,7 @@ import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
 import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
 import SearchMetadata from "../../components/search/SearchMetadata.astro";
-import { getLocalArticleSocialImage } from "../../features/site/social-image";
+import { resolveLocalArticleSocialImage } from "../../features/site/social-image";
 import { getUiText } from "../../lib/ui-text";
 import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
@@ -46,15 +46,13 @@ const articlePath = `/articles/${slug}/`;
 const shareUrl = toAbsoluteSiteUrl(siteUrl, article.href);
 const canonicalPath = article.isFallback ? articlePath : localizePath(articlePath, locale);
 const alternateLocales = createAlternateLocaleLinks(articlePath, article.availableLocales);
-const socialImage = getLocalArticleSocialImage({
+const articleImage = resolveLocalArticleSocialImage({
   slug,
   title: article.data.title,
-  requestedLocale: locale,
   contentLocale: article.contentLocale,
-  hasCustomCover: Boolean(article.data.cover),
+  cover: article.data.cover,
+  coverAlt: article.data.coverAlt,
 });
-const articleImage = article.data.cover ?? socialImage?.src;
-const articleImageAlt = article.data.coverAlt ?? socialImage?.alt;
 ---
 
 <SiteLayout
@@ -65,10 +63,10 @@ const articleImageAlt = article.data.coverAlt ?? socialImage?.alt;
   isFallback={article.isFallback}
   canonicalPath={canonicalPath}
   alternateLocales={alternateLocales}
-  image={articleImage}
-  imageAlt={articleImageAlt}
-  imageWidth={socialImage?.width}
-  imageHeight={socialImage?.height}
+  image={articleImage.src}
+  imageAlt={articleImage.alt}
+  imageWidth={articleImage.width}
+  imageHeight={articleImage.height}
 >
   <article class="article-page">
     <SearchMetadata
@@ -76,8 +74,8 @@ const articleImageAlt = article.data.coverAlt ?? socialImage?.alt;
       description={article.data.description}
       source={siteName}
       updatedAt={article.data.updatedAt ?? article.data.publishedAt}
-      image={articleImage}
-      imageAlt={articleImageAlt}
+      image={articleImage.src}
+      imageAlt={articleImage.alt}
       tags={article.data.tags}
     />
     <section class="page-header article-page-header">

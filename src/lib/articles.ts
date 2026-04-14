@@ -2,7 +2,7 @@ import type { ImageMetadata } from "astro";
 import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
-import { getLocalArticleSocialImage } from "../features/site/social-image";
+import { resolveLocalArticleSocialImage } from "../features/site/social-image";
 import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
 import {
   createTranslationMap,
@@ -177,11 +177,12 @@ export async function getLocalizedLocalArticles(locale: SiteLocale = defaultLoca
 }
 
 export function toLocalizedLocalArticleItem(article: LocalizedArticleEntry): ArticleItem {
-  const socialImage = getLocalArticleSocialImage({
+  const socialImage = resolveLocalArticleSocialImage({
     slug: article.slug,
     title: article.data.title,
     contentLocale: article.contentLocale,
-    hasCustomCover: Boolean(article.data.cover),
+    cover: article.data.cover,
+    coverAlt: article.data.coverAlt,
   });
 
   return {
@@ -194,8 +195,8 @@ export function toLocalizedLocalArticleItem(article: LocalizedArticleEntry): Art
     updatedAt: article.data.updatedAt,
     tags: article.data.tags,
     source: getSiteMeta(defaultLocale).name,
-    cover: article.data.cover ?? socialImage?.src,
-    coverAlt: article.data.coverAlt ?? socialImage?.alt,
+    cover: socialImage.src,
+    coverAlt: socialImage.alt,
     contentLocale: article.contentLocale,
     isFallback: article.isFallback,
   };

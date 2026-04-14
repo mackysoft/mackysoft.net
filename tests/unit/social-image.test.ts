@@ -8,7 +8,7 @@ import {
   articleTitleMaxWidth,
   calculateArticleTitleLayout,
 } from "../../src/features/site/og-image.mjs";
-import { getLocalArticleSocialImage } from "../../src/features/site/social-image";
+import { resolveLocalArticleSocialImage } from "../../src/features/site/social-image";
 
 describe("social image helpers", () => {
   test("keeps a short Japanese article title readable without breaking embedded English words", () => {
@@ -79,13 +79,11 @@ describe("social image helpers", () => {
     expect(layout.lines.every((line: string) => line === line.trim())).toBe(true);
   });
 
-  test("resolves generated article OGP paths from the content locale and skips covered articles", () => {
-    expect(getLocalArticleSocialImage({
+  test("resolves article images from the content locale and keeps authored covers", () => {
+    expect(resolveLocalArticleSocialImage({
       slug: "hascomponent",
       title: "【Unity】HasComponent関数【拡張メソッド】",
-      requestedLocale: "en",
       contentLocale: "ja",
-      hasCustomCover: false,
     })).toEqual({
       src: "/og/articles/hascomponent.png",
       alt: "【Unity】HasComponent関数【拡張メソッド】 の記事タイトル画像",
@@ -93,12 +91,10 @@ describe("social image helpers", () => {
       height: 630,
     });
 
-    expect(getLocalArticleSocialImage({
+    expect(resolveLocalArticleSocialImage({
       slug: "turnbased-gameloop",
       title: "How to Implement a Turn-Based Game Loop [C#]",
-      requestedLocale: "en",
       contentLocale: "en",
-      hasCustomCover: false,
     })).toEqual({
       src: "/en/og/articles/turnbased-gameloop.png",
       alt: "Title card for How to Implement a Turn-Based Game Loop [C#]",
@@ -106,12 +102,24 @@ describe("social image helpers", () => {
       height: 630,
     });
 
-    expect(getLocalArticleSocialImage({
+    const authoredCover = {
+      src: "/_astro/authored-cover.webp",
+      width: 1200,
+      height: 630,
+      format: "webp",
+    };
+
+    expect(resolveLocalArticleSocialImage({
       slug: "vision-introduction",
       title: "[Unity] Implementing CullingGroup More Easily [Vision]",
-      requestedLocale: "en",
       contentLocale: "en",
-      hasCustomCover: true,
-    })).toBeNull();
+      cover: authoredCover as never,
+      coverAlt: "著者指定カバー",
+    })).toEqual({
+      src: authoredCover,
+      alt: "著者指定カバー",
+      width: 1200,
+      height: 630,
+    });
   });
 });

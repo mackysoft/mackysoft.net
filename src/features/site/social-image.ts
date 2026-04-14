@@ -1,3 +1,5 @@
+import type { ImageMetadata } from "astro";
+
 import { localizePath, type SiteLocale } from "../../lib/i18n";
 
 const defaultSocialImageAltMap: Record<SiteLocale, string> = {
@@ -14,13 +16,20 @@ export const defaultSocialImagePath = "/og/default.png";
 export const defaultSocialImageWidth = 1200;
 export const defaultSocialImageHeight = 630;
 
+export type SocialImage = {
+  src: string | ImageMetadata;
+  alt: string;
+  width: number;
+  height: number;
+};
+
 export function getDefaultSocialImage(locale: SiteLocale) {
   return {
     src: defaultSocialImagePath,
     alt: defaultSocialImageAltMap[locale],
     width: defaultSocialImageWidth,
     height: defaultSocialImageHeight,
-  };
+  } satisfies SocialImage;
 }
 
 export function getArticleTitleSocialImagePath(slug: string, locale: SiteLocale) {
@@ -31,27 +40,48 @@ export function getArticleTitleSocialImageAlt(title: string, locale: SiteLocale)
   return articleTitleSocialImageAltMap[locale](title);
 }
 
-export function getLocalArticleSocialImage({
+export function getGeneratedLocalArticleSocialImage({
   slug,
   title,
-  requestedLocale: _requestedLocale,
   contentLocale,
-  hasCustomCover,
 }: {
   slug: string;
   title: string;
-  requestedLocale?: SiteLocale;
   contentLocale: SiteLocale;
-  hasCustomCover: boolean;
 }) {
-  if (hasCustomCover) {
-    return null;
-  }
-
   return {
     src: getArticleTitleSocialImagePath(slug, contentLocale),
     alt: getArticleTitleSocialImageAlt(title, contentLocale),
     width: defaultSocialImageWidth,
     height: defaultSocialImageHeight,
-  };
+  } satisfies SocialImage;
+}
+
+export function resolveLocalArticleSocialImage({
+  slug,
+  title,
+  contentLocale,
+  cover,
+  coverAlt,
+}: {
+  slug: string;
+  title: string;
+  contentLocale: SiteLocale;
+  cover?: ImageMetadata;
+  coverAlt?: string;
+}) {
+  if (cover) {
+    return {
+      src: cover,
+      alt: coverAlt ?? "",
+      width: cover.width,
+      height: cover.height,
+    } satisfies SocialImage;
+  }
+
+  return getGeneratedLocalArticleSocialImage({
+    slug,
+    title,
+    contentLocale,
+  });
 }
