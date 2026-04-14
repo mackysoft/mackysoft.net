@@ -1,5 +1,6 @@
 ---
 import { localizePath, type SiteLocale } from "../../lib/i18n";
+import { getProfileAvatar } from "../profile/avatar";
 import { getProfileContent } from "../profile/content";
 
 type Props = {
@@ -10,12 +11,13 @@ type Props = {
 
 const { locale, primaryCtaLabel, contactCtaLabel } = Astro.props as Props;
 const profile = getProfileContent(locale);
+const avatar = getProfileAvatar(locale);
 ---
 
 <section class="content-panel home-hero" data-home-hero>
   <img
-    src={profile.avatar.src}
-    alt={profile.avatar.alt}
+    src={avatar.src.src}
+    alt={avatar.alt}
     class="home-hero__avatar"
     loading="eager"
     decoding="async"
