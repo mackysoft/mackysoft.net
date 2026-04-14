@@ -74,6 +74,28 @@ async function expectMobileHomeGridFullWidth(page: Page, gridSelector: string, i
   expect(Math.abs(firstItemBox.width - gridBox.width)).toBeLessThanOrEqual(2);
 }
 
+async function expectTwoColumnHomeGrid(page: Page, gridSelector: string, itemSelector: string) {
+  const grid = page.locator(gridSelector);
+  const items = page.locator(`${gridSelector} > ${itemSelector}`);
+
+  if (await items.count() < 2) {
+    return;
+  }
+
+  const gridBox = await grid.boundingBox();
+  const firstItemBox = await items.first().boundingBox();
+  const secondItemBox = await items.nth(1).boundingBox();
+
+  if (!gridBox || !firstItemBox || !secondItemBox) {
+    throw new Error("home grid and first two items must be visible before two-column assertions");
+  }
+
+  expect(Math.abs(firstItemBox.x - gridBox.x)).toBeLessThanOrEqual(2);
+  expect(Math.abs(firstItemBox.y - secondItemBox.y)).toBeLessThanOrEqual(2);
+  expect(Math.abs(firstItemBox.width - secondItemBox.width)).toBeLessThanOrEqual(2);
+  expect(Math.abs((secondItemBox.x + secondItemBox.width) - (gridBox.x + gridBox.width))).toBeLessThanOrEqual(2);
+}
+
 test.describe("mobile cards", () => {
   test("keep thumbnails visible and hide descriptive copy on narrow screens", { tag: "@size:medium" }, async ({ browser }) => {
     const context = await browser.newContext({ viewport: mobileViewport, colorScheme: "light" });
@@ -129,6 +151,26 @@ test.describe("mobile cards", () => {
 });
 
 test.describe("home activity grids", () => {
+  test("use full-width cards when the container can only fit one column", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.setViewportSize({ width: 700, height: 900 });
+    await page.goto("/");
+
+    await expectMobileHomeGridFullWidth(page, ".latest-articles-grid", ".article-card");
+    await expectMobileHomeGridFullWidth(page, ".latest-releases-grid", ".release-card");
+    await expectMobileHomeGridFullWidth(page, ".latest-games-grid", ".game-card");
+  });
+
+  test("use two equal columns before expanding to three columns", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocale(page);
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.goto("/");
+
+    await expectTwoColumnHomeGrid(page, ".latest-articles-grid", ".article-card");
+    await expectTwoColumnHomeGrid(page, ".latest-releases-grid", ".release-card");
+    await expectTwoColumnHomeGrid(page, ".latest-games-grid", ".game-card");
+  });
+
   test("keep card widths uniform and packed from the left on desktop", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.setViewportSize({ width: 1280, height: 900 });

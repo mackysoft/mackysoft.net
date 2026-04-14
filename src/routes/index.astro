@@ -32,7 +32,7 @@ const localizedHomePath = localizePath("/", locale);
   <h1 class="visually-hidden">{content.homeHeading}</h1>
   <HomeHero locale={locale} primaryCtaLabel={content.heroPrimaryCta} contactCtaLabel={content.heroContactCta} />
 
-  <section class="content-panel">
+  <section class="content-panel latest-activity-section">
     <div class="section-head">
       <div>
         <p class="eyebrow">{content.latestArticlesEyebrow}</p>
@@ -40,7 +40,7 @@ const localizedHomePath = localizePath("/", locale);
       </div>
       <a href={localizePath("/articles/", locale)} class="button-link">{content.latestArticlesCta}</a>
     </div>
-    <div class="content-grid latest-activity-grid latest-articles-grid">
+      <div class="content-grid latest-activity-grid latest-articles-grid">
       {latestArticles.map((article) => (
         <ArticleCard article={article} layout="vertical" locale={locale} />
       ))}
@@ -48,7 +48,7 @@ const localizedHomePath = localizePath("/", locale);
   </section>
 
   {latestReleases.length > 0 && (
-    <section class="content-panel">
+    <section class="content-panel latest-activity-section">
       <div class="section-head">
         <div>
           <p class="eyebrow">{content.latestReleasesEyebrow}</p>
@@ -65,7 +65,7 @@ const localizedHomePath = localizePath("/", locale);
   )}
 
   {homeGames.length > 0 && (
-    <section class="content-panel">
+    <section class="content-panel latest-activity-section">
       <div class="section-head">
         <div>
           <p class="eyebrow">{content.gamesEyebrow}</p>
@@ -98,13 +98,22 @@ const localizedHomePath = localizePath("/", locale);
   }
 
   .latest-activity-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19.5rem), 19.5rem));
-    justify-content: start;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
-  @media (max-width: 759px) {
+  .latest-activity-section {
+    container-type: inline-size;
+  }
+
+  @container (min-width: 40rem) {
     .latest-activity-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 60rem) {
+    .latest-activity-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 </style>
