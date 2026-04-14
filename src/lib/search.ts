@@ -31,6 +31,15 @@ export type SearchQueryVariant = {
   strategy: "broad" | "exact";
 };
 
+export type RankedSearchResult<TData extends SearchResultDataLike = SearchResultDataLike> = {
+  data: TData;
+  variantOrder: number;
+  resultOrder: number;
+  score: number;
+};
+
+export type SearchResultMode = "page" | "inline";
+
 type SegmenterPartLike = {
   segment: string;
   isWordLike?: boolean;
@@ -158,10 +167,14 @@ export function createSearchQueryVariants(
   ];
 }
 
+export function hasExactSearchVariant(variants: SearchQueryVariant[]): boolean {
+  return variants.some((variant) => variant.strategy === "exact");
+}
+
 export function getSearchMatchPriority(data: SearchResultDataLike, rawQuery: string): number {
   const query = stripSurroundingQuotes(rawQuery);
 
-  if (!query || hasInternalWhitespace(query)) {
+  if (!query || hasInternalWhitespace(query) || !japaneseSearchPattern.test(query)) {
     return 0;
   }
 
@@ -194,6 +207,37 @@ export function getSearchMatchPriority(data: SearchResultDataLike, rawQuery: str
   }
 
   return 0;
+}
+
+export function prepareVisibleSearchResults<TData extends SearchResultDataLike>(
+  results: RankedSearchResult<TData>[],
+  rawQuery: string,
+  shouldRerank: boolean,
+  mode: SearchResultMode,
+): RankedSearchResult<TData>[] {
+  const rankedResults = shouldRerank
+    ? [...results].sort((left, right) => {
+      const priorityDelta = getSearchMatchPriority(right.data, rawQuery) - getSearchMatchPriority(left.data, rawQuery);
+
+      if (priorityDelta !== 0) {
+        return priorityDelta;
+      }
+
+      if (left.variantOrder !== right.variantOrder) {
+        return left.variantOrder - right.variantOrder;
+      }
+
+      if (right.score !== left.score) {
+        return right.score - left.score;
+      }
+
+      return left.resultOrder - right.resultOrder;
+    })
+    : results;
+
+  return mode === "inline"
+    ? rankedResults.slice(0, 20)
+    : rankedResults;
 }
 
 export function formatSearchResultDate(value: string | null | undefined, locale: SiteLocale): string | null {

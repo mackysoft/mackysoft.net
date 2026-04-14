@@ -1,13 +1,15 @@
 import {
   createSearchQueryVariants,
   formatSearchResultDate,
-  getSearchMatchPriority,
   getSearchContentType,
+  hasExactSearchVariant,
   isExternalSearchUrl,
+  prepareVisibleSearchResults,
   selectSearchExcerpt,
   selectSearchImage,
   selectSearchSubResult,
   selectSearchTargetUrl,
+  type RankedSearchResult,
   type SearchResultDataLike,
 } from "../lib/search";
 import {
@@ -411,9 +413,7 @@ function initSearchPanel(root: HTMLElement) {
     elements.input.value = initialQueryFromUrl;
   }
 
-  const searchPagefind = async (pagefind: PagefindModule, rawQuery: string, immediate: boolean) => {
-    const queryVariants = createSearchQueryVariants(rawQuery, elements.locale);
-
+  const searchPagefind = async (pagefind: PagefindModule, queryVariants: ReturnType<typeof createSearchQueryVariants>, immediate: boolean) => {
     if (queryVariants.length === 0) {
       return [];
     }
@@ -471,46 +471,32 @@ function initSearchPanel(root: HTMLElement) {
 
     try {
       const pagefind = await loadPagefind();
-      const responseEntries = await searchPagefind(pagefind, query, immediate);
+      const queryVariants = createSearchQueryVariants(query, elements.locale);
+      const shouldRerank = hasExactSearchVariant(queryVariants);
+      const responseEntries = await searchPagefind(pagefind, queryVariants, immediate);
 
       if (responseEntries === null || requestId !== currentRequestId) {
         return;
       }
 
       const totalCount = responseEntries.length;
-      const limitedEntries = elements.mode === "inline"
+      const entriesToLoad = !shouldRerank && elements.mode === "inline"
         ? responseEntries.slice(0, 20)
         : responseEntries;
-      const results = await Promise.all(limitedEntries.map(async ({ entry, variantOrder, resultOrder }) => ({
+      const results = await Promise.all(entriesToLoad.map(async ({ entry, variantOrder, resultOrder }) => ({
         data: await entry.data(),
         variantOrder,
         resultOrder,
         score: entry.score,
-      })));
+      } satisfies RankedSearchResult)));
 
       if (requestId !== currentRequestId) {
         return;
       }
 
-      results.sort((left, right) => {
-        const priorityDelta = getSearchMatchPriority(right.data, query) - getSearchMatchPriority(left.data, query);
+      const visibleResults = prepareVisibleSearchResults(results, query, shouldRerank, elements.mode);
 
-        if (priorityDelta !== 0) {
-          return priorityDelta;
-        }
-
-        if (left.variantOrder !== right.variantOrder) {
-          return left.variantOrder - right.variantOrder;
-        }
-
-        if (right.score !== left.score) {
-          return right.score - left.score;
-        }
-
-        return left.resultOrder - right.resultOrder;
-      });
-
-      renderResults(elements, results.map((result) => result.data), totalCount);
+      renderResults(elements, visibleResults.map((result) => result.data), totalCount);
     } catch {
       if (requestId !== currentRequestId) {
         return;
