@@ -96,6 +96,7 @@ public void SetPlayerDisplayName (string displayName) {
 
 ```cs
 
+using System.Collections.Generic;
 using UnityEngine;
 using PlayFab;
 using PlayFab.ClientModels;
