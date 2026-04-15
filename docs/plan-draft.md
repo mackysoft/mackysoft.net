@@ -44,7 +44,7 @@
 - **ホスティング**: Cloudflare Workers
 - **メタ**: OGP / Sitemap / RSS / `hreflang`
 - **画像**: Astro の画像機能
-- **移行補助**: `url-map.csv`, `taxonomy-map.yaml`, `media-audit.csv`
+- **移行補助**: `url-map.csv`, `taxonomy-map.yaml`
 
 ---
 
@@ -492,7 +492,6 @@ frontmatter の最小実用セット:
 移行補助:
 
 - WordPress categories / tags の変換表は `docs/migration/taxonomy-map.yaml`
-- 画像棚卸しは `docs/migration/media-audit.csv`
 
 ---
 
@@ -806,7 +805,6 @@ Definition of Done:
 - `url-map.csv` と content の照合
 - `taxonomy-map.yaml` 作成
 - category / tag / date archive URL の移行整理
-- `media-audit.csv` 作成
 - 画像 / 埋め込み / 外部リンク整理
 
 ## フェーズ4: TOP の編集設計
