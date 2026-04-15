@@ -7,6 +7,7 @@ import {
 
 const scrollRestoreStorageKey = "mackysoft-locale-scroll";
 const scrollRestoreMaxAgeMs = 15_000;
+const scrollRestoreObserveDurationMs = 4_000;
 const desktopHeaderQuery = "(min-width: 900px)";
 
 let headerInteractionsReady = false;
@@ -93,10 +94,13 @@ function applyScrollProgress(progress: number) {
 }
 
 function scheduleScrollRestore(progress: number) {
-  window.requestAnimationFrame(() => {
-    applyScrollProgress(progress);
-  });
+  const scheduleApply = () => {
+    window.requestAnimationFrame(() => {
+      applyScrollProgress(progress);
+    });
+  };
 
+  scheduleApply();
   window.addEventListener("load", () => {
     applyScrollProgress(progress);
   }, { once: true });
@@ -105,6 +109,21 @@ function scheduleScrollRestore(progress: number) {
     document.fonts.ready.then(() => {
       applyScrollProgress(progress);
     });
+  }
+
+  if ("ResizeObserver" in window) {
+    const observer = new ResizeObserver(() => {
+      scheduleApply();
+    });
+
+    observer.observe(document.documentElement);
+    if (document.body) {
+      observer.observe(document.body);
+    }
+
+    window.setTimeout(() => {
+      observer.disconnect();
+    }, scrollRestoreObserveDurationMs);
   }
 }
 
