@@ -92,12 +92,12 @@
       "repo": "mackysoft/Unity-SerializeReferenceExtensions",
       "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
       "license": "MIT",
-      "stargazerCount": 1244,
+      "stargazerCount": 1250,
       "name": "1.7.0",
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
       "publishedAt": "2026-01-18T14:37:19Z",
-      "coverUrl": "https://opengraph.githubassets.com/82e1544401f40150e589d4bb24314b2a755ebf9117c4258da1a04cac6dd58966/mackysoft/Unity-SerializeReferenceExtensions",
+      "coverUrl": "https://opengraph.githubassets.com/515b770ec82af03cb10c45bac34dbf6b9c467b4bcffeba9210da1974d5d00437/mackysoft/Unity-SerializeReferenceExtensions",
       "coverAlt": "mackysoft/Unity-SerializeReferenceExtensions のリポジトリサムネイル"
     },
     {
@@ -111,7 +111,7 @@
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/MasterTools/releases/tag/1.0.0",
       "publishedAt": "2024-08-15T16:19:05Z",
-      "coverUrl": "https://opengraph.githubassets.com/2da5a17ef9c8c98ecd6cc458bbb8faa7a2d37b8e395ee0b27465e13cdda3dbd9/mackysoft/MasterTools",
+      "coverUrl": "https://opengraph.githubassets.com/047490f2a4ad3563b3ddfcf27d50405b30dbd866afce989883c2f3823d289130/mackysoft/MasterTools",
       "coverAlt": "mackysoft/MasterTools のリポジトリサムネイル"
     },
     {
@@ -139,7 +139,7 @@
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/UnityCapture-URP/releases/tag/1.0.0",
       "publishedAt": "2022-12-25T14:49:51Z",
-      "coverUrl": "https://opengraph.githubassets.com/8e90dc9971d1db90eaebc39e8b13415d05b9886d5db36b4890a8c833a83a5d99/mackysoft/UnityCapture-URP",
+      "coverUrl": "https://opengraph.githubassets.com/754cadae913c210bb2966856dc5e70f095b04dc4faf93cf33bc20bb495b64295/mackysoft/UnityCapture-URP",
       "coverAlt": "mackysoft/UnityCapture-URP のリポジトリサムネイル"
     },
     {
