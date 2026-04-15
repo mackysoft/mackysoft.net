@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest";
 const siteConfigPath = path.join(process.cwd(), "wrangler.jsonc");
 const redirectConfigPath = path.join(process.cwd(), "wrangler.www-redirect.jsonc");
 
-async function readJson(filePath) {
+async function readJson(filePath: string) {
   return JSON.parse(await readFile(filePath, "utf8"));
 }
 
