@@ -11,20 +11,23 @@ Cloudflare Workers へ公開する前後で、URL 契約と主要導線を確認
 
 ## 公開コマンド
 
-- `npm run deploy:workers` を実行する
+- `npm run deploy:workers` を実行し、`site` と `site-www-redirect` の両方を公開する
 - GitHub Actions から公開する場合は `master` への push 後に `Deploy Workers` workflow が成功していることを確認する
 
 ## 公開後の確認
 
 - `https://site.mackysoft.workers.dev/` が表示できる
+- `https://site-www-redirect.<account>.workers.dev/` はプレビュー用途のみとし、本番では `www.mackysoft.net` を custom domain として割り当てる
 - `https://site.mackysoft.workers.dev/sitemap.xml` が `astro.config.mjs` の `site` で組み立てた canonical URL だけを返す
 - `https://site.mackysoft.workers.dev/feed.xml` が公開済みローカル記事だけを返す
 - `https://site.mackysoft.workers.dev/robots.txt` が sitemap の absolute URL を返す
 - `https://site.mackysoft.workers.dev/llms.txt` が主要ページと structured endpoint の absolute URL を返す
 - 主要ページ `/`、`/articles/`、`/games/`、`/assets/`、`/about/`、`/contact/`、`/privacy-policy/` が表示できる
 - canonical と `og:url` が `astro.config.mjs` の `site` に一致する
+- `https://www.mackysoft.net/*` が path と query を保持したまま `https://mackysoft.net/*` へ permanent redirect する
 - 代表的な旧 URL が HTTP の permanent redirect として正しい新 URL へ移動する
 
 ## メモ
 
 - canonical host を切り替える場合、変更箇所は `astro.config.mjs` の `site` のみとする
+- `mackysoft.net` は `site` Worker、`www.mackysoft.net` は `site-www-redirect` Worker に割り当てる

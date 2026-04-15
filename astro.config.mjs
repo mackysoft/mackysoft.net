@@ -1,8 +1,9 @@
 import { defineConfig } from "astro/config";
+import { canonicalSiteUrl } from "./src/config/site-url.mjs";
 
 export default defineConfig({
   output: "static",
-  site: "https://mackysoft.net",
+  site: canonicalSiteUrl,
   image: {
     remotePatterns: [
       {

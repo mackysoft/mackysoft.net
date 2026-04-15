@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "site-www-redirect",
+  "main": "./worker/www-redirect.mjs",
+  "compatibility_date": "2026-04-14",
+  "workers_dev": true
+}

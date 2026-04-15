@@ -48,6 +48,25 @@ export function toAbsoluteSiteUrl(site, path) {
 
 /**
  * @param {SiteUrlLike} site
+ * @param {readonly string[]} redirectHosts
+ * @param {URL | string} requestUrl
+ * @returns {string | null}
+ */
+export function resolveCanonicalHostRedirectUrl(site, redirectHosts, requestUrl) {
+  const parsedRequestUrl = requestUrl instanceof URL ? requestUrl : new URL(requestUrl);
+
+  if (!redirectHosts.includes(parsedRequestUrl.hostname)) {
+    return null;
+  }
+
+  return new URL(
+    `${parsedRequestUrl.pathname}${parsedRequestUrl.search}${parsedRequestUrl.hash}`,
+    toSiteUrl(site),
+  ).toString();
+}
+
+/**
+ * @param {SiteUrlLike} site
  * @param {SiteLayoutUrlInput} input
  */
 export function buildSiteLayoutUrls(site, { canonicalPath, alternateLocales = [] }) {
