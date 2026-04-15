@@ -20,6 +20,7 @@ import {
   parseZennArticlePage,
   githubApiBaseUrl,
   githubGraphqlUrl,
+  githubReleasePageSize,
   parseZennFeed,
   serializeActivity,
   summarizeDescription,
@@ -28,6 +29,12 @@ import {
 } from "../../scripts/sync-activity.mjs";
 
 const zennFeedFixturePath = path.join(import.meta.dirname, "../fixtures/zenn-feed.xml");
+
+test("re-exports shared GitHub activity sync constants", () => {
+  expect(githubApiBaseUrl).toBe("https://api.github.com");
+  expect(githubGraphqlUrl).toBe("https://api.github.com/graphql");
+  expect(githubReleasePageSize).toBe(100);
+});
 
 function createJsonResponse(payload: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(payload), {
