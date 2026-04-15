@@ -254,6 +254,101 @@ test.describe("site header", () => {
     expect(Math.abs(afterNavigation.progress - beforeNavigation.progress)).toBeLessThanOrEqual(0.08);
   });
 
+  test("stops restoring scroll progress after the reader scrolls on translated article routes", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/articles/how-to-complete-game-development/");
+
+    const beforeNavigation = await scrollToProgress(page, 0.48);
+    expect(beforeNavigation.maxScroll).toBeGreaterThan(1000);
+
+    await page.locator("[data-site-language-toggle]").click();
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL("/en/articles/how-to-complete-game-development/");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await page.waitForLoadState("load");
+    await page.waitForFunction((expectedProgress) => {
+      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
+
+      return Math.abs(progress - expectedProgress) <= 0.08;
+    }, beforeNavigation.progress);
+
+    const restored = await getScrollMetrics(page);
+
+    await page.evaluate(() => {
+      window.dispatchEvent(new WheelEvent("wheel", { deltaY: -480 }));
+      window.scrollBy({ left: 0, top: -480, behavior: "auto" });
+    });
+
+    await page.waitForFunction((previousScrollY) => {
+      return window.scrollY <= Math.max(previousScrollY - 200, 0);
+    }, restored.scrollY);
+
+    const manualScroll = await getScrollMetrics(page);
+
+    await page.evaluate(() => {
+      const spacer = document.createElement("div");
+      spacer.dataset.testScrollRestoreSpacer = "true";
+      spacer.style.height = "1200px";
+      document.body.append(spacer);
+    });
+
+    await page.waitForTimeout(200);
+
+    const afterResize = await getScrollMetrics(page);
+
+    expect(Math.abs(afterResize.scrollY - manualScroll.scrollY)).toBeLessThanOrEqual(2);
+    expect(afterResize.scrollY).toBeLessThan(restored.scrollY - 200);
+  });
+
+  test("stops restoring scroll progress after the reader scrolls with the keyboard on translated article routes", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/articles/how-to-complete-game-development/");
+
+    const beforeNavigation = await scrollToProgress(page, 0.48);
+    expect(beforeNavigation.maxScroll).toBeGreaterThan(1000);
+
+    await page.locator("[data-site-language-toggle]").click();
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL("/en/articles/how-to-complete-game-development/");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await page.waitForLoadState("load");
+    await page.waitForFunction((expectedProgress) => {
+      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
+
+      return Math.abs(progress - expectedProgress) <= 0.08;
+    }, beforeNavigation.progress);
+
+    const restored = await getScrollMetrics(page);
+
+    await page.evaluate(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+      window.scrollBy({ left: 0, top: 480, behavior: "auto" });
+    });
+    await page.waitForFunction((previousScrollY) => {
+      return window.scrollY >= previousScrollY + 200;
+    }, restored.scrollY);
+
+    const manualScroll = await getScrollMetrics(page);
+
+    await page.evaluate(() => {
+      const spacer = document.createElement("div");
+      spacer.dataset.testScrollRestoreKeyboardSpacer = "true";
+      spacer.style.height = "1200px";
+      document.body.append(spacer);
+    });
+
+    await page.waitForTimeout(200);
+
+    const afterResize = await getScrollMetrics(page);
+
+    expect(Math.abs(afterResize.scrollY - manualScroll.scrollY)).toBeLessThanOrEqual(2);
+    expect(afterResize.scrollY).toBeGreaterThan(restored.scrollY + 100);
+  });
+
   test("restores scroll progress when switching article index routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/articles/");
 
