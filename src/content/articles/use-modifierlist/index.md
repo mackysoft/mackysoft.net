@@ -43,7 +43,7 @@ public class Character : MonoBehaviour {
 	public int health = 3;
 
 	// ダメージに対して前処理を行うModifierList
-	public ModifierList<int> damageModifiers = new ModiferList<int>();
+	public ModifierList<int> damageModifiers = new ModifierList<int>();
 
 }
 ```
@@ -97,7 +97,7 @@ public class Character : MonoBehaviour {
 	public int health = 3;
 
 	// ダメージに対して前処理を行うModifierList
-	public ModifierList<int> damageModifiers = new ModiferList<int>();
+	public ModifierList<int> damageModifiers = new ModifierList<int>();
 
 	public int attackPower = 2;
 
@@ -159,4 +159,3 @@ damageModifiers.RemoveAll(modifier => {
 [![](./cover.png)](https://github.com/mackysoft/Modiferty)
 
 Github: [https://github.com/mackysoft/Modiferty](https://github.com/mackysoft/Modiferty)
-

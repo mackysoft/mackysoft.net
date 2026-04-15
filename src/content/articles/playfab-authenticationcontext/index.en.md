@@ -31,14 +31,14 @@ using PlayFab;
 using PlayFab.ClientModels;
 
 // UI for a leaderboard entry
-public class LeaderboardEntryUI : MonoBehavour {
+public class LeaderboardEntryUI : MonoBehaviour {
 
 	// UI used to highlight the entry
 	public Image focusImage;
 
 	public void SetEntry (PlayerLeaderboardEntry entry) {
 		// Highlight the UI if the leaderboard entry and the current player's PlayFabId match
-		focusImage.enabled = (entry.PlayFabId == PlayFabSettings.staticPlayer.PlayerId);
+		focusImage.enabled = (entry.PlayFabId == PlayFabSettings.staticPlayer.PlayFabId);
 	}
 }
 ```

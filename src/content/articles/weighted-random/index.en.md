@@ -1,8 +1,6 @@
 ---
 title: "Implementing Weighted Random Selection in C#"
 description: "Sometimes you want random selection where each item has a different chance of being chosen based on its weight, such as gacha or item drop rates. This article shows one way to implement WeightedRandom in C#."
-cover: "./cover.jpg"
-coverAlt: "Article image for Implementing Weighted Random Selection in C#"
 ---
 
 ## Introduction
@@ -26,7 +24,7 @@ public class WeightedSelector : MonoBehaviour {
 
 	public List<WeightedItem> items = new List<WeightedItem>();
 
-	public Select () {
+	public void Select () {
 		WeightedItem selectedItem = items[items.WeightedIndex(item => item.weight)];
 		Debug.Log(selectedItem.id);
 	}

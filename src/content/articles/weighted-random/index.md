@@ -5,8 +5,6 @@ publishedAt: "2020-06-05T19:41:58+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
 tags:
   - "csharp"
-cover: "./cover.jpg"
-coverAlt: "Weightedなランダムを実装する【C#】 の記事画像"
 ---
 
 ## はじめに
@@ -30,7 +28,7 @@ public class WeightedSelector : MonoBehaviour {
 
 	public List<WeightedItem> items = new List<WeightedItem>();
 
-	public Select () {
+	public void Select () {
 		WeightedItem selectedItem = items[items.WeightedIndex(item => item.weight)];
 		Debug.Log(selectedItem.id);
 	}
@@ -116,4 +114,3 @@ public static class WeightedRandom {
 ## おわりに
 
 実際に僕が開発した[「TreasureRogue」](https://play.google.com/store/apps/details?id=com.MackySoft.TreasureRogue)にて、敵のドロップアイテムや宝箱からのアイテムの選出に使ったりしています。
-

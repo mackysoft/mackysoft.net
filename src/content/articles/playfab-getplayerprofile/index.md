@@ -70,7 +70,7 @@ using PlayFab.ClientModels;
 public void GetDisplayName (string playfabId) {
 	PlayFabClientAPI.GetPlayerProfile(
 		new GetPlayerProfileRequest {
-			PlayFabId = playFabId,
+			PlayFabId = playfabId,
 			ProfileConstraints = new PlayerProfileViewConstraints {
 				ShowDisplayName = true
 			}

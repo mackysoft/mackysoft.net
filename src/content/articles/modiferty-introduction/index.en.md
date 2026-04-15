@@ -83,11 +83,11 @@ public class Character : MonoBehaviour {
 
 	// Attack processing
 	public void Attack (Character target) {
-		int multipiedAttackPower = attackPower;
+		int multipliedAttackPower = attackPower;
 
 		// Apply the multipliers to the attack power
 		foreach (float multiply in attackPowerMultiply) {
-			multipliesAttackPower *= multiply;
+			multipliedAttackPower *= multiply;
 		}
 
 		// Deal damage based on the modified attack power

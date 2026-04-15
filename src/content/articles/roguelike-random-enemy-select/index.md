@@ -13,8 +13,6 @@ tags:
 
 これからアップデートを行う予定の[『Treasure Rogue』](https://play.google.com/store/apps/details?id=com.MackySoft.TreasureRogue)の更新の一つである **「レベル生成アルゴリズムの改善」** が一段落したので、この記事ではその実装についての細かいコード付きで解説していきます。
 
-[ようやくAnimationCurveで難易度を制御するシステムの実装が一段落した～。ローグライクなのに敵の選出がランダムで行われない問題が解消されて少し面白くなった！— Makihiro@『Treasure Rogue』リリース！ (@makihiro\_dev) June 18, 2020](/%E3%82%88%E3%81%86%E3%82%84%E3%81%8FAnimationCurve%E3%81%A7%E9%9B%A3%E6%98%93%E5%BA%A6%E3%82%92%E5%88%B6%E5%BE%A1%E3%81%99%E3%82%8B%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%81%AE%E5%AE%9F%E8%A3%85%E3%81%8C%E4%B8%80%E6%AE%B5%E8%90%BD%E3%81%97%E3%81%9F%EF%BD%9E%E3%80%82%E3%83%AD%E3%83%BC%E3%82%B0%E3%83%A9%E3%82%A4%E3%82%AF%E3%81%AA%E3%81%AE%E3%81%AB%E6%95%B5%E3%81%AE%E9%81%B8%E5%87%BA%E3%81%8C%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E3%81%A7%E8%A1%8C%E3%82%8F%E3%82%8C%E3%81%AA%E3%81%84%E5%95%8F%E9%A1%8C%E3%81%8C%E8%A7%A3%E6%B6%88%E3%81%95%E3%82%8C%E3%81%A6%E5%B0%91%E3%81%97%E9%9D%A2%E7%99%BD%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%EF%BC%81%E2%80%94%20Makihiro@%E3%80%8ETreasure%20Rogue%E3%80%8F%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%EF%BC%81%20\(@makihiro_dev\)%20June%2018,%202020/)
-
 まず、この改善で何をしようとしているのかを、少し話しておこうと思います。
 
 ## 「同じようなプレイが起きてしまう」問題
@@ -287,4 +285,3 @@ public class WeightedMultiSpawnLevelProcessor : ILevelProcessor {
 -   [ローグライクのマップ生成アルゴリズムについて解説](/articles/roguelike-map-generation-algorithm/)
 -   [Weightedなランダムを実装する【C#】](/weighted-random/)
 -   [ゲームを面白くする「コントラスト」【ゲームデザイン】](/articles/gamedesign-contrast-cedec2018/)
-

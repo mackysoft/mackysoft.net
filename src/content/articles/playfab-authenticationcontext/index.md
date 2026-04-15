@@ -36,14 +36,14 @@ using PlayFab;
 using PlayFab.ClientModels;
 
 // リーダーボードのエントリーのUI
-public class LeaderboardEntryUI : MonoBehavour {
+public class LeaderboardEntryUI : MonoBehaviour {
 
 	// 強調表示するためのUI
 	public Image focusImage;
 
 	public void SetEntry (PlayerLeaderboardEntry entry) {
 		// リーダーボードのエントリーと現在のプレイヤーのPlayFabIdが一致したらUIで強調表示する
-		focusImage.enabled = (entry.PlayFabId == PlayFabSettings.staticPlayer.PlayerId);
+		focusImage.enabled = (entry.PlayFabId == PlayFabSettings.staticPlayer.PlayFabId);
 	}
 }
 ```
@@ -118,4 +118,3 @@ public class GetLeaderboardAroundPlayerRequest : PlayFabRequestCommon
 ## 参考
 
 -   [c# ServerInstanceAPI: what is the purpose of authenticationContext?](https://community.playfab.com/questions/36560/c-serverinstanceapi-what-is-the-purpose-of-authent.html)
-

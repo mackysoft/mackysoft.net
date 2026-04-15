@@ -9,8 +9,6 @@ description: "UOZU GAME BOOT CAMP is a game creator training program run as part
 
 As with the previous boot camp, I decided to take part again this year.
 
-[#Tsukuru UOZU BOOT CAMP entry complete! — Makihiro@ "Treasure Rogue" released! (@makihiro\_dev) June 20, 2020](/#%E3%81%A4%E3%81%8F%E3%82%8BUOZU%20BOOT%20CAMP%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%83%BC%E5%AE%8C%E4%BA%86%EF%BC%81%E2%80%94%20Makihiro@%E3%80%8ETreasure%20Rogue%E3%80%8F%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%EF%BC%81%20\(@makihiro_dev\)%20June%2020,%202020)
-
 ## Should I Make a New Game or Keep Working on the Same One?
 
 The biggest question I had going into this boot camp was, **"What should I make?"**
