@@ -91,6 +91,7 @@ The following code is a sample for submitting a player's score to the leaderboar
 
 ```cs
 
+using System.Collections.Generic;
 using UnityEngine;
 using PlayFab;
 using PlayFab.ClientModels;
