@@ -7,6 +7,18 @@ import {
 
 const scrollRestoreStorageKey = "mackysoft-locale-scroll";
 const scrollRestoreMaxAgeMs = 15_000;
+const scrollRestoreObserveDurationMs = 4_000;
+const scrollRestoreNavigationKeys = new Set([
+  "ArrowDown",
+  "ArrowUp",
+  "End",
+  "Home",
+  "PageDown",
+  "PageUp",
+  " ",
+  "Space",
+  "Spacebar",
+]);
 const desktopHeaderQuery = "(min-width: 900px)";
 
 let headerInteractionsReady = false;
@@ -93,18 +105,112 @@ function applyScrollProgress(progress: number) {
 }
 
 function scheduleScrollRestore(progress: number) {
-  window.requestAnimationFrame(() => {
-    applyScrollProgress(progress);
-  });
+  let observer: ResizeObserver | null = null;
+  let disconnectTimeout: number | null = null;
+  let isDisposed = false;
+  let ignoreNextScrollEvent = false;
+  let resetIgnoredScrollTimeout: number | null = null;
+  const applyRestoredScroll = () => {
+    if (isDisposed) {
+      return;
+    }
 
-  window.addEventListener("load", () => {
+    ignoreNextScrollEvent = true;
     applyScrollProgress(progress);
-  }, { once: true });
+
+    if (resetIgnoredScrollTimeout !== null) {
+      window.clearTimeout(resetIgnoredScrollTimeout);
+    }
+
+    resetIgnoredScrollTimeout = window.setTimeout(() => {
+      ignoreNextScrollEvent = false;
+      resetIgnoredScrollTimeout = null;
+    }, 0);
+  };
+  const handleLoad = () => {
+    if (!isDisposed) {
+      applyRestoredScroll();
+    }
+  };
+  const handleScroll = () => {
+    if (ignoreNextScrollEvent) {
+      ignoreNextScrollEvent = false;
+      return;
+    }
+
+    dispose();
+  };
+
+  const dispose = () => {
+    if (isDisposed) {
+      return;
+    }
+
+    isDisposed = true;
+    observer?.disconnect();
+
+    if (disconnectTimeout !== null) {
+      window.clearTimeout(disconnectTimeout);
+    }
+
+    if (resetIgnoredScrollTimeout !== null) {
+      window.clearTimeout(resetIgnoredScrollTimeout);
+    }
+
+    window.removeEventListener("wheel", dispose);
+    window.removeEventListener("pointerdown", dispose);
+    window.removeEventListener("touchmove", dispose);
+    window.removeEventListener("keydown", disposeOnNavigationKey);
+    window.removeEventListener("load", handleLoad);
+    window.removeEventListener("scroll", handleScroll);
+  };
+
+  const disposeOnNavigationKey = (event: KeyboardEvent) => {
+    if (scrollRestoreNavigationKeys.has(event.key)) {
+      dispose();
+    }
+  };
+
+  const scheduleApply = () => {
+    if (isDisposed) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      applyRestoredScroll();
+    });
+  };
+
+  scheduleApply();
+  window.addEventListener("load", handleLoad, { once: true });
 
   if ("fonts" in document) {
     document.fonts.ready.then(() => {
-      applyScrollProgress(progress);
+      if (!isDisposed) {
+        applyRestoredScroll();
+      }
     });
+  }
+
+  window.addEventListener("wheel", dispose, { passive: true });
+  window.addEventListener("pointerdown", dispose, { passive: true });
+  window.addEventListener("touchmove", dispose, { passive: true });
+  window.addEventListener("keydown", disposeOnNavigationKey);
+  window.addEventListener("scroll", handleScroll, { passive: true });
+
+  if ("ResizeObserver" in window) {
+    observer = new ResizeObserver(() => {
+      scheduleApply();
+    });
+
+    observer.observe(document.documentElement);
+    if (document.body) {
+      observer.observe(document.body);
+    }
+
+    disconnectTimeout = window.setTimeout(() => {
+      dispose();
+    }, scrollRestoreObserveDurationMs);
   }
 }
 
