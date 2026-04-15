@@ -9,7 +9,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "npm run generate:og-default && astro build && node scripts/build-search-index.mjs && node scripts/build-static-redirects.mjs",
-    "deploy:workers": "wrangler deploy",
+    "deploy:workers": "npm run deploy:workers:site && npm run deploy:workers:www-redirect",
+    "deploy:workers:site": "wrangler deploy",
+    "deploy:workers:www-redirect": "wrangler deploy -c wrangler.www-redirect.jsonc",
     "generate:og-default": "node scripts/generate-default-og.mjs",
     "preview": "astro preview",
     "preview:ci": "astro preview --host 127.0.0.1 --port 4322",

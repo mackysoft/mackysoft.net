@@ -2,13 +2,13 @@ import { canonicalRedirectHosts, canonicalSiteUrl } from "../src/config/site-url
 import { resolveCanonicalHostRedirectUrl } from "../src/lib/site-url.mjs";
 
 export default {
-  async fetch(request, env) {
+  async fetch(request) {
     const redirectUrl = resolveCanonicalHostRedirectUrl(canonicalSiteUrl, canonicalRedirectHosts, request.url);
 
-    if (redirectUrl) {
-      return Response.redirect(redirectUrl, 301);
+    if (!redirectUrl) {
+      return new Response("Not Found", { status: 404 });
     }
 
-    return env.ASSETS.fetch(request);
+    return Response.redirect(redirectUrl, 301);
   },
 };
