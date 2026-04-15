@@ -23,6 +23,7 @@ Cloudflare Workers へ公開する前後で、URL 契約と主要導線を確認
 - `https://site.mackysoft.workers.dev/llms.txt` が主要ページと structured endpoint の absolute URL を返す
 - 主要ページ `/`、`/articles/`、`/games/`、`/assets/`、`/about/`、`/contact/`、`/privacy-policy/` が表示できる
 - canonical と `og:url` が `astro.config.mjs` の `site` に一致する
+- `https://www.mackysoft.net/*` が path と query を保持したまま `https://mackysoft.net/*` へ permanent redirect する
 - 代表的な旧 URL が HTTP の permanent redirect として正しい新 URL へ移動する
 
 ## メモ
