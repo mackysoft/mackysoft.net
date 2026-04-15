@@ -3,6 +3,7 @@ import ArticleCard from "../../components/ArticleCard.astro";
 import PageLead from "../../components/PageLead.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import { getArticlesTagPageMeta } from "../../features/articles/page-meta";
+import { getArticleTagLabel } from "../../lib/article-tags";
 import { formatArticleCountLabel, getUiText } from "../../lib/ui-text";
 import { getLocalArticles, toLocalArticleItem } from "../../lib/articles";
 import { createAlternateLocaleLinks, getPathLocale, localizePath, type SiteLocale } from "../../lib/i18n";
@@ -31,8 +32,9 @@ type Props = {
 const { tag, articleEntries, locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const uiText = getUiText(locale);
+const tagLabel = getArticleTagLabel(tag, locale);
 const articles = await Promise.all(articleEntries.map((article) => toLocalArticleItem(article, locale)));
-const pageMeta = getArticlesTagPageMeta(locale, tag, {
+const pageMeta = getArticlesTagPageMeta(locale, tagLabel, {
   tag: uiText.common.tag,
 });
 ---
@@ -44,7 +46,7 @@ const pageMeta = getArticlesTagPageMeta(locale, tag, {
   canonicalPath={localizePath(`/tags/${tag}/`, locale)}
   alternateLocales={createAlternateLocaleLinks(`/tags/${tag}/`)}
 >
-  <PageHeader title={tag} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.articles, uiText.breadcrumb.tag)} />
+  <PageHeader title={tagLabel} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.articles, uiText.breadcrumb.tag)} />
 
   <PageLead summary={formatArticleCountLabel(articles.length, locale)}>
     {articles.map((article) => (

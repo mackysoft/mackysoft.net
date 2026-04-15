@@ -5,8 +5,6 @@ publishedAt: "2020-06-26T11:59:00+09:00"
 updatedAt: "2020-06-26T16:03:02+09:00"
 tags:
   - "misc"
-cover: "./cover.png"
-coverAlt: "Article image for the supplementary notes on 'A Released Bad Game Is More Valuable Than an Unreleased Masterpiece'"
 ---
 
 ## Introduction
@@ -18,8 +16,6 @@ Among that feedback, the line
 "**A released bad game is more valuable than an unreleased masterpiece**"
 
 seemed to be taking on a life of its own, so in this article I will add some context.
-
-[After reading "An article I want everyone who cannot finish games to see. How I Learned to Finish Games After It Took Me Six Years to Release My First One" https://t.co/phglTHqcPs I ended up writing six years' worth of thoughts, so it got long, but I think it should significantly reduce the chance of people giving up on game development. #gamedev #game-development #gamemaking— Makihiro @ "Treasure Rogue" released! (@makihiro_dev) June 23, 2020](/%E3%82%B2%E3%83%BC%E3%83%A0%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%97%E3%81%AA%E3%81%84%E4%BA%BA%E5%85%A8%E5%93%A1%E3%81%AB%E8%A6%8B%E3%81%A6%E3%81%BB%E3%81%97%E3%81%84%E8%A8%98%E4%BA%8B%E3%80%82%E5%88%9D%E4%BD%9C%E5%93%81%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E3%81%BE%E3%81%A7%E3%81%AB%EF%BC%96%E5%B9%B4%E3%81%8B%E3%81%8B%E3%81%A3%E3%81%9F%E5%83%95%E3%81%8C%E6%95%99%E3%81%88%E3%82%8B%E3%80%81%E3%82%B2%E3%83%BC%E3%83%A0%E3%82%92%E5%AE%8C%E6%88%90%E3%81%95%E3%81%9B%E3%82%8B%E6%96%B9%E6%B3%95https:/t.co/phglTHqcPs%206%E5%B9%B4%E5%88%86%E6%9B%B8%E3%81%84%E3%81%9F%E3%81%AE%E3%81%A7%E9%95%B7%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%E3%81%91%E3%81%A9%E3%80%81%E3%82%B2%E3%83%BC%E3%83%A0%E9%96%8B%E7%99%BA%E3%81%A7%E6%8C%AB%E6%8A%98%E3%81%99%E3%82%8B%E7%A2%BA%E7%8E%87%E3%81%AF%E3%81%A0%E3%81%84%E3%81%B6%E8%90%BD%E3%81%A1%E3%82%8B%E3%81%A8%E6%80%9D%E3%81%84%E3%81%BE%E3%81%99%E3%80%82/#%E3%82%B2%E3%83%BC%E3%83%A0%E9%96%8B%E7%99%BA%20#%E3%82%B2%E3%83%BC%E3%83%A0%E5%88%B6%E4%BD%9C%20#gamedev%E2%80%94%20Makihiro@%E3%80%8ETreasure%20Rogue%E3%80%8F%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%EF%BC%81%20\(@makihiro_dev\)%20June%2023,%202020)
 
 ## Excerpts from the Responses
 
@@ -149,4 +145,6 @@ Only then do you gain blood-and-bone knowledge about what went wrong and what wo
 
 ## Closing Thoughts
 
-That is all for the supplementary notes.
+What I wanted to say is simple: do not keep postponing release by using quality as an excuse.
+
+A game can only be evaluated as a game, and you can only truly learn as a developer, after you release it.

@@ -154,4 +154,8 @@ public class TurnManager : SingletonMonoBehaviour<TurnManager> {
 
 `AddCommander` lets you add any Commander you want to bring into the turn-based loop. (Commanders call `AddCommander` automatically from `OnEnable`.)
 
-## Conclusion
+## Closing Thoughts
+
+This is still a minimal setup, but simply separating `Commander` and `TurnManager` is enough to build a solid foundation for a turn-based game loop.
+
+From there, you can grow it into a practical system by adding rules such as turn order, knock-out handling, and explicit conditions for ending each turn.

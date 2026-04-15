@@ -3,16 +3,13 @@ title: "Weightedなランダムを実装する【C#】"
 description: "はじめに 「完全なランダムではなく、要素のWeight（重み）によって選ばれる確率が異なるランダムを実装したい」という時があります。例えば「ガチャ」や「アイテムのドロップ率」とかがそれにあたります。 この記事では、そんな … Weightedなランダムを実装する【C#】"
 publishedAt: "2020-06-05T19:41:58+09:00"
 updatedAt: "2020-06-10T21:03:11+09:00"
-draft: true
 tags:
   - "csharp"
-cover: "./cover.jpg"
-coverAlt: "Weightedなランダムを実装する【C#】 の記事画像"
 ---
 
 ## はじめに
 
-**「完全なランダムではなく、要素のWeight（重み）によって選ばれる確率が異なるランダムを実装したい」**という時があります。例えば「ガチャ」や「アイテムのドロップ率」とかがそれにあたります。
+**「完全なランダムではなく、要素のWeight（重み）によって選ばれる確率が異なるランダムを実装したい」** という時があります。例えば「ガチャ」や「アイテムのドロップ率」とかがそれにあたります。
 
 この記事では、そんな「WeightedRandom」の実装方法を紹介します。
 
@@ -31,7 +28,7 @@ public class WeightedSelector : MonoBehaviour {
 
 	public List<WeightedItem> items = new List<WeightedItem>();
 
-	public Select () {
+	public void Select () {
 		WeightedItem selectedItem = items[items.WeightedIndex(item => item.weight)];
 		Debug.Log(selectedItem.id);
 	}

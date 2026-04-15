@@ -83,11 +83,11 @@ public class Character : MonoBehaviour {
 
 	// Attack processing
 	public void Attack (Character target) {
-		int multipiedAttackPower = attackPower;
+		int multipliedAttackPower = attackPower;
 
 		// Apply the multipliers to the attack power
 		foreach (float multiply in attackPowerMultiply) {
-			multipliesAttackPower *= multiply;
+			multipliedAttackPower *= multiply;
 		}
 
 		// Deal damage based on the modified attack power
@@ -203,8 +203,6 @@ So if:
 then when you run attackPower.Evaluate(),
 
 **2 (baseValue) + 1 (AdditiveModifier)** means the return value is 3.
-
-* * *
 
 That completes the Modiferty implementation.
 

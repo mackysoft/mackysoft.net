@@ -54,15 +54,15 @@ npm run new:article -- my-new-article
 npm run test:unit
 npm run test:e2e
 npm run test
+npm run sync:migration-status
 npm run sync:activity
-npm run import:wordpress
 npm run deploy:workers
 ```
 
 - `npm run check`: Astro と TypeScript の整合性を確認します。
 - `npm run test:e2e`: ビルド後に Playwright で E2E テストを実行します。初回は Chromium のセットアップを含みます。
+- `npm run sync:migration-status`: `docs/migration/url-map.csv` と `docs/migration/taxonomy-map.yaml` の `mapped / excluded` を現在の公開状態に同期します。
 - `npm run sync:activity`: GitHub と Zenn の活動データを `src/generated/activity.json` に同期します。
-- `npm run import:wordpress`: 旧 WordPress 記事を `src/content/articles` 配下へ取り込みます。
 
 ## 日次活動同期
 

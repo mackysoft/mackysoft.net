@@ -8,7 +8,7 @@ tags:
   - "unity"
 ---
 
-Unityで**「単純にコンポーネントを持っているかチェックしたいな」**みたいなことがあって、ただ「GetComponentしてnullチェック」とか「TryGetComponentするけど結果は破棄」はなんか嫌という潔癖なところがあるので、HasCompoent関数を実装しました。
+Unityで **「単純にコンポーネントを持っているかチェックしたいな」** みたいなことがあって、ただ「GetComponentしてnullチェック」とか「TryGetComponentするけど結果は破棄」はなんか嫌という潔癖なところがあるので、HasCompoent関数を実装しました。
 
 ```cs
 
@@ -36,3 +36,4 @@ if (gameObject.HasComponent<Mover>()) {
 	// 何かする
 }
 ```
+

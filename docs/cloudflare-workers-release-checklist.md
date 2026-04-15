@@ -23,9 +23,8 @@ Cloudflare Workers へ公開する前後で、URL 契約と主要導線を確認
 - `https://site.mackysoft.workers.dev/llms.txt` が主要ページと structured endpoint の absolute URL を返す
 - 主要ページ `/`、`/articles/`、`/games/`、`/assets/`、`/about/`、`/contact/`、`/privacy-policy/` が表示できる
 - canonical と `og:url` が `astro.config.mjs` の `site` に一致する
-- 代表的な旧 URL からの redirect が query と hash を維持している
+- 代表的な旧 URL が HTTP の permanent redirect として正しい新 URL へ移動する
 
 ## メモ
 
 - canonical host を切り替える場合、変更箇所は `astro.config.mjs` の `site` のみとする
-- `scripts/import-wordpress.mjs` の URL 定数は移行入力の正規化用であり、このチェックリストの canonical host 契約対象外とする

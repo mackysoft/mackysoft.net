@@ -7,6 +7,7 @@ import ArticleToc from "../../components/ArticleToc.astro";
 import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
 import SearchMetadata from "../../components/search/SearchMetadata.astro";
 import { resolveLocalArticlePageImages } from "../../features/site/social-image";
+import { getArticleTagLabel } from "../../lib/article-tags";
 import { getUiText } from "../../lib/ui-text";
 import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
@@ -112,7 +113,7 @@ const { social: articleImage, search: searchImage } = resolveLocalArticlePageIma
         {article.data.tags.length > 0 && (
           <ul class="tags article-content__tags" aria-label={uiText.article.tagsAriaLabel}>
             {article.data.tags.map((tag) => (
-              <li><a href={localizePath(`/tags/${tag}/`, locale)}>{tag}</a></li>
+              <li><a href={localizePath(`/tags/${tag}/`, locale)}>{getArticleTagLabel(tag, locale)}</a></li>
             ))}
           </ul>
         )}
@@ -213,6 +214,16 @@ const { social: articleImage, search: searchImage } = resolveLocalArticlePageIma
 
   .article-content__tags {
     margin-bottom: 0;
+  }
+
+  .article-content :global(p > img),
+  .article-content :global(p > a:only-child > img) {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: min(70vh, 42rem);
+    margin-inline: auto;
   }
 
   @media (min-width: 960px) {

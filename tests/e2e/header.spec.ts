@@ -17,21 +17,16 @@ async function getScrollMetrics(page: Page) {
 }
 
 async function scrollToProgress(page: Page, progress: number) {
-  await page.evaluate((targetProgress) => {
+  const targetScrollTop = await page.evaluate((targetProgress) => {
     const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
     const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
     const nextScrollTop = Math.max(Math.min(Math.round(maxScroll * targetProgress), maxScroll), 0);
 
     window.scrollTo(0, nextScrollTop);
+    return nextScrollTop;
   }, progress);
 
-  await page.waitForFunction((targetProgress) => {
-    const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
-    const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
-    const expectedScrollTop = Math.max(Math.min(Math.round(maxScroll * targetProgress), maxScroll), 0);
-
-    return Math.abs(window.scrollY - expectedScrollTop) <= 2;
-  }, progress);
+  await page.waitForFunction((expectedScrollTop) => Math.abs(window.scrollY - expectedScrollTop) <= 2, targetScrollTop);
 
   return getScrollMetrics(page);
 }

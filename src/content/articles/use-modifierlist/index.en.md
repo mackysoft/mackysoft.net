@@ -43,7 +43,7 @@ public class Character : MonoBehaviour {
 	public int health = 3;
 
 	// ModifierList that preprocesses incoming damage
-	public ModifierList<int> damageModifiers = new ModiferList<int>();
+	public ModifierList<int> damageModifiers = new ModifierList<int>();
 
 }
 ```
@@ -97,7 +97,7 @@ public class Character : MonoBehaviour {
 	public int health = 3;
 
 	// ModifierList that preprocesses incoming damage
-	public ModifierList<int> damageModifiers = new ModiferList<int>();
+	public ModifierList<int> damageModifiers = new ModifierList<int>();
 
 	public int attackPower = 2;
 

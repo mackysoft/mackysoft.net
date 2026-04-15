@@ -56,7 +56,7 @@ Debug.Log(Mathf.NextPowerOfTwo(256));
 
 ## 使用例
 
-僕の場合は、**「高い頻度で長さが変わる配列の生成頻度を抑える」**という目的で2の累乗を使用しました。
+僕の場合は、 **「高い頻度で長さが変わる配列の生成頻度を抑える」** という目的で2の累乗を使用しました。
 
 以下のコードは、実際に2の累乗を使用したコードの一例です。
 
@@ -82,3 +82,4 @@ void UpdateBoundingSpheres () {
 ## 参考
 
 -   [Scripting API: Mathf](https://docs.unity3d.com/ScriptReference/Mathf.html)
+

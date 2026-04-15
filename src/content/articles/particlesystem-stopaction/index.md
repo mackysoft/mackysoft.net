@@ -8,7 +8,7 @@ tags:
   - "unity"
   - "particlesystem"
   - "stopaction"
-  - "終了判定"
+  - "completion-detection"
 cover: "./cover.png"
 coverAlt: "ParticleSystemの再生の終了判定（StopAction）【Unity】 の記事画像"
 ---

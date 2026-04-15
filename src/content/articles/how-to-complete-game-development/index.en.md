@@ -217,3 +217,13 @@ _Makihiro | unityroom_
 **Game development continues until people can actually play the game.**
 
 ## Closing Thoughts
+
+That wraps up this article about the six-year struggle it took me to release my first game.
+
+I hope it helps people who have trouble actually finishing games.
+
+### Postscript
+
+One of the lines in this article started circulating on Twitter on its own, so I wrote a follow-up article to add some context.
+
+[Supplementary Notes on "A Released Bad Game Is More Valuable Than an Unreleased Masterpiece"](/articles/value-of-the-game/)

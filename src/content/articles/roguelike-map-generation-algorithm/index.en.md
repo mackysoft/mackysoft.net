@@ -146,8 +146,8 @@ Finally, generate obstacles. No obstacles are spawned on the secured path.
 
 The same code is used as in "Generate accessible objects." However, path securing is not performed because these are obstacles.
 
-* * *
+## Closing Thoughts
 
-That concludes the explanation of the map generation system.
+That is the basic flow of the map generation algorithm used in _Treasure Rogue_.
 
-## Conclusion
+If you swap out each `ILevelProcessor` to match the objects you want to place and the rules of your game, you can reuse the same structure for many kinds of map generation.
