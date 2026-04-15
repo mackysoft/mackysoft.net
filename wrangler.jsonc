@@ -8,6 +8,25 @@
     "binding": "ASSETS",
     "directory": "./dist",
     "not_found_handling": "404-page",
-    "run_worker_first": true
+    "run_worker_first": [
+      "/",
+      "/_astro/*",
+      "/about/",
+      "/archive/*",
+      "/articles/*",
+      "/assets/*",
+      "/contact/",
+      "/en/*",
+      "/feed.xml",
+      "/games/*",
+      "/llms.txt",
+      "/og/*",
+      "/pagefind/*",
+      "/privacy-policy/",
+      "/robots.txt",
+      "/search/",
+      "/sitemap.xml",
+      "/tags/*"
+    ]
   }
 }
