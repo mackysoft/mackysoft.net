@@ -62,8 +62,6 @@ public bool IsClientLoggedIn (PlayFabAuthenticationContext context) {
 }
 ```
 
-* * *
-
 この２つを見ると「認証の文脈」がなんなのか少しわかりましたね。
 
 ## 現在のプレイヤーを取得する方法

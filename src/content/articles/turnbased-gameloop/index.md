@@ -153,3 +153,9 @@ public class TurnManager : SingletonMonoBehaviour<TurnManager> {
 ```
 
 AddCommander関数を持っているので、ターン制のループに取り込みたいCommanderを追加します。（CommanderはOnEnable時に自動でAddCommanderを呼びます）
+
+## おわりに
+
+かなり最小限の構成ですが、CommanderとTurnManagerを分けておくだけでも、ターン制の土台としては十分に使えます。
+
+ゲームに合わせて「行動順の決定」「戦闘不能時のスキップ」「行動終了条件」などを足していけば、そのまま実用的なループに育てられます。

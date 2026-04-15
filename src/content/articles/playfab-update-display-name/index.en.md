@@ -60,4 +60,6 @@ Open `Title settings` from the gear icon in the PlayFab dashboard. You should se
 
 ## Closing Thoughts
 
-Registering a player name is surprisingly easy.
+Registering a player name is very simple. Once the player is logged in, it only takes a single API call.
+
+If you plan to show player names inside your game, it is worth wiring this up early.

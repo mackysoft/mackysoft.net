@@ -145,4 +145,6 @@ Only then do you gain blood-and-bone knowledge about what went wrong and what wo
 
 ## Closing Thoughts
 
-That is all for the supplementary notes.
+What I wanted to say is simple: do not keep postponing release by using quality as an excuse.
+
+A game can only be evaluated as a game, and you can only truly learn as a developer, after you release it.

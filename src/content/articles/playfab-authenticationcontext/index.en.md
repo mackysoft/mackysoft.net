@@ -57,8 +57,6 @@ public bool IsClientLoggedIn (PlayFabAuthenticationContext context) {
 }
 ```
 
-* * *
-
 Looking at these two members, we now have a rough idea of what "the context of authentication" means.
 
 ## How to Get the Current Player

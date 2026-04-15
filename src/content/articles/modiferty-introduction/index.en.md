@@ -204,8 +204,6 @@ then when you run attackPower.Evaluate(),
 
 **2 (baseValue) + 1 (AdditiveModifier)** means the return value is 3.
 
-* * *
-
 That completes the Modiferty implementation.
 
 ## Closing Thoughts
