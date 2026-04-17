@@ -92,12 +92,12 @@
       "repo": "mackysoft/Unity-SerializeReferenceExtensions",
       "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
       "license": "MIT",
-      "stargazerCount": 1250,
+      "stargazerCount": 1251,
       "name": "1.7.0",
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
       "publishedAt": "2026-01-18T14:37:19Z",
-      "coverUrl": "https://opengraph.githubassets.com/515b770ec82af03cb10c45bac34dbf6b9c467b4bcffeba9210da1974d5d00437/mackysoft/Unity-SerializeReferenceExtensions",
+      "coverUrl": "https://opengraph.githubassets.com/5c7b08b2079754df932bdebbb64f2f85495c5523d6ba1405035825aa81753c04/mackysoft/Unity-SerializeReferenceExtensions",
       "coverAlt": "mackysoft/Unity-SerializeReferenceExtensions のリポジトリサムネイル"
     },
     {
@@ -106,12 +106,12 @@
       "repo": "mackysoft/MasterTools",
       "description": "An import tool for importing tables from excel or spreadsheet to generate a database.",
       "license": "MIT",
-      "stargazerCount": 8,
+      "stargazerCount": 9,
       "name": "1.0.0",
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/MasterTools/releases/tag/1.0.0",
       "publishedAt": "2024-08-15T16:19:05Z",
-      "coverUrl": "https://opengraph.githubassets.com/047490f2a4ad3563b3ddfcf27d50405b30dbd866afce989883c2f3823d289130/mackysoft/MasterTools",
+      "coverUrl": "https://opengraph.githubassets.com/1711fb007ea4560660eee10577aa40ace05a2946693a1285a08cb04fe7c9febd/mackysoft/MasterTools",
       "coverAlt": "mackysoft/MasterTools のリポジトリサムネイル"
     },
     {
@@ -120,7 +120,7 @@
       "repo": "mackysoft/Navigathena",
       "description": "Scene management framework for Unity. Provides a new generation of scene management.",
       "license": "MIT",
-      "stargazerCount": 167,
+      "stargazerCount": 166,
       "name": "1.1.0",
       "version": "1.1.0",
       "url": "https://github.com/mackysoft/Navigathena/releases/tag/1.1.0",
