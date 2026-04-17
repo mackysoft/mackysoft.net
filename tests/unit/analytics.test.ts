@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { buildAnalyticsEventPayload, getAnalyticsMeasurementId, isAnalyticsEnabled } from "../../src/lib/analytics";
+import {
+  buildAnalyticsEventPayload,
+  buildSearchResultsAnalyticsEventPayload,
+  getAnalyticsMeasurementId,
+  isAnalyticsEnabled,
+} from "../../src/lib/analytics";
 
 describe("analytics helpers", () => {
   test("disables analytics when the measurement ID is missing", () => {
@@ -100,7 +105,22 @@ describe("analytics helpers", () => {
     });
   });
 
-  test("does not build payloads for unimplemented reserved events", () => {
+  test("builds the search results payload from fixed metadata only", () => {
+    expect(
+      buildSearchResultsAnalyticsEventPayload({
+        location: "search-page",
+        resultsCount: 24,
+      }),
+    ).toEqual({
+      eventName: "view_search_results",
+      params: {
+        ui_location: "search-page",
+        results_count: 24,
+      },
+    });
+  });
+
+  test("keeps the click payload builder scoped to click events", () => {
     expect(
       buildAnalyticsEventPayload({
         eventName: "view_search_results",

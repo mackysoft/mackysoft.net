@@ -6,11 +6,61 @@ const externalSearchQuery = "Vibe駆動開発";
 const releaseSearchQuery = "SerializeReference";
 const articleUiQuery = "コピーリンク";
 const overflowSearchQuery = "C#";
+const analyticsStorageKey = "__analytics_events__";
+const analyticsInitKey = "__analytics_capture_initialized__";
 
 async function setJapaneseLocale(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem("mackysoft-locale", "ja");
   });
+}
+
+async function setJapaneseLocaleWithAnalyticsCapture(page: Page) {
+  await page.addInitScript(({ storageKey, initKey }) => {
+    const dataLayer: unknown[] = [];
+    const originalPush = Array.prototype.push;
+
+    dataLayer.push = function push(...items: unknown[]) {
+      const result = originalPush.apply(this, items);
+      const storedEvents = JSON.parse(window.sessionStorage.getItem(storageKey) ?? "[]");
+      const serializedEvents = items.map((item) => {
+        if (!item || typeof item !== "object" || !("length" in item)) {
+          return item;
+        }
+
+        return Array.from(item as ArrayLike<unknown>, (value) => {
+          return value instanceof Date ? value.toISOString() : value;
+        });
+      });
+
+      storedEvents.push(...serializedEvents);
+      window.sessionStorage.setItem(storageKey, JSON.stringify(storedEvents));
+      return result;
+    };
+
+    if (window.sessionStorage.getItem(initKey) !== "true") {
+      window.sessionStorage.removeItem(storageKey);
+      window.sessionStorage.setItem(initKey, "true");
+    }
+
+    window.localStorage.setItem("mackysoft-locale", "ja");
+    Object.defineProperty(window, "dataLayer", {
+      configurable: true,
+      writable: true,
+      value: dataLayer,
+    });
+  }, { storageKey: analyticsStorageKey, initKey: analyticsInitKey });
+}
+
+async function getTrackedAnalyticsEvents(page: Page, eventName: string) {
+  return page.evaluate(({ storageKey, trackedEventName }) => {
+    const storedEvents = window.sessionStorage.getItem(storageKey);
+    const events = storedEvents ? JSON.parse(storedEvents) : [];
+
+    return events.filter((event: unknown) => {
+      return Array.isArray(event) && event[0] === "event" && event[1] === trackedEventName;
+    });
+  }, { storageKey: analyticsStorageKey, trackedEventName: eventName });
 }
 
 test.describe("site search", () => {
@@ -128,6 +178,41 @@ test.describe("site search", () => {
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
   });
 
+  test("tracks dedicated search result views once per rendered state", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
+
+    const pagePanel = page.locator('[data-search-mode="page"]').first();
+    await expect.poll(async () => pagePanel.locator(".site-search-card").count()).toBeGreaterThan(0);
+    const resultCount = await pagePanel.locator(".site-search-card").count();
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+    let trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
+
+    expect(trackedEvents[0]).toMatchObject([
+      "event",
+      "view_search_results",
+      {
+        ui_location: "search-page",
+        results_count: resultCount,
+      },
+    ]);
+
+    await page.evaluate(() => {
+      const input = document.querySelector('[data-search-mode="page"] [data-site-search-input]');
+
+      if (!(input instanceof HTMLInputElement)) {
+        throw new Error("search page input must exist");
+      }
+
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+    trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
+    expect(trackedEvents).toHaveLength(1);
+  });
+
   test("prioritizes exact Japanese title matches over broader body matches", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent("ゲームデザイン")}`);
@@ -231,6 +316,54 @@ test.describe("site search", () => {
     const totalCount = await pagePanel.locator(".site-search-card").count();
     expect(inlineSummaryText).toContain(`${totalCount} 件の検索結果`);
     expect(inlineSummaryText).toContain("上位 20 件を表示");
+  });
+
+  test("tracks inline search result views once per rendered state", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto("/");
+
+    await page.locator('[data-site-search-trigger]').click();
+    const inlinePanel = page.locator('[data-site-search-inline]');
+
+    await page.evaluate((query) => {
+      const input = document.querySelector('[data-site-search-inline] [data-site-search-input]');
+
+      if (!(input instanceof HTMLInputElement)) {
+        throw new Error("inline search input must exist");
+      }
+
+      input.value = query;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }, localSearchQuery);
+
+    await expect.poll(async () => inlinePanel.locator(".site-search-card").count()).toBeGreaterThan(0);
+    const resultCount = await inlinePanel.locator(".site-search-card").count();
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+    let trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
+
+    expect(trackedEvents[0]).toMatchObject([
+      "event",
+      "view_search_results",
+      {
+        ui_location: "site-header-search",
+        results_count: resultCount,
+      },
+    ]);
+
+    await page.evaluate(() => {
+      const input = document.querySelector('[data-site-search-inline] [data-site-search-input]');
+
+      if (!(input instanceof HTMLInputElement)) {
+        throw new Error("inline search input must exist");
+      }
+
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+    trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
+    expect(trackedEvents).toHaveLength(1);
   });
 
   test("does not include Japanese-only local pages in English search", { tag: "@size:medium" }, async ({ page }) => {

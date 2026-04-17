@@ -25,8 +25,10 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("Google signals");
     await expect(main).toContainText("広告向けパーソナライズ機能は利用しません");
     await expect(main).toContainText("_ga");
+    await expect(main).toContainText("検索結果の表示件数");
     await expect(main).toContainText("テーマ切替");
     await expect(main).toContainText("言語切替");
+    await expect(main).toContainText("検索語そのものは送信しません");
     await expect(main.getByRole("heading", { level: 2, name: "外部サービス" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
@@ -44,7 +46,7 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("オプトアウト アドオン");
     await expect(main.getByRole("heading", { level: 2, name: "改定日" })).toBeVisible();
     await expect(main).toContainText("制定日: 2026年4月12日");
-    await expect(main).toContainText("最終更新日: 2026年4月14日");
+    await expect(main).toContainText("最終更新日: 2026年4月17日");
     await expect(page.locator(`script[src*="googletagmanager.com/gtag/js?id=${gaMeasurementId}"]`)).toHaveCount(1);
     expect(await page.evaluate(() => typeof (window as AnalyticsWindow).gtag)).toBe("function");
     expect(
@@ -72,8 +74,10 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("Google signals");
     await expect(main).toContainText("advertising personalization features are not used");
     await expect(main).toContainText("_ga");
+    await expect(main).toContainText("search result views");
     await expect(main).toContainText("theme switches");
     await expect(main).toContainText("language switches");
+    await expect(main).toContainText("Search terms themselves are not sent");
     await expect(main.getByRole("heading", { level: 2, name: "External Services" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
@@ -91,6 +95,6 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("opt-out browser add-on");
     await expect(main.getByRole("heading", { level: 2, name: "Revision Date" })).toBeVisible();
     await expect(main).toContainText("Effective date: April 12, 2026");
-    await expect(main).toContainText("Last updated: April 14, 2026");
+    await expect(main).toContainText("Last updated: April 17, 2026");
   });
 });
