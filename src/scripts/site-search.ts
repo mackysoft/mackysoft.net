@@ -72,6 +72,12 @@ type AnalyticsWindow = Window & typeof globalThis & {
   gtag?: (...args: unknown[]) => void;
 };
 
+type TrackedSearchState = {
+  query: string;
+  totalCount: number;
+  location: string;
+};
+
 let pagefindPromise: Promise<PagefindModule> | null = null;
 let activeSearchTrigger: HTMLElement | null = null;
 let activeSearchPanel: HTMLElement | null = null;
@@ -207,11 +213,7 @@ function getSearchAnalyticsLocation(mode: SearchPanelElements["mode"]) {
   return searchAnalyticsLocationMap[mode];
 }
 
-function createTrackedSearchStateKey(query: string, totalCount: number, location: string) {
-  return `${query}\u0000${totalCount}\u0000${location}`;
-}
-
-function trackSearchResults(elements: SearchPanelElements, query: string, totalCount: number, previousState: string | null) {
+function trackSearchResults(elements: SearchPanelElements, query: string, totalCount: number, previousState: TrackedSearchState | null) {
   const analyticsWindow = window as AnalyticsWindow;
   const payload = buildSearchResultsAnalyticsEventPayload({
     location: getSearchAnalyticsLocation(elements.mode),
@@ -228,14 +230,20 @@ function trackSearchResults(elements: SearchPanelElements, query: string, totalC
     return previousState;
   }
 
-  const nextState = createTrackedSearchStateKey(query, totalCount, location);
-
-  if (previousState === nextState) {
+  if (
+    previousState?.query === query
+    && previousState.totalCount === totalCount
+    && previousState.location === location
+  ) {
     return previousState;
   }
 
   analyticsWindow.gtag("event", payload.eventName, payload.params);
-  return nextState;
+  return {
+    query,
+    totalCount,
+    location,
+  };
 }
 
 function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
@@ -449,7 +457,7 @@ function initSearchPanel(root: HTMLElement) {
   root.dataset.searchReady = "true";
 
   let currentRequestId = 0;
-  let lastTrackedSearchState: string | null = null;
+  let lastTrackedSearchState: TrackedSearchState | null = null;
   const initialQueryFromUrl = elements.mode === "page"
     ? new URL(window.location.href).searchParams.get("q")?.trim() ?? ""
     : "";
@@ -511,6 +519,10 @@ function initSearchPanel(root: HTMLElement) {
       lastTrackedSearchState = null;
       renderIdleState(elements);
       return;
+    }
+
+    if (lastTrackedSearchState?.query !== query) {
+      lastTrackedSearchState = null;
     }
 
     renderLoadingState(elements);

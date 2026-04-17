@@ -15,6 +15,7 @@ const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const uiText = getUiText(locale);
 const searchPath = localizePath("/search/", locale);
 const initialQuery = Astro.url.searchParams.get("q") ?? "";
+const analyticsPageLocation = new URL(searchPath, Astro.url).toString();
 ---
 
 <SiteLayout
@@ -23,6 +24,7 @@ const initialQuery = Astro.url.searchParams.get("q") ?? "";
   locale={locale}
   canonicalPath={searchPath}
   alternateLocales={createAlternateLocaleLinks("/search/")}
+  analyticsPageLocation={analyticsPageLocation}
 >
   <PageHeader title={uiText.common.search} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.search)} />
 

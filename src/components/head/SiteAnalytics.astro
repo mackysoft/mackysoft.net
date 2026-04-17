@@ -1,6 +1,11 @@
 ---
 import { getAnalyticsMeasurementId } from "../../lib/analytics";
 
+type Props = {
+  pageLocation?: string;
+};
+
+const { pageLocation } = Astro.props as Props;
 const measurementId = getAnalyticsMeasurementId(import.meta.env.PUBLIC_GA4_MEASUREMENT_ID);
 const analyticsScriptUrl = measurementId
   ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`
@@ -11,18 +16,24 @@ const analyticsScriptUrl = measurementId
   measurementId && analyticsScriptUrl && (
     <>
       <script is:inline async src={analyticsScriptUrl}></script>
-      <script is:inline define:vars={{ measurementId }}>
+      <script is:inline define:vars={{ measurementId, pageLocation }}>
         window.dataLayer = window.dataLayer || [];
         window.gtag = function gtag() {
           window.dataLayer.push(arguments);
         };
         const skipInitialPageView = window.__mackysoftSkipInitialPageView === true;
-        window.gtag("js", new Date());
-        window.gtag("config", measurementId, {
+        const configOptions = {
           allow_google_signals: false,
           allow_ad_personalization_signals: false,
           send_page_view: !skipInitialPageView,
-        });
+        };
+
+        if (typeof pageLocation === "string" && pageLocation.length > 0) {
+          configOptions.page_location = pageLocation;
+        }
+
+        window.gtag("js", new Date());
+        window.gtag("config", measurementId, configOptions);
       </script>
       <script>
         import { buildAnalyticsEventPayload } from "../../lib/analytics";
