@@ -1,3 +1,4 @@
+import { buildSearchResultsAnalyticsEventPayload } from "../lib/analytics";
 import {
   createSearchQueryVariants,
   formatSearchResultDate,
@@ -67,12 +68,20 @@ type SearchPanelElements = {
   searchPath: string;
 };
 
+type AnalyticsWindow = Window & typeof globalThis & {
+  gtag?: (...args: unknown[]) => void;
+};
+
 let pagefindPromise: Promise<PagefindModule> | null = null;
 let activeSearchTrigger: HTMLElement | null = null;
 let activeSearchPanel: HTMLElement | null = null;
 let searchInteractionsReady = false;
 const pagefindBundlePath = "/pagefind/pagefind.js";
 const searchInlineViewportPadding = 16;
+const searchAnalyticsLocationMap = {
+  page: "search-page",
+  inline: "site-header-search",
+} as const;
 
 async function importPagefindBundle(bundlePath: string) {
   return new Function("path", "return import(path)")(bundlePath) as Promise<PagefindModule>;
@@ -192,6 +201,41 @@ function createMetaItem(text: string) {
   const item = document.createElement("span");
   item.textContent = text;
   return item;
+}
+
+function getSearchAnalyticsLocation(mode: SearchPanelElements["mode"]) {
+  return searchAnalyticsLocationMap[mode];
+}
+
+function createTrackedSearchStateKey(query: string, totalCount: number, location: string) {
+  return `${query}\u0000${totalCount}\u0000${location}`;
+}
+
+function trackSearchResults(elements: SearchPanelElements, query: string, totalCount: number, previousState: string | null) {
+  const analyticsWindow = window as AnalyticsWindow;
+  const payload = buildSearchResultsAnalyticsEventPayload({
+    location: getSearchAnalyticsLocation(elements.mode),
+    resultsCount: totalCount,
+  });
+
+  if (!payload || typeof analyticsWindow.gtag !== "function") {
+    return previousState;
+  }
+
+  const location = payload.params.ui_location;
+
+  if (typeof location !== "string") {
+    return previousState;
+  }
+
+  const nextState = createTrackedSearchStateKey(query, totalCount, location);
+
+  if (previousState === nextState) {
+    return previousState;
+  }
+
+  analyticsWindow.gtag("event", payload.eventName, payload.params);
+  return nextState;
 }
 
 function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
@@ -405,6 +449,7 @@ function initSearchPanel(root: HTMLElement) {
   root.dataset.searchReady = "true";
 
   let currentRequestId = 0;
+  let lastTrackedSearchState: string | null = null;
   const initialQueryFromUrl = elements.mode === "page"
     ? new URL(window.location.href).searchParams.get("q")?.trim() ?? ""
     : "";
@@ -463,6 +508,7 @@ function initSearchPanel(root: HTMLElement) {
     syncSearchPageUrl(elements, query);
 
     if (!query) {
+      lastTrackedSearchState = null;
       renderIdleState(elements);
       return;
     }
@@ -497,11 +543,13 @@ function initSearchPanel(root: HTMLElement) {
       const visibleResults = prepareVisibleSearchResults(results, query, shouldRerank, elements.mode);
 
       renderResults(elements, visibleResults.map((result) => result.data), totalCount);
+      lastTrackedSearchState = trackSearchResults(elements, query, totalCount, lastTrackedSearchState);
     } catch {
       if (requestId !== currentRequestId) {
         return;
       }
 
+      lastTrackedSearchState = null;
       renderErrorState(elements);
     }
   };

@@ -1,18 +1,27 @@
-const implementedAnalyticsEventNames = [
+const clickAnalyticsEventNames = [
   "theme_switch",
   "locale_switch",
   "project_cta_click",
   "external_link_click",
 ] as const;
 
-const reservedAnalyticsEventNames = ["view_search_results"] as const;
+const analyticsEventNames = [
+  ...clickAnalyticsEventNames,
+  "view_search_results",
+] as const;
 
-export type ImplementedAnalyticsEventName = (typeof implementedAnalyticsEventNames)[number];
-export type AnalyticsEventName = ImplementedAnalyticsEventName | (typeof reservedAnalyticsEventNames)[number];
+export type ClickAnalyticsEventName = (typeof clickAnalyticsEventNames)[number];
+export type AnalyticsEventName = (typeof analyticsEventNames)[number];
+export type AnalyticsEventParamValue = string | number;
 
 export type AnalyticsEventPayload = {
-  eventName: ImplementedAnalyticsEventName;
-  params: Record<string, string>;
+  eventName: AnalyticsEventName;
+  params: Record<string, AnalyticsEventParamValue>;
+};
+
+export type ClickAnalyticsEventPayload = {
+  eventName: ClickAnalyticsEventName;
+  params: Record<string, AnalyticsEventParamValue>;
 };
 
 export type AnalyticsPayloadInput = {
@@ -26,10 +35,23 @@ export type AnalyticsPayloadInput = {
   ariaLabel?: string | null | undefined;
 };
 
+export type SearchResultsAnalyticsPayloadInput = {
+  location?: string | null | undefined;
+  resultsCount?: number | null | undefined;
+};
+
 function normalizeAnalyticsValue(value: string | null | undefined) {
   const normalizedValue = value?.replace(/\s+/g, " ").trim();
 
   return normalizedValue ? normalizedValue : null;
+}
+
+function normalizeAnalyticsCount(value: number | null | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    return null;
+  }
+
+  return Math.trunc(value);
 }
 
 function normalizeAnalyticsHref(value: string | null | undefined) {
@@ -52,8 +74,8 @@ function normalizeAnalyticsHref(value: string | null | undefined) {
   return null;
 }
 
-function isImplementedAnalyticsEventName(value: string): value is ImplementedAnalyticsEventName {
-  return (implementedAnalyticsEventNames as readonly string[]).includes(value);
+function isClickAnalyticsEventName(value: string): value is ClickAnalyticsEventName {
+  return (clickAnalyticsEventNames as readonly string[]).includes(value);
 }
 
 function getTargetTheme(currentTheme: string | null) {
@@ -76,10 +98,10 @@ export function isAnalyticsEnabled(value: string | null | undefined) {
   return getAnalyticsMeasurementId(value) !== null;
 }
 
-export function buildAnalyticsEventPayload(input: AnalyticsPayloadInput): AnalyticsEventPayload | null {
+export function buildAnalyticsEventPayload(input: AnalyticsPayloadInput): ClickAnalyticsEventPayload | null {
   const eventName = normalizeAnalyticsValue(input.eventName);
 
-  if (!eventName || !isImplementedAnalyticsEventName(eventName)) {
+  if (!eventName || !isClickAnalyticsEventName(eventName)) {
     return null;
   }
 
@@ -89,7 +111,7 @@ export function buildAnalyticsEventPayload(input: AnalyticsPayloadInput): Analyt
     ?? normalizeAnalyticsValue(input.textContent);
   const location = normalizeAnalyticsValue(input.location);
   const href = normalizeAnalyticsHref(input.href);
-  const params: Record<string, string> = {};
+  const params: Record<string, AnalyticsEventParamValue> = {};
 
   if (label) {
     params.target_label = label;
@@ -122,5 +144,22 @@ export function buildAnalyticsEventPayload(input: AnalyticsPayloadInput): Analyt
   return {
     eventName,
     params,
+  };
+}
+
+export function buildSearchResultsAnalyticsEventPayload(input: SearchResultsAnalyticsPayloadInput): AnalyticsEventPayload | null {
+  const location = normalizeAnalyticsValue(input.location);
+  const resultsCount = normalizeAnalyticsCount(input.resultsCount);
+
+  if (!location || resultsCount === null) {
+    return null;
+  }
+
+  return {
+    eventName: "view_search_results",
+    params: {
+      ui_location: location,
+      results_count: resultsCount,
+    },
   };
 }
