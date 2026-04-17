@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { expect, test } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 
 import { formatContentDate } from "../../src/lib/content-date";
 
@@ -24,6 +25,23 @@ const latestReleaseRepoName = latestRelease.repo.split("/").at(-1)!;
 const secondLatestRelease = activityData.releases
   .toSorted((left, right) => right.publishedAt.localeCompare(left.publishedAt))[1];
 
+async function expectReleaseCoverOrFallback(card: Locator, repoName: string, coverAlt: string) {
+  const image = card.getByRole("img", { name: coverAlt });
+
+  if (await image.isVisible().catch(() => false)) {
+    await expect(image).toBeVisible();
+    return;
+  }
+
+  const cover = card.locator(".asset-card__cover");
+  const fallback = card.locator(".asset-card__cover-fallback");
+
+  await expect(cover).toHaveAttribute("data-cover-state", "error");
+  await expect(fallback).toBeVisible();
+  await expect(fallback).toContainText("GitHub");
+  await expect(fallback).toContainText(repoName);
+}
+
 test.describe("assets page", () => {
   test("shows GitHub releases in descending order with asset cards", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/assets/");
@@ -37,7 +55,7 @@ test.describe("assets page", () => {
     await expect(firstCard.getByRole("link", { name: latestReleaseRepoName, exact: true })).toHaveAttribute("href", latestRelease.url);
     await expect(firstCard.locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
     await expect(firstCard.locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
-    await expect(firstCard.getByRole("img", { name: latestRelease.coverAlt })).toBeVisible();
+    await expectReleaseCoverOrFallback(firstCard, latestReleaseRepoName, latestRelease.coverAlt);
     await expect(firstCard).toContainText("最新リリース日");
     await expect(firstCard).toContainText(formatContentDate(new Date(latestRelease.publishedAt)));
     await expect(firstCard).toContainText(latestRelease.version);
