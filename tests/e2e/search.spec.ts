@@ -63,6 +63,17 @@ async function getTrackedAnalyticsEvents(page: Page, eventName: string) {
   }, { storageKey: analyticsStorageKey, trackedEventName: eventName });
 }
 
+async function getAnalyticsCommands(page: Page, commandName: string) {
+  return page.evaluate(({ storageKey, trackedCommandName }) => {
+    const storedEvents = window.sessionStorage.getItem(storageKey);
+    const events = storedEvents ? JSON.parse(storedEvents) : [];
+
+    return events.filter((event: unknown) => {
+      return Array.isArray(event) && event[0] === trackedCommandName;
+    });
+  }, { storageKey: analyticsStorageKey, trackedCommandName: commandName });
+}
+
 test.describe("site search", () => {
   test("opens the inline panel from the header and returns focus when it closes", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
@@ -211,6 +222,27 @@ test.describe("site search", () => {
     await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
     trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
     expect(trackedEvents).toHaveLength(1);
+  });
+
+  test("sanitizes the search page location before the initial GA4 page view", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
+
+    await expect.poll(async () => (await getAnalyticsCommands(page, "config")).length).toBeGreaterThan(0);
+    const configCommands = await getAnalyticsCommands(page, "config");
+    const configCommand = configCommands.find((command: unknown) => {
+      return Array.isArray(command) && command[1] === "G-TEST123456";
+    });
+
+    expect(configCommand).toBeDefined();
+
+    const pageLocation = Array.isArray(configCommand) && typeof configCommand[2] === "object" && configCommand[2] !== null
+      ? (configCommand[2] as { page_location?: unknown }).page_location
+      : null;
+
+    expect(typeof pageLocation).toBe("string");
+    expect(pageLocation).toContain("/search/");
+    expect(pageLocation).not.toContain("?q=");
   });
 
   test("prioritizes exact Japanese title matches over broader body matches", { tag: "@size:medium" }, async ({ page }) => {
@@ -364,6 +396,21 @@ test.describe("site search", () => {
     await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
     trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
     expect(trackedEvents).toHaveLength(1);
+  });
+
+  test("tracks the same query again after another query interrupts the search flow", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
+
+    const pagePanel = page.locator('[data-search-mode="page"]').first();
+    const input = pagePanel.locator("[data-site-search-input]");
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+
+    await input.fill("Serialize");
+    await input.fill(localSearchQuery);
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(2);
   });
 
   test("does not include Japanese-only local pages in English search", { tag: "@size:medium" }, async ({ page }) => {
