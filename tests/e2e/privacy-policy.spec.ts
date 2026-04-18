@@ -126,4 +126,31 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("制定日: 2026年4月12日");
     await expect(main).toContainText("最後更新日: 2026年4月19日");
   });
+
+  test("renders the Korean privacy policy with the same scope", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/ko/privacy-policy/");
+
+    await expect(page).toHaveTitle("개인정보 처리방침 | mackysoft.net");
+
+    const main = page.getByRole("main");
+
+    await expect(main.getByText("Home / Privacy Policy", { exact: true })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "운영자 정보와 연락처" })).toBeVisible();
+    await expect(main).toContainText("Hiroya Aramaki(아라마키 히로야) / Makihiro");
+    await expect(main.getByRole("link", { name: "연락처" })).toHaveAttribute("href", "/ko/contact/");
+    await expect(main.getByRole("heading", { level: 2, name: "분석" })).toBeVisible();
+    await expect(main).toContainText("Google Analytics 4");
+    await expect(main).toContainText("Google signals");
+    await expect(main).toContainText("테마 전환");
+    await expect(main).toContainText("언어 전환");
+    await expect(main).toContainText("사이트 내 검색 제출");
+    await expect(main).toContainText("사이트 내 검색에서 제출된 검색어");
+    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "외부 서비스" })).toBeVisible();
+    await expect(main).toContainText("공개 저장소 정보와 릴리스 정보");
+    await expect(main.getByRole("heading", { level: 2, name: "해외 사업자에 의한 처리" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "이용자의 통제 방법" })).toBeVisible();
+    await expect(main).toContainText("시행일: 2026년 4월 12일");
+    await expect(main).toContainText("최종 업데이트: 2026년 4월 19일");
+  });
 });

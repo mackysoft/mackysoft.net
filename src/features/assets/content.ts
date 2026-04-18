@@ -26,6 +26,14 @@ const assetsPageContentMap = {
       ctaLabel: "在 GitHub Sponsors 支持",
     },
   },
+  ko: {
+    description: "GitHub Releases로 공개 중인 에셋 목록입니다.",
+    support: {
+      ariaLabel: "GitHub Sponsors",
+      body: "GitHub Sponsors를 통해 후원하실 수 있습니다. 지속적인 개발 자금에 도움이 됩니다.",
+      ctaLabel: "GitHub Sponsors로 후원하기",
+    },
+  },
 } as const;
 
 export function getAssetsPageContent(locale: SiteLocale, title: string) {

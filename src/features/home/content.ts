@@ -58,6 +58,25 @@ const homePageContentMap = {
     aboutCta: "查看個人簡介",
     homeHeading: "首頁",
   },
+  ko: {
+    pageTitle: undefined,
+    latestArticlesEyebrow: "Latest Articles",
+    latestArticlesHeading: "최신 글",
+    latestArticlesCta: "글 목록 보기",
+    latestReleasesEyebrow: "Latest Releases",
+    latestReleasesHeading: "최신 릴리스",
+    latestReleasesCta: "에셋 목록 보기",
+    gamesEyebrow: "Games",
+    gamesHeading: "게임",
+    gamesCta: "게임 목록 보기",
+    heroPrimaryCta: "소개 보기",
+    heroContactCta: "문의",
+    aboutEyebrow: "About",
+    aboutHeading: "진행 중인 활동을 한곳의 원본으로 모으기",
+    aboutBody: "이 사이트는 프로필, 작업물, 글, 연락 경로를 한곳에서 따라갈 수 있도록 외부 서비스 의존을 줄이며 다시 구성하고 있습니다.",
+    aboutCta: "소개 보기",
+    homeHeading: "홈",
+  },
 } as const;
 
 export function getHomePageContent(locale: SiteLocale) {

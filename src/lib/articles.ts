@@ -114,6 +114,10 @@ function getExternalArticleLocaleFallbackOrder(locale: SiteLocale): SiteLocale[]
     return ["zh-hant", "en", defaultLocale];
   }
 
+  if (locale === "ko") {
+    return ["ko", "en", defaultLocale];
+  }
+
   return [locale, defaultLocale];
 }
 

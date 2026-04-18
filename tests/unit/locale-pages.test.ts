@@ -12,6 +12,9 @@ describe("locale page helpers", () => {
       {
         params: { locale: getLocalePathPrefix("zh-hant") },
       },
+      {
+        params: { locale: getLocalePathPrefix("ko") },
+      },
     ]);
   });
 
@@ -30,6 +33,10 @@ describe("locale page helpers", () => {
       },
       {
         params: { locale: getLocalePathPrefix("zh-hant"), slug: "vision-introduction" },
+        props: { slug: "vision-introduction" },
+      },
+      {
+        params: { locale: getLocalePathPrefix("ko"), slug: "vision-introduction" },
         props: { slug: "vision-introduction" },
       },
     ]);

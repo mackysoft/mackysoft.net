@@ -75,6 +75,7 @@ test.describe("site header", () => {
     await expect(languageTool.getByRole("menuitemradio", { name: "日本語" })).toBeVisible();
     await expect(languageTool.getByRole("menuitemradio", { name: "English" })).toBeVisible();
     await expect(languageTool.getByRole("menuitemradio", { name: "繁體中文" })).toBeVisible();
+    await expect(languageTool.getByRole("menuitemradio", { name: "한국어" })).toBeVisible();
     await expect(languageTool.locator(".site-language-menu__popover")).toHaveCSS("background-color", "rgb(220, 239, 255)");
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "プライバシーポリシー", exact: true })).toHaveAttribute(
       "href",
@@ -107,7 +108,7 @@ test.describe("site header", () => {
 
     const widths: number[] = [];
 
-    for (const path of ["/", "/en/", "/zh-hant/"]) {
+    for (const path of ["/", "/en/", "/zh-hant/", "/ko/"]) {
       await page.goto(path);
       const box = await page.locator("[data-site-language-toggle]").boundingBox();
 

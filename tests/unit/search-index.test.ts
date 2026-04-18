@@ -162,6 +162,45 @@ describe("search-index records", () => {
     expect(record?.content).toContain("Expanded English body.");
   });
 
+  test("falls back to English metadata when building a Korean external article record", async () => {
+    const record = await createExternalArticleSearchRecord({
+      id: "zenn:localized-ko",
+      source: "Zenn",
+      publishedAt: "2026-01-06T03:05:01.000Z",
+      locales: {
+        ja: {
+          title: "日本語記事",
+          description: "日本語概要",
+          url: "https://zenn.dev/makihiro_dev/articles/localized-ko",
+        },
+        en: {
+          title: "English article",
+          description: "English summary",
+          url: "https://zenn.dev/makihiro_dev/articles/localized-ko?locale=en",
+        },
+      },
+    }, "ko", async (input) => {
+      expect(String(input)).toContain("?locale=en");
+
+      return createHtmlResponse(createZennArticlePageHtml({
+        locale: "en",
+        title: "English article",
+        canonicalUrl: "https://zenn.dev/makihiro_dev/articles/localized-ko?locale=en",
+        bodyHtml: "<p>Expanded English body.</p>",
+        isTranslated: true,
+      }));
+    });
+
+    expect(record).toMatchObject({
+      url: "https://zenn.dev/makihiro_dev/articles/localized-ko?locale=en",
+      language: "ko",
+      meta: {
+        title: "English article",
+      },
+    });
+    expect(record?.content).toContain("Expanded English body.");
+  });
+
   test("creates release search records for all supported indexes", async () => {
     const records = await createReleaseSearchRecords([
       {
@@ -180,8 +219,8 @@ describe("search-index records", () => {
       },
     ], async () => createHtmlResponse("# Example README\n\nFeature overview with README only keyword."));
 
-    expect(records).toHaveLength(3);
-    expect(records.map((record: { language: string }) => record.language)).toEqual(["ja", "en", "zh-hant"]);
+    expect(records).toHaveLength(4);
+    expect(records.map((record: { language: string }) => record.language)).toEqual(["ja", "en", "zh-hant", "ko"]);
     expect(records[0]).toMatchObject({
       url: "/__search-index/release/ja/GitHub%3Amackysoft%2Fexample/",
       meta: {
@@ -220,7 +259,7 @@ describe("search-index records", () => {
       statusText: "Not Found",
     }));
 
-    expect(records).toHaveLength(3);
+    expect(records).toHaveLength(4);
     expect(records[0]?.content).toContain("Release description");
   });
 });
