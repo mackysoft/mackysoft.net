@@ -3,7 +3,6 @@ import { expect, test } from "@playwright/test";
 const gaMeasurementId = "G-TEST123456";
 type AnalyticsWindow = Window & typeof globalThis & {
   gtag?: unknown;
-  dataLayer?: unknown[];
 };
 
 test.describe("privacy policy page", () => {
@@ -29,7 +28,8 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("テーマ切替");
     await expect(main).toContainText("言語切替");
     await expect(main).toContainText("サイト内検索で送信された検索語");
-    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
+    await expect(main).toContainText("ページ閲覧・操作計測のパラメータ");
+    await expect(main.locator("code", { hasText: "__pending_analytics_events__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "外部サービス" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
@@ -48,13 +48,22 @@ test.describe("privacy policy page", () => {
     await expect(main.getByRole("heading", { level: 2, name: "改定日" })).toBeVisible();
     await expect(main).toContainText("制定日: 2026年4月12日");
     await expect(main).toContainText("最終更新日: 2026年4月19日");
-    await expect(page.locator(`script[src*="googletagmanager.com/gtag/js?id=${gaMeasurementId}"]`)).toHaveCount(1);
     expect(await page.evaluate(() => typeof (window as AnalyticsWindow).gtag)).toBe("function");
     expect(
-      await page.evaluate(() => {
-        const analyticsWindow = window as AnalyticsWindow;
-        return Array.isArray(analyticsWindow.dataLayer) && analyticsWindow.dataLayer.length >= 2;
-      }),
+      await page.evaluate((measurementId) => {
+        const configElement = document.getElementById("site-analytics-config");
+
+        if (!(configElement instanceof HTMLScriptElement)) {
+          return false;
+        }
+
+        try {
+          const config = JSON.parse(configElement.textContent ?? "") as { measurementId?: unknown };
+          return config.measurementId === measurementId;
+        } catch {
+          return false;
+        }
+      }, gaMeasurementId),
     ).toBe(true);
   });
 
@@ -79,7 +88,8 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("theme switches");
     await expect(main).toContainText("language switches");
     await expect(main).toContainText("search terms submitted through on-site search");
-    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
+    await expect(main).toContainText("Page-view and interaction analytics parameters");
+    await expect(main.locator("code", { hasText: "__pending_analytics_events__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "External Services" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
