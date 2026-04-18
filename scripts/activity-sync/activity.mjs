@@ -1,7 +1,8 @@
 import { writeFile } from "node:fs/promises";
 
+import { syncReleaseCoverAssets } from "./covers.mjs";
 import { fetchGitHubReleaseActivities } from "./github.mjs";
-import { activityPath } from "./shared.mjs";
+import { activityCoverPublicDir, activityPath } from "./shared.mjs";
 import { enrichZennArticlesWithEnglishLocale, fetchZennFeed, parseZennFeed } from "./zenn.mjs";
 
 /**
@@ -70,13 +71,17 @@ export function serializeActivity(activity) {
 }
 
 /**
- * @param {{ fetchImpl?: typeof fetch; outputPath?: string }} [options]
+ * @param {{ fetchImpl?: typeof fetch; outputPath?: string; coverOutputDir?: string }} [options]
  * @returns {Promise<ActivityData>}
  */
-export async function syncActivity({ fetchImpl = fetch, outputPath = activityPath } = {}) {
+export async function syncActivity({ fetchImpl = fetch, outputPath = activityPath, coverOutputDir = activityCoverPublicDir } = {}) {
   const xml = await fetchZennFeed(fetchImpl);
   const articles = await enrichZennArticlesWithEnglishLocale(parseZennFeed(xml), fetchImpl);
-  const releases = await fetchGitHubReleaseActivities(fetchImpl);
+  const releases = await syncReleaseCoverAssets(await fetchGitHubReleaseActivities(fetchImpl), {
+    fetchImpl,
+    activityPath: outputPath,
+    coverOutputDir,
+  });
   const activity = createActivityData(articles, releases);
   await writeFile(outputPath, serializeActivity(activity), "utf8");
   return activity;
