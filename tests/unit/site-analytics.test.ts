@@ -130,6 +130,86 @@ describe("site analytics queue", () => {
     ]);
   });
 
+  test("waits for the latest matching search page config on repeated visits", () => {
+    const { windowMock } = installWindow("https://mackysoft.net/about/");
+    const measurementId = "G-TEST123456";
+    const sharedConfigParams = {
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+      send_page_view: true,
+    } as const;
+
+    initAnalyticsWindow();
+    queueAnalyticsConfig(measurementId, {
+      ...sharedConfigParams,
+      page_location: "https://mackysoft.net/search/",
+    });
+    queueAnalyticsConfig(measurementId, {
+      ...sharedConfigParams,
+      page_location: "https://mackysoft.net/about/",
+    });
+    sendAnalyticsEvent("site_search", {
+      search_term: "BoundingSphereUpdateMode",
+      ui_location: "site-header-search",
+    }, {
+      persistWhenUnavailable: true,
+      replayCondition: {
+        kind: "search-page",
+        pathname: "/search/",
+        searchParam: "q",
+        value: "BoundingSphereUpdateMode",
+      },
+    });
+
+    Object.assign(windowMock, {
+      location: new URL("https://mackysoft.net/search/?q=BoundingSphereUpdateMode"),
+    });
+    queueAnalyticsConfig(measurementId, {
+      ...sharedConfigParams,
+      page_location: "https://mackysoft.net/search/",
+    });
+
+    windowMock.gtag = (...args: unknown[]) => {
+      windowMock.dataLayer.push(args);
+    };
+    markAnalyticsReady();
+
+    expect(windowMock.dataLayer).toEqual([
+      [
+        "config",
+        measurementId,
+        {
+          ...sharedConfigParams,
+          page_location: "https://mackysoft.net/search/",
+        },
+      ],
+      [
+        "config",
+        measurementId,
+        {
+          ...sharedConfigParams,
+          page_location: "https://mackysoft.net/about/",
+        },
+      ],
+      [
+        "config",
+        measurementId,
+        {
+          ...sharedConfigParams,
+          page_location: "https://mackysoft.net/search/",
+        },
+      ],
+      [
+        "event",
+        "site_search",
+        {
+          search_term: "BoundingSphereUpdateMode",
+          ui_location: "site-header-search",
+        },
+      ],
+    ]);
+  });
+
   test("replays site search only on the matching search page", () => {
     const pendingStorageKey = "__pending_analytics_events__";
     const { storedValues, windowMock } = installWindow("https://mackysoft.net/about/");

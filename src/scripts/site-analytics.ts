@@ -178,6 +178,16 @@ function isCurrentPageConfigCall(call: PendingAnalyticsCall, location: URL) {
   }
 }
 
+function findCurrentPageConfigIndex(calls: PendingAnalyticsCall[], location: URL) {
+  for (let index = calls.length - 1; index >= 0; index -= 1) {
+    if (isCurrentPageConfigCall(calls[index], location)) {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
 function flushPendingAnalyticsEventCalls(analyticsWindow: AnalyticsWindow, calls: PendingAnalyticsEventCall[]) {
   if (typeof analyticsWindow.gtag !== "function") {
     return;
@@ -218,9 +228,10 @@ export function flushPendingAnalyticsCalls() {
   const currentLocation = new URL(window.location.href);
   const remainingCalls: PendingAnalyticsCall[] = [];
   const delayedReplayCalls: PendingAnalyticsEventCall[] = [];
+  const currentPageConfigIndex = findCurrentPageConfigIndex(pendingCalls, currentLocation);
   let didFlushCurrentPageConfig = false;
 
-  for (const call of pendingCalls) {
+  for (const [index, call] of pendingCalls.entries()) {
     const disposition = getPendingAnalyticsCallDisposition(call, currentLocation);
 
     if (disposition === "retain") {
@@ -244,7 +255,7 @@ export function flushPendingAnalyticsCalls() {
 
     analyticsWindow.gtag(call.command, call.target, call.params);
 
-    if (isCurrentPageConfigCall(call, currentLocation)) {
+    if (index === currentPageConfigIndex) {
       didFlushCurrentPageConfig = true;
 
       if (delayedReplayCalls.length > 0) {
