@@ -603,6 +603,36 @@ describe("sync-activity", () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
+  test("fails sync when a release cover download fails without a previous cached cover", async () => {
+    const successfulFetch = await createSuccessfulFetchMock();
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
+    const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
+    const fetchImpl = async (input, init) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+
+      if (url === "https://opengraph.githubassets.com/mock/alpha") {
+        return createJsonResponse(
+          { message: "Service Unavailable" },
+          {
+            status: 503,
+            statusText: "Service Unavailable",
+          },
+        );
+      }
+
+      return successfulFetch(input, init);
+    };
+
+    await expect(syncActivity({
+      fetchImpl,
+      outputPath,
+      coverOutputDir,
+    })).rejects.toThrow("Failed to localize release cover for mackysoft/Alpha");
+
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
   test("adds English article metadata when translation is available and keeps Japanese-only articles as fallback", async () => {
     const fetchImpl = await createSuccessfulFetchMock();
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));

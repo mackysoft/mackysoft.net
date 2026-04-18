@@ -196,7 +196,7 @@ export async function syncReleaseCoverAssets(
     try {
       asset = await fetchReleaseCoverAsset(release.coverUrl, fetchImpl);
     }
-    catch {
+    catch (error) {
       const previousCover = await reusePreviousReleaseCover(previousCoverUrls.get(release.repo), coverOutputDir);
 
       if (previousCover) {
@@ -207,8 +207,9 @@ export async function syncReleaseCoverAssets(
         });
         continue;
       }
-      localizedReleases.push(release);
-      continue;
+      throw new Error(`Failed to localize release cover for ${release.repo}: ${release.coverUrl}`, {
+        cause: error,
+      });
     }
 
     const localizedCover = await writeReleaseCoverAsset(release.repo, asset.content, asset.extension, coverOutputDir);
