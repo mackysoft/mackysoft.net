@@ -66,7 +66,7 @@ test.describe("site header", () => {
     await expect(themeTool).toBeEnabled();
     await expect(themeTool).toHaveAttribute("aria-label", "テーマを切り替え");
     await expect(themeTool).toHaveAttribute("aria-pressed", "false");
-    await expect(languageTool).toContainText("JP");
+    await expect(languageTool).toContainText("JA");
     await expect(languageToggle).toHaveAttribute("aria-label", "表示言語を切り替え");
 
     await languageToggle.click();
@@ -84,13 +84,45 @@ test.describe("site header", () => {
     const brandBox = await brand.boundingBox();
     const toolsBox = await tools.boundingBox();
     const navBox = await nav.boundingBox();
+    const languageBox = await languageTool.boundingBox();
+    const themeBox = await themeTool.boundingBox();
+    const searchBox = await searchTool.boundingBox();
 
-    if (!brandBox || !toolsBox || !navBox) {
+    if (!brandBox || !toolsBox || !navBox || !languageBox || !themeBox || !searchBox) {
       throw new Error("header elements must be visible before layout assertions");
     }
 
     expect(navBox.x).toBeGreaterThan(brandBox.x + brandBox.width - 1);
     expect(toolsBox.x).toBeGreaterThanOrEqual(navBox.x + navBox.width - 1);
+    expect(languageBox.x).toBeGreaterThanOrEqual(themeBox.x + themeBox.width - 1);
+    expect(searchBox.x).toBeGreaterThanOrEqual(languageBox.x + languageBox.width - 1);
+    expect(Math.abs(languageBox.y - themeBox.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(searchBox.y - themeBox.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(languageBox.height - themeBox.height)).toBeLessThanOrEqual(1);
+    expect(Math.abs(searchBox.height - themeBox.height)).toBeLessThanOrEqual(1);
+  });
+
+  test("keeps the language button width stable across locales", { tag: "@size:medium" }, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    const widths: number[] = [];
+
+    for (const path of ["/", "/en/", "/zh-hant/"]) {
+      await page.goto(path);
+      const box = await page.locator("[data-site-language-toggle]").boundingBox();
+
+      if (!box) {
+        throw new Error("language toggle must be visible before width assertions");
+      }
+
+      widths.push(box.width);
+    }
+
+    const referenceWidth = widths[0]!;
+
+    for (const width of widths.slice(1)) {
+      expect(Math.abs(width - referenceWidth)).toBeLessThanOrEqual(1);
+    }
   });
 
   test("hides the primary nav behind the mobile menu on narrow screens", { tag: "@size:medium" }, async ({ browser }) => {
@@ -108,14 +140,15 @@ test.describe("site header", () => {
     const nav = header.locator(".site-header__nav");
     const mobileMenu = header.locator("[data-site-mobile-nav]");
     const menuToggle = header.locator('[data-site-tool="menu"]');
+    const searchTool = tools.locator('[data-site-tool="search"]');
 
     await expect(brand).toBeVisible();
     await expect(tools).toBeVisible();
     await expect(nav).toBeHidden();
     await expect(menuToggle).toBeVisible();
-    await expect(tools.locator('[data-site-tool="search"]')).toHaveAttribute("href", "/search/");
+    await expect(searchTool).toHaveAttribute("href", "/search/");
     await expect(tools.locator('[data-site-tool="theme"]')).toBeEnabled();
-    await expect(tools.locator('[data-site-tool="language"]')).toContainText("JP");
+    await expect(tools.locator('[data-site-tool="language"]')).toContainText("JA");
 
     await menuToggle.click();
 
@@ -128,12 +161,31 @@ test.describe("site header", () => {
 
     const aboutLinkBox = await mobileMenu.getByRole("link", { name: "プロフィール", exact: true }).boundingBox();
     const gamesLinkBox = await mobileMenu.getByRole("link", { name: "ゲーム", exact: true }).boundingBox();
+    const languageBox = await tools.locator('[data-site-tool="language"]').boundingBox();
+    const themeBox = await tools.locator('[data-site-tool="theme"]').boundingBox();
 
-    if (!aboutLinkBox || !gamesLinkBox) {
-      throw new Error("mobile navigation links must be visible before vertical layout assertions");
+    if (!aboutLinkBox || !gamesLinkBox || !languageBox || !themeBox) {
+      throw new Error("mobile navigation links and tools must be visible before layout assertions");
     }
 
     expect(gamesLinkBox.y).toBeGreaterThanOrEqual(aboutLinkBox.y + aboutLinkBox.height - 1);
+
+    const searchBox = await searchTool.boundingBox();
+    const menuBox = await menuToggle.boundingBox();
+
+    if (!searchBox || !menuBox) {
+      throw new Error("search and menu tools must be visible before alignment assertions");
+    }
+
+    expect(Math.abs(searchBox.y - menuBox.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(searchBox.height - menuBox.height)).toBeLessThanOrEqual(1);
+
+    const themeLanguageGap = languageBox.x - (themeBox.x + themeBox.width);
+    const languageSearchGap = searchBox.x - (languageBox.x + languageBox.width);
+    const searchMenuGap = menuBox.x - (searchBox.x + searchBox.width);
+
+    expect(Math.abs(themeLanguageGap - languageSearchGap)).toBeLessThanOrEqual(1);
+    expect(Math.abs(languageSearchGap - searchMenuGap)).toBeLessThanOrEqual(1);
 
     await page.keyboard.press("Escape");
     await expect(mobileMenu).not.toHaveAttribute("open", "");
@@ -148,6 +200,136 @@ test.describe("site header", () => {
 
     await page.mouse.click(panelBox.x + 12, panelBox.y + panelBox.height + 24);
     await expect(mobileMenu).not.toHaveAttribute("open", "");
+
+    await context.close();
+  });
+
+  test("shows the primary nav again on tablet widths", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 800, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const header = page.locator(".site-header");
+    const nav = header.locator(".site-header__nav");
+    const menuToggle = header.locator('[data-site-tool="menu"]');
+
+    await expect(nav).toBeVisible();
+    await expect(menuToggle).toBeHidden();
+    await expect(nav.getByRole("link", { name: "プロフィール", exact: true })).toHaveAttribute("href", "/about/");
+
+    await context.close();
+  });
+
+  test("keeps the mobile menu below the desktop nav breakpoint", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 799, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const header = page.locator(".site-header");
+    const nav = header.locator(".site-header__nav");
+    const menuToggle = header.locator('[data-site-tool="menu"]');
+
+    await expect(nav).toBeHidden();
+    await expect(menuToggle).toBeVisible();
+
+    await context.close();
+  });
+
+  test("keeps the header nav on a single row when it is visible", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 800, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const linkBoxes = await page.locator(".site-header__nav .site-nav a").evaluateAll((elements) =>
+      elements.map((element) => {
+        const { y, height } = element.getBoundingClientRect();
+        return { y, height };
+      })
+    );
+
+    if (linkBoxes.length === 0) {
+      throw new Error("header nav links must be visible before row assertions");
+    }
+
+    const firstRowTop = linkBoxes[0]!.y;
+
+    for (const { y, height } of linkBoxes) {
+      expect(Math.abs(y - firstRowTop)).toBeLessThanOrEqual(1);
+      expect(height).toBeGreaterThan(0);
+    }
+
+    await context.close();
+  });
+
+  test("keeps the brand visible when the compact tools still fit", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 320, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "zh-hant");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/zh-hant/search/");
+
+    const brand = page.locator(".site-brand");
+    const tools = page.locator("[data-site-header-tools]");
+    const menuToggle = page.locator('[data-site-tool="menu"]');
+
+    await expect(brand).toBeVisible();
+    await expect(tools).toBeVisible();
+    await expect(menuToggle).toBeVisible();
+
+    const brandBox = await brand.boundingBox();
+    const toolsBox = await tools.boundingBox();
+    const menuBox = await menuToggle.boundingBox();
+
+    if (!brandBox || !toolsBox || !menuBox) {
+      throw new Error("brand, header tools, and menu must be visible before layout assertions");
+    }
+
+    expect(toolsBox.x).toBeGreaterThanOrEqual(brandBox.x + brandBox.width - 1);
+    expect(menuBox.x).toBeGreaterThanOrEqual(toolsBox.x + toolsBox.width - 1);
+
+    await context.close();
+  });
+
+  test("hides the brand on extremely narrow screens to keep header tools visible", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 300, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "zh-hant");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/zh-hant/search/");
+
+    const brand = page.locator(".site-brand");
+    const tools = page.locator("[data-site-header-tools]");
+    const menuToggle = page.locator('[data-site-tool="menu"]');
+
+    await expect(brand).toBeHidden();
+    await expect(tools).toBeVisible();
+    await expect(menuToggle).toBeVisible();
+
+    const toolsBox = await tools.boundingBox();
+    const menuBox = await menuToggle.boundingBox();
+
+    if (!toolsBox || !menuBox) {
+      throw new Error("header tools and menu must be visible before layout assertions");
+    }
+
+    expect(toolsBox.x).toBeGreaterThanOrEqual(0);
+    expect(menuBox.x).toBeGreaterThanOrEqual(toolsBox.x + toolsBox.width - 1);
 
     await context.close();
   });

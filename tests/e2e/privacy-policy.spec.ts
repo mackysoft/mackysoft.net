@@ -113,12 +113,17 @@ test.describe("privacy policy page", () => {
     await expect(main.getByRole("link", { name: "聯絡方式" })).toHaveAttribute("href", "/zh-hant/contact/");
     await expect(main.getByRole("heading", { level: 2, name: "流量分析" })).toBeVisible();
     await expect(main).toContainText("Google Analytics 4");
+    await expect(main).toContainText("Google signals");
     await expect(main).toContainText("主題切換");
     await expect(main).toContainText("語言切換");
+    await expect(main).toContainText("站內搜尋的送出");
+    await expect(main).toContainText("在站內搜尋中送出的搜尋詞");
+    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "外部服務" })).toBeVisible();
+    await expect(main).toContainText("公開儲存庫資訊與 Release 資訊");
     await expect(main.getByRole("heading", { level: 2, name: "由海外業者進行的處理" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "使用者可採取的控制方式" })).toBeVisible();
     await expect(main).toContainText("制定日: 2026年4月12日");
-    await expect(main).toContainText("最後更新日: 2026年4月14日");
+    await expect(main).toContainText("最後更新日: 2026年4月19日");
   });
 });
