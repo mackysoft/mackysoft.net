@@ -20,6 +20,7 @@ const llmsStructuredEndpoints = [
 export function renderRobotsTxt(site: URL) {
   return [
     "User-agent: *",
+    "Content-Signal: ai-train=yes, search=yes, ai-input=yes",
     "Allow: /",
     "",
     `Sitemap: ${toAbsoluteSiteUrl(site, "/sitemap.xml")}`,
