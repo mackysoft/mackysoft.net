@@ -19,7 +19,7 @@ This site, or the external services used by this site, may process the following
 - Browser language preferences such as `navigator.languages`, used to decide the initial display language
 - `mackysoft-theme` and `mackysoft-locale` stored in `localStorage` to preserve theme and language preferences
 - `mackysoft-locale-scroll` stored in `sessionStorage` to restore scroll position after a language switch
-- Search terms and analytics parameters temporarily stored in `sessionStorage` under `__pending_site_search__` so site-search measurement can complete after navigation
+- Page-view and interaction analytics parameters temporarily stored in `sessionStorage` under `__pending_analytics_events__` so delayed analytics measurement can complete after navigation or after the analytics script becomes available
 
 If you contact the operator by email or through GitHub, the site may receive your name, email address, account name, subject, message body, and any other information you choose to send.
 
