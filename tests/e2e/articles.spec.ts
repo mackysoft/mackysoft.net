@@ -30,7 +30,9 @@ const activityData = JSON.parse(
 const latestZennArticle = activityData.articles[0]!;
 const latestZennArticleJa = latestZennArticle.locales.ja;
 const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.locales.ja;
+const visionTitleJa = "【Unity】CullingGroupをより簡単に実装する【Vision】";
 const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
+const translatedVisionTitleZhHant = "【Unity】更輕鬆地實作 CullingGroup【Vision】";
 
 test.describe("articles page", () => {
   test("shows local and Zenn articles in the same card format", { tag: "@size:medium" }, async ({ page }) => {
@@ -51,6 +53,23 @@ test.describe("articles page", () => {
       "href",
       latestZennArticleJa.url,
     );
+
+    const localCard = page.locator(".article-card").filter({ hasText: visionTitleJa }).first();
+    const localTags = localCard.locator(".article-card__tags");
+
+    await expect(localTags.getByRole("link", { name: "アセット", exact: true })).toHaveAttribute("href", "/tags/asset/");
+    await expect(localTags.getByRole("link", { name: "チュートリアル", exact: true })).toHaveAttribute("href", "/tags/tutorial/");
+
+    const cardBox = await localCard.boundingBox();
+    const metaBox = await localCard.locator(".article-card__meta").boundingBox();
+    const tagsBox = await localTags.boundingBox();
+
+    if (!cardBox || !metaBox || !tagsBox) {
+      throw new Error("article card, meta, and tags must be visible before order assertions");
+    }
+
+    expect(tagsBox.y).toBeGreaterThan(metaBox.y);
+    expect(tagsBox.y + tagsBox.height).toBeLessThanOrEqual(cardBox.y + cardBox.height + 1);
   });
 
   test("shows translated external metadata and localized local articles on the English index page", { tag: "@size:medium" }, async ({ page }) => {
@@ -73,6 +92,10 @@ test.describe("articles page", () => {
     await expect(localizedLocalCard.getByRole("link", { name: translatedVisionTitle, exact: true })).toHaveAttribute(
       "href",
       "/en/articles/vision-introduction/",
+    );
+    await expect(localizedLocalCard.locator(".article-card__tags").getByRole("link", { name: "Asset", exact: true })).toHaveAttribute(
+      "href",
+      "/en/tags/asset/",
     );
   });
 
@@ -383,12 +406,17 @@ test.describe("articles page", () => {
     await page.goto("/zh-hant/articles/");
 
     const translatedZennCard = page.locator(".article-card").filter({ hasText: latestZennArticleEn.title }).first();
+    const localizedLocalCard = page.locator(".article-card").filter({ hasText: translatedVisionTitleZhHant }).first();
 
     await expect(page.getByRole("heading", { level: 1, name: "文章" })).toBeVisible();
     await expect(translatedZennCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "zh-hant"));
     await expect(translatedZennCard.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toHaveAttribute(
       "href",
       latestZennArticleEn.url,
+    );
+    await expect(localizedLocalCard.locator(".article-card__tags").getByRole("link", { name: "資產", exact: true })).toHaveAttribute(
+      "href",
+      "/zh-hant/tags/asset/",
     );
   });
 });

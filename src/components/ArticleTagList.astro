@@ -1,0 +1,29 @@
+---
+import { getArticleTagLabel } from "../lib/article-tags";
+import { localizePath, type SiteLocale } from "../lib/i18n";
+import { getUiText } from "../lib/ui-text";
+
+type Props = {
+  tags: string[];
+  locale?: SiteLocale;
+  class?: string;
+};
+
+const { tags, locale = "ja", class: className } = Astro.props as Props;
+const uiText = getUiText(locale);
+---
+
+<ul class:list={["article-tag-list", "pill-list", className]} aria-label={uiText.article.tagsAriaLabel}>
+  {tags.map((tag) => (
+    <li>
+      <a class="pill pill--interactive" href={localizePath(`/tags/${tag}/`, locale)}>{getArticleTagLabel(tag, locale)}</a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .article-tag-list a {
+    position: relative;
+    z-index: 2;
+  }
+</style>
