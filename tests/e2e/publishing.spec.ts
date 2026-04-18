@@ -66,8 +66,13 @@ test.describe("publishing endpoints", () => {
     expect(body).toContain("https://mackysoft.net/");
     expect(body).toContain("https://mackysoft.net/en/");
     expect(body).toContain("https://mackysoft.net/en/articles/vision-introduction/");
-    expect(body).toContain("https://mackysoft.net/en/privacy-policy/");
     expect(body).toContain("https://mackysoft.net/games/treasure-rogue/");
+    expect(body).not.toContain("https://mackysoft.net/contact/");
+    expect(body).not.toContain("https://mackysoft.net/en/contact/");
+    expect(body).not.toContain("https://mackysoft.net/search/");
+    expect(body).not.toContain("https://mackysoft.net/en/search/");
+    expect(body).not.toContain("https://mackysoft.net/privacy-policy/");
+    expect(body).not.toContain("https://mackysoft.net/en/privacy-policy/");
     expect(body).not.toContain("https://mackysoft.net/en/articles/debug-context/");
   });
 

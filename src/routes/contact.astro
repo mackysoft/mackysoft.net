@@ -40,6 +40,7 @@ const contactChannels = contactPageContent.channels.map((channel) => {
   description={contactPageContent.description}
   locale={locale}
   canonicalPath={localizePath("/contact/", locale)}
+  robotsContent="noindex, follow"
   alternateLocales={createAlternateLocaleLinks("/contact/")}
 >
   <PageHeader title={contactPageContent.hero.title} eyebrow={contactPageContent.hero.eyebrow} />

@@ -11,6 +11,7 @@ interface ImportMeta {
 
 declare global {
   interface Window {
+    __mackysoftAnalyticsScriptLoaded?: boolean;
     __mackysoftSkipInitialPageView?: boolean;
     dataLayer: unknown[];
     gtag?: (...args: unknown[]) => void;

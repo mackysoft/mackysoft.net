@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { buildAnalyticsEventPayload, getAnalyticsMeasurementId, isAnalyticsEnabled } from "../../src/lib/analytics";
+import {
+  buildAnalyticsEventPayload,
+  buildSiteSearchAnalyticsEventPayload,
+  getAnalyticsMeasurementId,
+  isAnalyticsEnabled,
+} from "../../src/lib/analytics";
 
 describe("analytics helpers", () => {
   test("disables analytics when the measurement ID is missing", () => {
@@ -49,23 +54,7 @@ describe("analytics helpers", () => {
     });
   });
 
-  test("builds project and external link payloads from stable metadata", () => {
-    expect(
-      buildAnalyticsEventPayload({
-        eventName: "project_cta_click",
-        explicitLabel: "play",
-        location: "game-action-panel",
-        href: "https://unityroom.com/games/treasure-rogue",
-      }),
-    ).toEqual({
-      eventName: "project_cta_click",
-      params: {
-        target_label: "play",
-        ui_location: "game-action-panel",
-        target_href: "https://unityroom.com/games/treasure-rogue",
-      },
-    });
-
+  test("builds external link payloads from stable metadata", () => {
     expect(
       buildAnalyticsEventPayload({
         eventName: "external_link_click",
@@ -100,10 +89,32 @@ describe("analytics helpers", () => {
     });
   });
 
-  test("does not build payloads for unimplemented reserved events", () => {
+  test("builds the site search payload from the submitted query and location", () => {
+    expect(
+      buildSiteSearchAnalyticsEventPayload({
+        searchTerm: "BoundingSphereUpdateMode",
+        location: "search-page",
+      }),
+    ).toEqual({
+      eventName: "site_search",
+      params: {
+        search_term: "BoundingSphereUpdateMode",
+        ui_location: "search-page",
+      },
+    });
+  });
+
+  test("keeps the click payload builder scoped to click events", () => {
     expect(
       buildAnalyticsEventPayload({
-        eventName: "view_search_results",
+        eventName: "project_cta_click",
+        explicitLabel: "search",
+      }),
+    ).toBeNull();
+
+    expect(
+      buildAnalyticsEventPayload({
+        eventName: "site_search",
         explicitLabel: "search",
       }),
     ).toBeNull();

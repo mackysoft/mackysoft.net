@@ -32,6 +32,7 @@ const { Content } = await render(page.entry as never);
   contentLocale={page.contentLocale}
   isFallback={page.isFallback}
   canonicalPath={localizePath("/privacy-policy/", locale)}
+  robotsContent="noindex, follow"
   alternateLocales={createAlternateLocaleLinks("/privacy-policy/", page.availableLocales)}
 >
   <PageHeader title={page.data.title} eyebrow={formatBreadcrumb(uiText.breadcrumb.home, uiText.breadcrumb.privacyPolicy)} />

@@ -27,8 +27,18 @@ const avatar = getProfileAvatar(locale);
     <p class="home-hero__summary">{profile.home.summary}</p>
   </div>
   <div class="button-row home-hero__actions">
-    <a href={localizePath("/about/", locale)} class="button-link home-hero__cta">{primaryCtaLabel}</a>
-    <a href={localizePath("/contact/", locale)} class="button-link home-hero__cta home-hero__cta--secondary">{contactCtaLabel}</a>
+    <a
+      href={localizePath("/about/", locale)}
+      class="button-link home-hero__cta"
+    >
+      {primaryCtaLabel}
+    </a>
+    <a
+      href={localizePath("/contact/", locale)}
+      class="button-link home-hero__cta home-hero__cta--secondary"
+    >
+      {contactCtaLabel}
+    </a>
   </div>
 </section>
 

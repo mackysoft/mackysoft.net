@@ -107,7 +107,12 @@ const profilePrimaryExternalLink = getExternalLink(aboutPageContent.profile.prim
             <p>{paragraph}</p>
           ))}
         </div>
-        <a href={localizePath(aboutPageContent.contact.href, locale)} class="button-link">{aboutPageContent.contact.ctaLabel}</a>
+        <a
+          href={localizePath(aboutPageContent.contact.href, locale)}
+          class="button-link"
+        >
+          {aboutPageContent.contact.ctaLabel}
+        </a>
       </section>
     </section>
   </div>

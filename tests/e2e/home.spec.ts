@@ -60,7 +60,6 @@ async function fulfillLatestReleaseCover(page: Page, coverUrl: string) {
     });
   });
 }
-
 async function setJapaneseLocale(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem("mackysoft-locale", "ja");

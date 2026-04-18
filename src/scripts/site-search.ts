@@ -23,6 +23,7 @@ import {
   openDropdownPanel,
   prepareDropdownPanel,
 } from "./site-dropdown";
+import { replayPendingSiteSearch, trackSiteSearchSubmit } from "./site-search-analytics";
 
 type PagefindResult = {
   id: string;
@@ -192,6 +193,18 @@ function createMetaItem(text: string) {
   const item = document.createElement("span");
   item.textContent = text;
   return item;
+}
+
+function navigateToSearchPage(elements: SearchPanelElements, query: string) {
+  const nextUrl = new URL(elements.searchPath, window.location.href);
+
+  if (query) {
+    nextUrl.searchParams.set("q", query);
+  } else {
+    nextUrl.searchParams.delete("q");
+  }
+
+  window.location.assign(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
 }
 
 function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
@@ -413,6 +426,10 @@ function initSearchPanel(root: HTMLElement) {
     elements.input.value = initialQueryFromUrl;
   }
 
+  if (elements.mode === "page") {
+    replayPendingSiteSearch(initialQueryFromUrl);
+  }
+
   const searchPagefind = async (pagefind: PagefindModule, queryVariants: ReturnType<typeof createSearchQueryVariants>, immediate: boolean) => {
     if (queryVariants.length === 0) {
       return [];
@@ -515,13 +532,20 @@ function initSearchPanel(root: HTMLElement) {
   });
 
   elements.form.addEventListener("submit", (event) => {
+    const query = elements.input.value.trim();
+    elements.input.value = query;
+
     if (elements.mode === "inline") {
-      elements.input.value = elements.input.value.trim();
+      event.preventDefault();
+      trackSiteSearchSubmit(elements.mode, query, () => {
+        navigateToSearchPage(elements, query);
+      });
       return;
     }
 
+    trackSiteSearchSubmit(elements.mode, query);
     event.preventDefault();
-    void runSearch(elements.input.value, true);
+    void runSearch(query, true);
   });
 
   const initialQuery = elements.input.value.trim();

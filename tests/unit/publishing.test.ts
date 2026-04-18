@@ -112,10 +112,15 @@ describe("publishing helpers", () => {
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/articles/vision-introduction/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/games/treasure-rogue/"));
-    expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/privacy-policy/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/tags/unity/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/archive/2021/03/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/articles/debug-context/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/contact/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/contact/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/search/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/search/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/privacy-policy/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/privacy-policy/"));
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/articles/debug-context/"));
   });
 
