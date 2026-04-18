@@ -1,8 +1,8 @@
 import { writeFile } from "node:fs/promises";
 
-import { syncReleaseCoverAssets } from "./covers.mjs";
+import { syncReleaseCoverAssets, syncReleaseCoverSourceAssets } from "./covers.mjs";
 import { fetchGitHubReleaseActivities } from "./github.mjs";
-import { activityCoverPublicDir, activityPath } from "./shared.mjs";
+import { activityCoverPublicDir, activityCoverSourceDir, activityPath } from "./shared.mjs";
 import { enrichZennArticlesWithEnglishLocale, fetchZennFeed, parseZennFeed } from "./zenn.mjs";
 
 /**
@@ -74,7 +74,12 @@ export function serializeActivity(activity) {
  * @param {{ fetchImpl?: typeof fetch; outputPath?: string; coverOutputDir?: string }} [options]
  * @returns {Promise<ActivityData>}
  */
-export async function syncActivity({ fetchImpl = fetch, outputPath = activityPath, coverOutputDir = activityCoverPublicDir } = {}) {
+export async function syncActivity({
+  fetchImpl = fetch,
+  outputPath = activityPath,
+  coverOutputDir = activityCoverPublicDir,
+  coverSourceDir = activityCoverSourceDir,
+} = {}) {
   const xml = await fetchZennFeed(fetchImpl);
   const articles = await enrichZennArticlesWithEnglishLocale(parseZennFeed(xml), fetchImpl);
   const releases = await syncReleaseCoverAssets(await fetchGitHubReleaseActivities(fetchImpl), {
@@ -84,5 +89,9 @@ export async function syncActivity({ fetchImpl = fetch, outputPath = activityPat
   });
   const activity = createActivityData(articles, releases);
   await writeFile(outputPath, serializeActivity(activity), "utf8");
+  await syncReleaseCoverSourceAssets(releases, {
+    sourceCoverDir: coverOutputDir,
+    outputDir: coverSourceDir,
+  });
   return activity;
 }

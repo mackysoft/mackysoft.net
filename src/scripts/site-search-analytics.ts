@@ -1,16 +1,19 @@
 import { buildSiteSearchAnalyticsEventPayload } from "../lib/analytics";
+import { sendAnalyticsEvent } from "./site-analytics";
 
 export type SiteSearchMode = "page" | "inline";
 
-type AnalyticsWindow = Window & typeof globalThis & {
-  gtag?: (...args: unknown[]) => void;
-  __mackysoftAnalyticsScriptLoaded?: boolean;
+const inlineSearchTrackingParam = "search-token";
+const inlineSearchTrackingStorageKey = "mackysoft-inline-search-tracking";
+const inlineSearchTrackingValue = "site-header-search";
+
+type InlineSearchTrackingState = {
+  query: string;
+  source: string;
+  pathname: string;
+  token: string;
 };
 
-type SiteSearchAnalyticsPayload = NonNullable<ReturnType<typeof buildSiteSearchAnalyticsEventPayload>>;
-
-const pendingSiteSearchStorageKey = "__pending_site_search__";
-export const analyticsReadyEventName = "mackysoft:analytics-ready";
 const searchAnalyticsLocationMap = {
   page: "search-page",
   inline: "site-header-search",
@@ -20,135 +23,154 @@ function getSearchAnalyticsLocation(mode: SiteSearchMode) {
   return searchAnalyticsLocationMap[mode];
 }
 
-function persistPendingSiteSearch(payload: SiteSearchAnalyticsPayload) {
-  try {
-    window.sessionStorage.setItem(pendingSiteSearchStorageKey, JSON.stringify(payload));
-  } catch {
-    // Ignore storage failures and continue navigation without replay support.
+function isInlineSearchTrackingState(value: unknown): value is InlineSearchTrackingState {
+  if (typeof value !== "object" || value === null) {
+    return false;
   }
+
+  const candidate = value as {
+    query?: unknown;
+    source?: unknown;
+    pathname?: unknown;
+    token?: unknown;
+  };
+
+  return (
+    typeof candidate.query === "string"
+    && typeof candidate.source === "string"
+    && typeof candidate.pathname === "string"
+    && typeof candidate.token === "string"
+  );
 }
 
-function clearPendingSiteSearch() {
-  try {
-    window.sessionStorage.removeItem(pendingSiteSearchStorageKey);
-  } catch {
-    // Ignore storage failures and leave analytics replay best-effort.
+function createInlineSearchTrackingToken() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
   }
+
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function readPendingSiteSearch() {
+function readInlineSearchTrackingState() {
   try {
-    const rawValue = window.sessionStorage.getItem(pendingSiteSearchStorageKey);
+    const rawValue = window.sessionStorage.getItem(inlineSearchTrackingStorageKey);
 
     if (!rawValue) {
       return null;
     }
 
     const parsedValue = JSON.parse(rawValue);
-
-    if (
-      !parsedValue
-      || typeof parsedValue !== "object"
-      || parsedValue.eventName !== "site_search"
-      || !("params" in parsedValue)
-      || !parsedValue.params
-      || typeof parsedValue.params !== "object"
-    ) {
-      clearPendingSiteSearch();
-      return null;
-    }
-
-    return parsedValue as SiteSearchAnalyticsPayload;
+    return isInlineSearchTrackingState(parsedValue) ? parsedValue : null;
   } catch {
-    clearPendingSiteSearch();
     return null;
   }
 }
 
-function sendSiteSearchPayload(payload: SiteSearchAnalyticsPayload) {
-  const analyticsWindow = window as AnalyticsWindow;
-
-  if (typeof analyticsWindow.gtag !== "function") {
-    return false;
-  }
-
-  analyticsWindow.gtag("event", payload.eventName, payload.params);
-  return true;
-}
-
-export function replayPendingSiteSearch(expectedQuery: string) {
-  const pendingPayload = readPendingSiteSearch();
-
-  if (!pendingPayload) {
-    return;
-  }
-
-  const pendingSearchTerm =
-    "search_term" in pendingPayload.params && typeof pendingPayload.params.search_term === "string"
-      ? pendingPayload.params.search_term
-      : null;
-
-  if (!expectedQuery || pendingSearchTerm !== expectedQuery) {
-    clearPendingSiteSearch();
-    return;
-  }
-
-  const flushPendingPayload = () => {
-    const analyticsWindow = window as AnalyticsWindow;
-
-    if (analyticsWindow.__mackysoftAnalyticsScriptLoaded !== true) {
-      return;
-    }
-
-    if (sendSiteSearchPayload(pendingPayload)) {
-      clearPendingSiteSearch();
-    }
-  };
-
-  flushPendingPayload();
-
-  if (readPendingSiteSearch()) {
-    window.addEventListener(analyticsReadyEventName, flushPendingPayload, { once: true });
+function writeInlineSearchTrackingState(state: InlineSearchTrackingState) {
+  try {
+    window.sessionStorage.setItem(inlineSearchTrackingStorageKey, JSON.stringify(state));
+  } catch {
+    // Ignore storage failures and keep analytics best-effort.
   }
 }
 
-export function trackSiteSearchSubmit(mode: SiteSearchMode, query: string, onComplete?: () => void) {
-  const analyticsWindow = window as AnalyticsWindow;
-  const payload = buildSiteSearchAnalyticsEventPayload({
+function clearInlineSearchTrackingState() {
+  try {
+    window.sessionStorage.removeItem(inlineSearchTrackingStorageKey);
+  } catch {
+    // Ignore storage failures and keep analytics best-effort.
+  }
+}
+
+function buildTrackedSiteSearchUrl(searchPath: string, query: string, baseUrl: string) {
+  const nextUrl = new URL(searchPath, baseUrl);
+  const trimmedQuery = query.trim();
+
+  if (trimmedQuery) {
+    const token = createInlineSearchTrackingToken();
+
+    nextUrl.searchParams.set("q", trimmedQuery);
+    nextUrl.searchParams.set(inlineSearchTrackingParam, token);
+    writeInlineSearchTrackingState({
+      query: trimmedQuery,
+      source: inlineSearchTrackingValue,
+      pathname: nextUrl.pathname,
+      token,
+    });
+    return nextUrl;
+  }
+
+  nextUrl.searchParams.delete("q");
+  nextUrl.searchParams.delete(inlineSearchTrackingParam);
+  clearInlineSearchTrackingState();
+  return nextUrl;
+}
+
+function buildSiteSearchPayload(mode: SiteSearchMode, query: string) {
+  return buildSiteSearchAnalyticsEventPayload({
     searchTerm: query,
     location: getSearchAnalyticsLocation(mode),
   });
+}
 
-  if (!payload || typeof analyticsWindow.gtag !== "function") {
-    onComplete?.();
-    return;
+export function buildInlineSearchNavigationUrl(searchPath: string, query: string, baseUrl = window.location.href) {
+  return buildTrackedSiteSearchUrl(searchPath, query, baseUrl);
+}
+
+export function trackSiteSearchSubmit(mode: SiteSearchMode, query: string) {
+  if (mode !== "page") {
+    return false;
   }
 
-  if (!onComplete) {
-    analyticsWindow.gtag("event", payload.eventName, payload.params);
-    return;
+  const payload = buildSiteSearchPayload(mode, query);
+
+  if (!payload) {
+    return false;
   }
 
-  if (analyticsWindow.__mackysoftAnalyticsScriptLoaded !== true) {
-    persistPendingSiteSearch(payload);
-    onComplete();
-    return;
-  }
+  sendAnalyticsEvent(payload.eventName, payload.params);
+  return true;
+}
 
-  let completed = false;
-  const complete = () => {
-    if (completed) {
-      return;
+export function consumeInlineSearchPageVisit(currentUrl = new URL(window.location.href)) {
+  const sanitizedUrl = new URL(currentUrl.toString());
+  sanitizedUrl.searchParams.delete(inlineSearchTrackingParam);
+
+  const trackingToken = currentUrl.searchParams.get(inlineSearchTrackingParam)?.trim() ?? "";
+  const trackingState = readInlineSearchTrackingState();
+
+  if (
+    !trackingToken
+    || !trackingState
+    || trackingState.source !== inlineSearchTrackingValue
+    || trackingState.token !== trackingToken
+    || trackingState.pathname !== currentUrl.pathname
+    || trackingState.query !== (currentUrl.searchParams.get("q")?.trim() ?? "")
+  ) {
+    if (trackingToken || trackingState) {
+      clearInlineSearchTrackingState();
     }
 
-    completed = true;
-    onComplete();
-  };
+    return {
+      tracked: false,
+      sanitizedUrl,
+    };
+  }
 
-  analyticsWindow.gtag("event", payload.eventName, {
-    ...payload.params,
-    event_callback: complete,
-    transport_type: "beacon",
-  });
-  window.setTimeout(complete, 1000);
+  clearInlineSearchTrackingState();
+
+  const payload = buildSiteSearchPayload("inline", trackingState.query);
+
+  if (!payload) {
+    return {
+      tracked: false,
+      sanitizedUrl,
+    };
+  }
+
+  sendAnalyticsEvent(payload.eventName, payload.params);
+  return {
+    tracked: true,
+    sanitizedUrl,
+  };
 }

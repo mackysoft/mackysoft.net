@@ -21,13 +21,14 @@ const platforms = game.data.platforms;
 const showDescription = layout === "horizontal";
 const publishedAtLabel = publishedAt ? formatContentDate(publishedAt, locale) : null;
 const coverSizes = layout === "compact" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
+const coverWidths = [320, 480];
 const uiText = getUiText(locale);
 ---
 
 <article class:list={["game-card", "activity-card", layout === "compact" && "activity-card--compact", `game-card--${layout}`]}>
   <a href={href} class="activity-card__link-layer" aria-label={game.data.title}></a>
   <div class="game-card__cover activity-card__cover">
-    <Image src={game.data.cover} alt={game.data.coverAlt} widths={[480]} sizes={coverSizes} />
+    <Image src={game.data.cover} alt={game.data.coverAlt} widths={coverWidths} sizes={coverSizes} loading="lazy" decoding="async" />
   </div>
   <div class="game-card__body activity-card__body">
     <h3 class="activity-card__title">{game.data.title}</h3>

@@ -19,7 +19,7 @@ This site, or the external services used by this site, may process the following
 - Browser language preferences such as `navigator.languages`, used to decide the initial display language
 - `mackysoft-theme` and `mackysoft-locale` stored in `localStorage` to preserve theme and language preferences
 - `mackysoft-locale-scroll` stored in `sessionStorage` to restore scroll position after a language switch
-- Search terms and analytics parameters temporarily stored in `sessionStorage` under `__pending_site_search__` so site-search measurement can complete after navigation
+- A temporary value stored in `sessionStorage` so an on-site search submission from the header search can be measured once after navigation within the same tab
 
 If you contact the operator by email or through GitHub, the site may receive your name, email address, account name, subject, message body, and any other information you choose to send.
 
@@ -59,7 +59,7 @@ This site uses services provided by companies located outside Japan, including G
 
 ## Visitor Controls
 
-Visitors can delete or disable cookies, `localStorage`, and `sessionStorage` through browser settings. Doing so may prevent theme preferences, language preferences, scroll restoration after language switching, or some measurement features from working as intended.
+Visitors can delete or disable cookies, `localStorage`, and `sessionStorage` through browser settings. Doing so may prevent theme preferences, language preferences, scroll restoration after language switching, or some search submission measurement from working as intended.
 
 If you want to stop information collection by Google Analytics, use Google's opt-out browser add-on or similar controls provided by Google.
 
