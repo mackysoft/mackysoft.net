@@ -191,15 +191,10 @@ export async function syncReleaseCoverAssets(
   const localizedReleases = [];
 
   for (const release of releases) {
+    let asset;
+
     try {
-      const asset = await fetchReleaseCoverAsset(release.coverUrl, fetchImpl);
-      const localizedCover = await writeReleaseCoverAsset(release.repo, asset.content, asset.extension, coverOutputDir);
-      usedRelativePaths.add(localizedCover.relativePath);
-      localizedReleases.push({
-        ...release,
-        coverUrl: localizedCover.coverUrl,
-      });
-      continue;
+      asset = await fetchReleaseCoverAsset(release.coverUrl, fetchImpl);
     }
     catch {
       const previousCover = await reusePreviousReleaseCover(previousCoverUrls.get(release.repo), coverOutputDir);
@@ -212,9 +207,16 @@ export async function syncReleaseCoverAssets(
         });
         continue;
       }
+      localizedReleases.push(release);
+      continue;
     }
 
-    localizedReleases.push(release);
+    const localizedCover = await writeReleaseCoverAsset(release.repo, asset.content, asset.extension, coverOutputDir);
+    usedRelativePaths.add(localizedCover.relativePath);
+    localizedReleases.push({
+      ...release,
+      coverUrl: localizedCover.coverUrl,
+    });
   }
 
   await pruneUnusedReleaseCoverAssets(usedRelativePaths, coverOutputDir);

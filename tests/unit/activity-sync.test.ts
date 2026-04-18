@@ -584,6 +584,25 @@ describe("sync-activity", () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
+  test("fails sync when the fetched cover cannot be written locally", async () => {
+    const fetchImpl = await createSuccessfulFetchMock();
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
+    const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
+    const blockingPath = path.join(coverOutputDir, "github");
+
+    await mkdir(coverOutputDir, { recursive: true });
+    await writeFile(blockingPath, "not-a-directory", "utf8");
+
+    await expect(syncActivity({
+      fetchImpl,
+      outputPath,
+      coverOutputDir,
+    })).rejects.toThrow();
+
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
   test("adds English article metadata when translation is available and keeps Japanese-only articles as fallback", async () => {
     const fetchImpl = await createSuccessfulFetchMock();
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
