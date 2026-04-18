@@ -94,6 +94,7 @@ const socialImageHeight = imageHeight ?? (typeof image === "object" ? image.heig
     <meta name="color-scheme" content="light dark" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <SiteSeo
       title={pageTitle}
       description={description}
@@ -114,13 +115,36 @@ const socialImageHeight = imageHeight ?? (typeof image === "object" ? image.heig
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@600;700&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
     />
   </head>
   <body>
     <header class="site-header" data-site-header>
       <div class="site-header__inner">
-        <a href={localizePath("/", locale)} class="site-brand">{siteMeta.name}</a>
+        <a href={localizePath("/", locale)} class="site-brand" aria-label={siteMeta.name}>
+          <svg
+            class="site-brand__icon"
+            viewBox="0 0 64 64"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <rect x="5" y="5" width="54" height="54" rx="13" fill="#1f92d5"></rect>
+            <text
+              x="32"
+              y="32"
+              fill="#f8fdff"
+              font-family="IBM Plex Sans, Roboto, Helvetica Neue, Arial, sans-serif"
+              font-size="30"
+              font-weight="700"
+              text-anchor="middle"
+              dominant-baseline="middle"
+            >
+              m
+            </text>
+          </svg>
+          <span class="site-brand__label">{siteMeta.name}</span>
+        </a>
         <div class="site-header__nav">
           <PrimaryNav items={primaryNav} currentPath={currentPath} ariaLabel={uiText.header.primaryNavLabel} />
         </div>
