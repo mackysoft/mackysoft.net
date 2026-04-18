@@ -129,6 +129,7 @@ describe("publishing helpers", () => {
     const robots = renderRobotsTxt(site);
     const llms = renderLlmsTxt(site);
 
+    expect(robots).toContain("Content-Signal: ai-train=yes, search=yes, ai-input=yes");
     expect(robots).toContain(`Sitemap: ${toAbsoluteSiteUrl(site, "/sitemap.xml")}`);
 
     expect(llms).toContain(`[About](${toAbsoluteSiteUrl(site, "/about/")})`);
