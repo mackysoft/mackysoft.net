@@ -1,6 +1,7 @@
 ---
 import { getAnalyticsMeasurementId } from "../../lib/analytics";
 import { localizePath, supportedLocales } from "../../lib/i18n";
+import siteAnalyticsBootstrapInlineScript from "../../scripts/site-analytics-bootstrap.inline.js?raw";
 
 type Props = {
   pageLocation?: string;
@@ -26,11 +27,7 @@ const analyticsConfig = measurementId && analyticsScriptUrl
   analyticsConfig && (
     <>
       <script is:inline id="site-analytics-config" type="application/json" set:html={JSON.stringify(analyticsConfig)}></script>
-      <script>
-        import { initSiteAnalytics } from "../../scripts/site-analytics-client";
-
-        initSiteAnalytics();
-      </script>
+      <script is:inline set:html={siteAnalyticsBootstrapInlineScript}></script>
     </>
   )
 }

@@ -65,6 +65,15 @@ test.describe("privacy policy page", () => {
         }
       }, gaMeasurementId),
     ).toBe(true);
+    expect(
+      await page.evaluate(() => {
+        return Array.from(document.head.querySelectorAll("script")).some((script) => {
+          return script instanceof HTMLScriptElement
+            && script.src === ""
+            && (script.textContent ?? "").includes("__pending_analytics_events__");
+        });
+      }),
+    ).toBe(true);
   });
 
   test("renders the English privacy policy with the same scope", { tag: "@size:medium" }, async ({ page }) => {
