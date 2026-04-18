@@ -295,6 +295,61 @@ test.describe("home page", () => {
     await expect(footerInner).toHaveCSS("justify-content", "space-between");
   });
 
+  test("keeps footer links in two columns once there is enough width", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 420, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const columns = page.locator(".site-footer__columns");
+    const firstColumn = page.locator(".site-footer__column").first();
+    const secondColumn = page.locator(".site-footer__column").nth(1);
+    const rssLink = page.locator(".site-footer__rss-link");
+
+    const columnsBox = await columns.boundingBox();
+    const firstColumnBox = await firstColumn.boundingBox();
+    const secondColumnBox = await secondColumn.boundingBox();
+    const rssLinkBox = await rssLink.boundingBox();
+
+    if (!columnsBox || !firstColumnBox || !secondColumnBox || !rssLinkBox) {
+      throw new Error("footer columns and RSS link must be visible before layout assertions");
+    }
+
+    expect(Math.abs(firstColumnBox.y - secondColumnBox.y)).toBeLessThanOrEqual(2);
+    expect(secondColumnBox.x).toBeGreaterThan(firstColumnBox.x + firstColumnBox.width - 1);
+    expect(rssLinkBox.x).toBeGreaterThan(columnsBox.x + columnsBox.width - 1);
+
+    await context.close();
+  });
+
+  test("stacks footer links on phone-sized screens", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 375, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const firstColumn = page.locator(".site-footer__column").first();
+    const secondColumn = page.locator(".site-footer__column").nth(1);
+
+    const firstColumnBox = await firstColumn.boundingBox();
+    const secondColumnBox = await secondColumn.boundingBox();
+
+    if (!firstColumnBox || !secondColumnBox) {
+      throw new Error("footer columns must be visible before stack assertions");
+    }
+
+    expect(secondColumnBox.y).toBeGreaterThan(firstColumnBox.y + firstColumnBox.height - 1);
+    expect(Math.abs(secondColumnBox.x - firstColumnBox.x)).toBeLessThanOrEqual(2);
+
+    await context.close();
+  });
+
   test("redirects the first root visit to /en/ when English is preferred", async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem("mackysoft-locale");

@@ -49,7 +49,9 @@ describe("ui text", () => {
 
     expect(uiText.header.primaryNavLabel).toBe("全域導覽");
     expect(uiText.header.menuToggle).toBe("開啟選單");
-    expect(uiText.header.languageShortLabel["zh-hant"]).toBe("ZH-HANT");
+    expect(uiText.header.languageShortLabel.ja).toBe("JA");
+    expect(uiText.header.languageShortLabel.en).toBe("EN");
+    expect(uiText.header.languageShortLabel["zh-hant"]).toBe("ZH");
     expect(uiText.header.languageName["zh-hant"]).toBe("繁體中文");
     expect(uiText.common.home).toBe("首頁");
     expect(uiText.common.about).toBe("個人簡介");

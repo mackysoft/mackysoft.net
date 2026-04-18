@@ -347,9 +347,11 @@ test.describe("site search", () => {
     const externalCard = page.locator(".site-search-card").filter({
       has: page.locator('.activity-card__link-layer[href^="https://zenn.dev/"]'),
     }).first();
+    const externalBadge = externalCard.locator(".activity-card__badge").filter({ hasText: "外部" });
 
     await expect(externalCard).toBeVisible();
-    await expect(externalCard.locator(".activity-card__badge").filter({ hasText: "外部" })).toBeVisible();
+    await expect(externalBadge).toBeVisible();
+    await expect(externalBadge).toHaveClass(/pill/);
     await expect(externalCard.locator(".site-search-card__meta")).toContainText("Zenn");
 
     await page.goto(`/search/?q=${encodeURIComponent(releaseSearchQuery)}`);

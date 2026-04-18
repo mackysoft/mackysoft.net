@@ -109,9 +109,9 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       themeToggle: "テーマを切り替え",
       languageMenu: "表示言語を切り替え",
       languageShortLabel: {
-        ja: "JP",
+        ja: "JA",
         en: "EN",
-        "zh-hant": "ZH-HANT",
+        "zh-hant": "ZH",
       },
       languageName: {
         ja: "日本語",
@@ -184,9 +184,9 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       themeToggle: "Toggle theme",
       languageMenu: "Switch language",
       languageShortLabel: {
-        ja: "JP",
+        ja: "JA",
         en: "EN",
-        "zh-hant": "ZH-HANT",
+        "zh-hant": "ZH",
       },
       languageName: {
         ja: "Japanese",
@@ -259,9 +259,9 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       themeToggle: "切換主題",
       languageMenu: "切換顯示語言",
       languageShortLabel: {
-        ja: "JP",
+        ja: "JA",
         en: "EN",
-        "zh-hant": "ZH-HANT",
+        "zh-hant": "ZH",
       },
       languageName: {
         ja: "日文",
