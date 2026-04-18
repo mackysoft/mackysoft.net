@@ -17,7 +17,16 @@ const searchPaths = supportedLocales.map((locale) => localizePath("/search/", lo
 {
   measurementId && analyticsScriptUrl && (
     <>
-      <script is:inline async src={analyticsScriptUrl}></script>
+      <script is:inline>
+        window.__mackysoftAnalyticsScriptLoaded = false;
+      </script>
+      <script
+        is:inline
+        async
+        src={analyticsScriptUrl}
+        onload="window.__mackysoftAnalyticsScriptLoaded = true"
+        onerror="window.__mackysoftAnalyticsScriptLoaded = false"
+      ></script>
       <script is:inline define:vars={{ measurementId, pageLocation, searchPaths }}>
         window.dataLayer = window.dataLayer || [];
         window.gtag = function gtag() {

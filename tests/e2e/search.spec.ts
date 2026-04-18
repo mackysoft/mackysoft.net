@@ -43,7 +43,12 @@ async function setJapaneseLocaleWithAnalyticsCapture(page: Page) {
       window.sessionStorage.setItem(initKey, "true");
     }
 
+    const analyticsWindow = window as Window & typeof globalThis & {
+      __mackysoftAnalyticsScriptLoaded?: boolean;
+    };
+
     window.localStorage.setItem("mackysoft-locale", "ja");
+    analyticsWindow.__mackysoftAnalyticsScriptLoaded = true;
     Object.defineProperty(window, "dataLayer", {
       configurable: true,
       writable: true,

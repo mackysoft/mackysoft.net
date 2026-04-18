@@ -70,6 +70,7 @@ type SearchPanelElements = {
 
 type AnalyticsWindow = Window & typeof globalThis & {
   gtag?: (...args: unknown[]) => void;
+  __mackysoftAnalyticsScriptLoaded?: boolean;
 };
 
 let pagefindPromise: Promise<PagefindModule> | null = null;
@@ -233,6 +234,11 @@ function trackSearchSubmit(elements: SearchPanelElements, query: string, onCompl
 
   if (!onComplete) {
     analyticsWindow.gtag("event", payload.eventName, payload.params);
+    return;
+  }
+
+  if (analyticsWindow.__mackysoftAnalyticsScriptLoaded !== true) {
+    onComplete();
     return;
   }
 
