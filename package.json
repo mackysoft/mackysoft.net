@@ -12,6 +12,7 @@
     "deploy:workers": "npm run deploy:workers:site && npm run deploy:workers:www-redirect",
     "deploy:workers:site": "wrangler deploy",
     "deploy:workers:www-redirect": "wrangler deploy -c wrangler.www-redirect.jsonc",
+    "generate:favicon": "node scripts/generate-favicon.mjs",
     "generate:og-default": "node scripts/generate-default-og.mjs",
     "preview": "astro preview",
     "preview:ci": "astro preview --host 127.0.0.1 --port 4322",
