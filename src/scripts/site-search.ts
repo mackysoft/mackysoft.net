@@ -1,4 +1,3 @@
-import { buildSiteSearchAnalyticsEventPayload } from "../lib/analytics";
 import {
   createSearchQueryVariants,
   formatSearchResultDate,
@@ -24,6 +23,7 @@ import {
   openDropdownPanel,
   prepareDropdownPanel,
 } from "./site-dropdown";
+import { replayPendingSiteSearch, trackSiteSearchSubmit } from "./site-search-analytics";
 
 type PagefindResult = {
   id: string;
@@ -68,21 +68,12 @@ type SearchPanelElements = {
   searchPath: string;
 };
 
-type AnalyticsWindow = Window & typeof globalThis & {
-  gtag?: (...args: unknown[]) => void;
-  __mackysoftAnalyticsScriptLoaded?: boolean;
-};
-
 let pagefindPromise: Promise<PagefindModule> | null = null;
 let activeSearchTrigger: HTMLElement | null = null;
 let activeSearchPanel: HTMLElement | null = null;
 let searchInteractionsReady = false;
 const pagefindBundlePath = "/pagefind/pagefind.js";
 const searchInlineViewportPadding = 16;
-const searchAnalyticsLocationMap = {
-  page: "search-page",
-  inline: "site-header-search",
-} as const;
 
 async function importPagefindBundle(bundlePath: string) {
   return new Function("path", "return import(path)")(bundlePath) as Promise<PagefindModule>;
@@ -204,10 +195,6 @@ function createMetaItem(text: string) {
   return item;
 }
 
-function getSearchAnalyticsLocation(mode: SearchPanelElements["mode"]) {
-  return searchAnalyticsLocationMap[mode];
-}
-
 function navigateToSearchPage(elements: SearchPanelElements, query: string) {
   const nextUrl = new URL(elements.searchPath, window.location.href);
 
@@ -218,46 +205,6 @@ function navigateToSearchPage(elements: SearchPanelElements, query: string) {
   }
 
   window.location.assign(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
-}
-
-function trackSearchSubmit(elements: SearchPanelElements, query: string, onComplete?: () => void) {
-  const analyticsWindow = window as AnalyticsWindow;
-  const payload = buildSiteSearchAnalyticsEventPayload({
-    searchTerm: query,
-    location: getSearchAnalyticsLocation(elements.mode),
-  });
-
-  if (!payload || typeof analyticsWindow.gtag !== "function") {
-    onComplete?.();
-    return;
-  }
-
-  if (!onComplete) {
-    analyticsWindow.gtag("event", payload.eventName, payload.params);
-    return;
-  }
-
-  if (analyticsWindow.__mackysoftAnalyticsScriptLoaded !== true) {
-    onComplete();
-    return;
-  }
-
-  let completed = false;
-  const complete = () => {
-    if (completed) {
-      return;
-    }
-
-    completed = true;
-    onComplete();
-  };
-
-  analyticsWindow.gtag("event", payload.eventName, {
-    ...payload.params,
-    event_callback: complete,
-    transport_type: "beacon",
-  });
-  window.setTimeout(complete, 1000);
 }
 
 function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
@@ -479,6 +426,10 @@ function initSearchPanel(root: HTMLElement) {
     elements.input.value = initialQueryFromUrl;
   }
 
+  if (elements.mode === "page") {
+    replayPendingSiteSearch(initialQueryFromUrl);
+  }
+
   const searchPagefind = async (pagefind: PagefindModule, queryVariants: ReturnType<typeof createSearchQueryVariants>, immediate: boolean) => {
     if (queryVariants.length === 0) {
       return [];
@@ -586,13 +537,13 @@ function initSearchPanel(root: HTMLElement) {
 
     if (elements.mode === "inline") {
       event.preventDefault();
-      trackSearchSubmit(elements, query, () => {
+      trackSiteSearchSubmit(elements.mode, query, () => {
         navigateToSearchPage(elements, query);
       });
       return;
     }
 
-    trackSearchSubmit(elements, query);
+    trackSiteSearchSubmit(elements.mode, query);
     event.preventDefault();
     void runSearch(query, true);
   });

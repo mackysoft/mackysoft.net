@@ -1,6 +1,7 @@
 ---
 import { getAnalyticsMeasurementId } from "../../lib/analytics";
 import { localizePath, supportedLocales } from "../../lib/i18n";
+import { analyticsReadyEventName } from "../../scripts/site-search-analytics";
 
 type Props = {
   pageLocation?: string;
@@ -12,6 +13,7 @@ const analyticsScriptUrl = measurementId
   ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`
   : null;
 const searchPaths = supportedLocales.map((locale) => localizePath("/search/", locale));
+const analyticsScriptOnLoad = `window.__mackysoftAnalyticsScriptLoaded = true; window.dispatchEvent(new Event(${JSON.stringify(analyticsReadyEventName)}));`;
 ---
 
 {
@@ -24,7 +26,7 @@ const searchPaths = supportedLocales.map((locale) => localizePath("/search/", lo
         is:inline
         async
         src={analyticsScriptUrl}
-        onload="window.__mackysoftAnalyticsScriptLoaded = true"
+        onload={analyticsScriptOnLoad}
         onerror="window.__mackysoftAnalyticsScriptLoaded = false"
       ></script>
       <script is:inline define:vars={{ measurementId, pageLocation, searchPaths }}>
