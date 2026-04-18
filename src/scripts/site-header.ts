@@ -8,6 +8,7 @@ import {
 const scrollRestoreStorageKey = "mackysoft-locale-scroll";
 const scrollRestoreMaxAgeMs = 15_000;
 const scrollRestoreObserveDurationMs = 4_000;
+const scrollRestoreIgnoreScrollWindowMs = 250;
 const scrollRestoreNavigationKeys = new Set([
   "ArrowDown",
   "ArrowUp",
@@ -102,30 +103,24 @@ function applyScrollProgress(progress: number) {
     top: nextScrollTop,
     behavior: "auto",
   });
+
+  return nextScrollTop;
 }
 
 function scheduleScrollRestore(progress: number) {
   let observer: ResizeObserver | null = null;
   let disconnectTimeout: number | null = null;
   let isDisposed = false;
-  let ignoreNextScrollEvent = false;
-  let resetIgnoredScrollTimeout: number | null = null;
+  let ignoreScrollEventsUntil = 0;
   const applyRestoredScroll = () => {
     if (isDisposed) {
       return;
     }
 
-    ignoreNextScrollEvent = true;
+    // Layout and programmatic restoration can emit multiple delayed scroll events on slower runners.
+    // Keep a short grace window so those events do not cancel restoration prematurely.
+    ignoreScrollEventsUntil = window.performance.now() + scrollRestoreIgnoreScrollWindowMs;
     applyScrollProgress(progress);
-
-    if (resetIgnoredScrollTimeout !== null) {
-      window.clearTimeout(resetIgnoredScrollTimeout);
-    }
-
-    resetIgnoredScrollTimeout = window.setTimeout(() => {
-      ignoreNextScrollEvent = false;
-      resetIgnoredScrollTimeout = null;
-    }, 0);
   };
   const handleLoad = () => {
     if (!isDisposed) {
@@ -133,8 +128,7 @@ function scheduleScrollRestore(progress: number) {
     }
   };
   const handleScroll = () => {
-    if (ignoreNextScrollEvent) {
-      ignoreNextScrollEvent = false;
+    if (window.performance.now() <= ignoreScrollEventsUntil) {
       return;
     }
 
@@ -151,10 +145,6 @@ function scheduleScrollRestore(progress: number) {
 
     if (disconnectTimeout !== null) {
       window.clearTimeout(disconnectTimeout);
-    }
-
-    if (resetIgnoredScrollTimeout !== null) {
-      window.clearTimeout(resetIgnoredScrollTimeout);
     }
 
     window.removeEventListener("wheel", dispose);
