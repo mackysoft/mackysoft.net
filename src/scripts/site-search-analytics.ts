@@ -45,9 +45,13 @@ export function trackSiteSearchSubmit(mode: SiteSearchMode, query: string, optio
     return;
   }
 
-  sendAnalyticsEvent(payload.eventName, payload.params, {
+  const analyticsOptions = {
     onComplete,
     persistWhenUnavailable: true,
-    replayCondition: buildSearchReplayCondition(searchPath, searchTerm),
+  } as const;
+
+  sendAnalyticsEvent(payload.eventName, payload.params, {
+    ...analyticsOptions,
+    ...(mode === "inline" ? { replayCondition: buildSearchReplayCondition(searchPath, searchTerm) } : {}),
   });
 }
