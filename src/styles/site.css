@@ -1350,6 +1350,12 @@ h3,
   }
 }
 
+@media (min-width: 400px) {
+  .site-footer__columns {
+    grid-template-columns: repeat(2, max-content);
+  }
+}
+
 @media (min-width: 800px) {
   .site-nav {
     flex-wrap: nowrap;
@@ -1409,7 +1415,6 @@ h3,
   }
 
   .site-footer__columns {
-    grid-template-columns: repeat(2, max-content);
     gap: 1.5rem 3rem;
   }
 }
