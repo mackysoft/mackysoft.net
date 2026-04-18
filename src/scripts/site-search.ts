@@ -207,7 +207,19 @@ function getSearchAnalyticsLocation(mode: SearchPanelElements["mode"]) {
   return searchAnalyticsLocationMap[mode];
 }
 
-function trackSearchSubmit(elements: SearchPanelElements, query: string) {
+function navigateToSearchPage(elements: SearchPanelElements, query: string) {
+  const nextUrl = new URL(elements.searchPath, window.location.href);
+
+  if (query) {
+    nextUrl.searchParams.set("q", query);
+  } else {
+    nextUrl.searchParams.delete("q");
+  }
+
+  window.location.assign(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+}
+
+function trackSearchSubmit(elements: SearchPanelElements, query: string, onComplete?: () => void) {
   const analyticsWindow = window as AnalyticsWindow;
   const payload = buildSiteSearchAnalyticsEventPayload({
     searchTerm: query,
@@ -215,10 +227,31 @@ function trackSearchSubmit(elements: SearchPanelElements, query: string) {
   });
 
   if (!payload || typeof analyticsWindow.gtag !== "function") {
+    onComplete?.();
     return;
   }
 
-  analyticsWindow.gtag("event", payload.eventName, payload.params);
+  if (!onComplete) {
+    analyticsWindow.gtag("event", payload.eventName, payload.params);
+    return;
+  }
+
+  let completed = false;
+  const complete = () => {
+    if (completed) {
+      return;
+    }
+
+    completed = true;
+    onComplete();
+  };
+
+  analyticsWindow.gtag("event", payload.eventName, {
+    ...payload.params,
+    event_callback: complete,
+    transport_type: "beacon",
+  });
+  window.setTimeout(complete, 1000);
 }
 
 function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
@@ -544,12 +577,16 @@ function initSearchPanel(root: HTMLElement) {
   elements.form.addEventListener("submit", (event) => {
     const query = elements.input.value.trim();
     elements.input.value = query;
-    trackSearchSubmit(elements, query);
 
     if (elements.mode === "inline") {
+      event.preventDefault();
+      trackSearchSubmit(elements, query, () => {
+        navigateToSearchPage(elements, query);
+      });
       return;
     }
 
+    trackSearchSubmit(elements, query);
     event.preventDefault();
     void runSearch(query, true);
   });
