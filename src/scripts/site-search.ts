@@ -1,4 +1,4 @@
-import { buildSearchResultsAnalyticsEventPayload } from "../lib/analytics";
+import { buildSiteSearchAnalyticsEventPayload } from "../lib/analytics";
 import {
   createSearchQueryVariants,
   formatSearchResultDate,
@@ -70,12 +70,6 @@ type SearchPanelElements = {
 
 type AnalyticsWindow = Window & typeof globalThis & {
   gtag?: (...args: unknown[]) => void;
-};
-
-type TrackedSearchState = {
-  query: string;
-  totalCount: number;
-  location: string;
 };
 
 let pagefindPromise: Promise<PagefindModule> | null = null;
@@ -213,37 +207,18 @@ function getSearchAnalyticsLocation(mode: SearchPanelElements["mode"]) {
   return searchAnalyticsLocationMap[mode];
 }
 
-function trackSearchResults(elements: SearchPanelElements, query: string, totalCount: number, previousState: TrackedSearchState | null) {
+function trackSearchSubmit(elements: SearchPanelElements, query: string) {
   const analyticsWindow = window as AnalyticsWindow;
-  const payload = buildSearchResultsAnalyticsEventPayload({
+  const payload = buildSiteSearchAnalyticsEventPayload({
+    searchTerm: query,
     location: getSearchAnalyticsLocation(elements.mode),
-    resultsCount: totalCount,
   });
 
   if (!payload || typeof analyticsWindow.gtag !== "function") {
-    return previousState;
-  }
-
-  const location = payload.params.ui_location;
-
-  if (typeof location !== "string") {
-    return previousState;
-  }
-
-  if (
-    previousState?.query === query
-    && previousState.totalCount === totalCount
-    && previousState.location === location
-  ) {
-    return previousState;
+    return;
   }
 
   analyticsWindow.gtag("event", payload.eventName, payload.params);
-  return {
-    query,
-    totalCount,
-    location,
-  };
 }
 
 function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, mode: "page" | "inline") {
@@ -457,7 +432,6 @@ function initSearchPanel(root: HTMLElement) {
   root.dataset.searchReady = "true";
 
   let currentRequestId = 0;
-  let lastTrackedSearchState: TrackedSearchState | null = null;
   const initialQueryFromUrl = elements.mode === "page"
     ? new URL(window.location.href).searchParams.get("q")?.trim() ?? ""
     : "";
@@ -516,13 +490,8 @@ function initSearchPanel(root: HTMLElement) {
     syncSearchPageUrl(elements, query);
 
     if (!query) {
-      lastTrackedSearchState = null;
       renderIdleState(elements);
       return;
-    }
-
-    if (lastTrackedSearchState?.query !== query) {
-      lastTrackedSearchState = null;
     }
 
     renderLoadingState(elements);
@@ -555,13 +524,11 @@ function initSearchPanel(root: HTMLElement) {
       const visibleResults = prepareVisibleSearchResults(results, query, shouldRerank, elements.mode);
 
       renderResults(elements, visibleResults.map((result) => result.data), totalCount);
-      lastTrackedSearchState = trackSearchResults(elements, query, totalCount, lastTrackedSearchState);
     } catch {
       if (requestId !== currentRequestId) {
         return;
       }
 
-      lastTrackedSearchState = null;
       renderErrorState(elements);
     }
   };
@@ -575,14 +542,16 @@ function initSearchPanel(root: HTMLElement) {
   });
 
   elements.form.addEventListener("submit", (event) => {
+    const query = elements.input.value.trim();
+    elements.input.value = query;
+    trackSearchSubmit(elements, query);
+
     if (elements.mode === "inline") {
-      elements.input.value = elements.input.value.trim();
       return;
     }
 
     event.preventDefault();
-    lastTrackedSearchState = null;
-    void runSearch(elements.input.value, true);
+    void runSearch(query, true);
   });
 
   const initialQuery = elements.input.value.trim();

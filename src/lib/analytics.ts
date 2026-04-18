@@ -7,7 +7,7 @@ const clickAnalyticsEventNames = [
 
 const analyticsEventNames = [
   ...clickAnalyticsEventNames,
-  "view_search_results",
+  "site_search",
 ] as const;
 
 export type ClickAnalyticsEventName = (typeof clickAnalyticsEventNames)[number];
@@ -35,23 +35,15 @@ export type AnalyticsPayloadInput = {
   ariaLabel?: string | null | undefined;
 };
 
-export type SearchResultsAnalyticsPayloadInput = {
+export type SiteSearchAnalyticsPayloadInput = {
+  searchTerm?: string | null | undefined;
   location?: string | null | undefined;
-  resultsCount?: number | null | undefined;
 };
 
 function normalizeAnalyticsValue(value: string | null | undefined) {
   const normalizedValue = value?.replace(/\s+/g, " ").trim();
 
   return normalizedValue ? normalizedValue : null;
-}
-
-function normalizeAnalyticsCount(value: number | null | undefined) {
-  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
-    return null;
-  }
-
-  return Math.trunc(value);
 }
 
 function normalizeAnalyticsHref(value: string | null | undefined) {
@@ -147,19 +139,19 @@ export function buildAnalyticsEventPayload(input: AnalyticsPayloadInput): ClickA
   };
 }
 
-export function buildSearchResultsAnalyticsEventPayload(input: SearchResultsAnalyticsPayloadInput): AnalyticsEventPayload | null {
+export function buildSiteSearchAnalyticsEventPayload(input: SiteSearchAnalyticsPayloadInput): AnalyticsEventPayload | null {
+  const searchTerm = normalizeAnalyticsValue(input.searchTerm);
   const location = normalizeAnalyticsValue(input.location);
-  const resultsCount = normalizeAnalyticsCount(input.resultsCount);
 
-  if (!location || resultsCount === null) {
+  if (!searchTerm || !location) {
     return null;
   }
 
   return {
-    eventName: "view_search_results",
+    eventName: "site_search",
     params: {
+      search_term: searchTerm,
       ui_location: location,
-      results_count: resultsCount,
     },
   };
 }
