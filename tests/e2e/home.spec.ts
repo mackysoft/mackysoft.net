@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { expect, test, type Page } from "@playwright/test";
-import type { Locator } from "@playwright/test";
 
 import { formatContentDate } from "../../src/lib/content-date";
 import { getHomePageContent } from "../../src/features/home/content";
@@ -25,6 +24,7 @@ const activityData = JSON.parse(
     license: string;
     url: string;
     publishedAt: string;
+    coverUrl: string;
     coverAlt: string;
   }>;
 };
@@ -38,22 +38,27 @@ const homePageContentEn = getHomePageContent("en");
 const homeHeroJa = getProfileContent("ja").home;
 const homeHeroEn = getProfileContent("en").home;
 const mobileViewport = { width: 375, height: 812 };
+const tinyPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9sX6s2sAAAAASUVORK5CYII=",
+  "base64",
+);
 
-async function expectReleaseCoverOrFallback(card: Locator, repoName: string, coverAlt: string) {
-  const image = card.getByRole("img", { name: coverAlt });
+function createCoverRoutePattern(coverUrl: string) {
+  const normalized = coverUrl.startsWith("/")
+    ? new URL(coverUrl, "https://mackysoft.net")
+    : new URL(coverUrl);
+  return coverUrl.startsWith("/")
+    ? `**${normalized.pathname}*`
+    : `${normalized.origin}${normalized.pathname}*`;
+}
 
-  if (await image.isVisible().catch(() => false)) {
-    await expect(image).toBeVisible();
-    return;
-  }
-
-  const cover = card.locator(".release-card__cover");
-  const fallback = card.locator(".release-card__cover-fallback");
-
-  await expect(cover).toHaveAttribute("data-cover-state", "error");
-  await expect(fallback).toBeVisible();
-  await expect(fallback).toContainText("GitHub");
-  await expect(fallback).toContainText(repoName);
+async function fulfillLatestReleaseCover(page: Page, coverUrl: string) {
+  await page.route(createCoverRoutePattern(coverUrl), async (route) => {
+    await route.fulfill({
+      contentType: "image/png",
+      body: tinyPng,
+    });
+  });
 }
 
 async function setJapaneseLocale(page: Page) {
@@ -184,6 +189,7 @@ test.describe("home page", () => {
   });
 
   test("renders the home page as an activity hub", async ({ page }) => {
+    await fulfillLatestReleaseCover(page, latestRelease.coverUrl);
     await page.addInitScript(() => {
       window.localStorage.setItem("mackysoft-locale", "ja");
     });
@@ -222,7 +228,7 @@ test.describe("home page", () => {
     await expect(main.locator(".release-card").first()).toBeVisible();
     await expect(main.locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("href", latestRelease.url);
     await expect(main.locator(".release-card").first().locator(".activity-card__link-layer")).toHaveAttribute("target", "_blank");
-    await expectReleaseCoverOrFallback(main.locator(".release-card").first(), latestReleaseRepoName, latestRelease.coverAlt);
+    await expect(main.locator(".release-card").first().getByRole("img", { name: latestRelease.coverAlt })).toBeVisible();
     await expect(main.locator(".release-card").first()).toContainText("最新リリース日");
     await expect(main.locator(".release-card").first()).toContainText(
       formatContentDate(new Date(latestRelease.publishedAt)),
@@ -438,10 +444,7 @@ test.describe("home page", () => {
   });
 
   test("falls back to a local cover treatment when release images fail", async ({ page }) => {
-    await page.route("https://opengraph.githubassets.com/**", async (route) => {
-      await route.abort();
-    });
-    await page.route("https://repository-images.githubusercontent.com/**", async (route) => {
+    await page.route(createCoverRoutePattern(latestRelease.coverUrl), async (route) => {
       await route.abort();
     });
     await page.goto("/");
