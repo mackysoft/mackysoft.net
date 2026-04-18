@@ -111,6 +111,42 @@ const contactPageContentMap = {
       ],
     },
   },
+  ko: {
+    title: "문의",
+    description: "업무 상담과 OSS 관련 문의 창구, 현재의 회신 방침을 정리한 페이지입니다.",
+    hero: {
+      eyebrow: formatBreadcrumb("Home", "Contact"),
+      title: "문의",
+    },
+    lead: "내용에 가장 가까운 연락 경로를 이용해 주세요.",
+    channels: [
+      {
+        heading: "업무 및 상담",
+        description: "업무 상담이나 일반 문의는 이메일로 받고 있습니다.",
+        action: {
+          type: "email",
+          href: "mailto:mackysoft0129@gmail.com",
+          label: "이메일로 문의하기",
+        },
+      },
+      {
+        heading: "OSS 및 에셋",
+        description: "버그 제보와 기술적인 상담은 GitHub로 받는 편이 가장 적합합니다.",
+        action: {
+          type: "external",
+          externalLinkId: "github" as ExternalLinkId,
+          label: "GitHub 열기",
+        },
+      },
+    ],
+    replyPolicy: {
+      heading: "회신에 대해",
+      paragraphs: [
+        "모든 연락에 답변드리지는 못할 수 있습니다.",
+        "내용 확인이나 판단에 시간이 걸리는 경우가 있습니다.",
+      ],
+    },
+  },
 } as const;
 
 export function getContactPageContent(locale: SiteLocale) {

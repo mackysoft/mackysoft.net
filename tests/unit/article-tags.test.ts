@@ -7,6 +7,7 @@ describe("article tags", () => {
     expect(getArticleTagLabel("asset", "ja")).toBe("アセット");
     expect(getArticleTagLabel("game-design", "en")).toBe("Game Design");
     expect(getArticleTagLabel("asset", "zh-hant")).toBe("資產");
+    expect(getArticleTagLabel("asset", "ko")).toBe("에셋");
     expect(getArticleTagLabel("completion-detection", "ja")).toBe("終了判定");
     expect(getArticleTagLabel("play-review", "en")).toBe("Play Review");
     expect(getArticleTagLabel("tsukuru-uozu", "ja")).toBe("つくるUOZU");
@@ -18,6 +19,10 @@ describe("article tags", () => {
 
   test("falls back to English labels when zh-hant-specific labels are not defined", () => {
     expect(getArticleTagLabel("unity", "zh-hant")).toBe("Unity");
+  });
+
+  test("falls back to English labels when ko-specific labels are not defined", () => {
+    expect(getArticleTagLabel("unity", "ko")).toBe("Unity");
   });
 
   test("keeps the localization dictionary addressable by arbitrary tag keys", () => {

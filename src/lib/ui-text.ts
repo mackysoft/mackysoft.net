@@ -85,6 +85,10 @@ const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnly
     japaneseOnlyBadge: "僅提供日文",
     fallbackNotice: "此頁面目前僅提供日文。",
   },
+  ko: {
+    japaneseOnlyBadge: "일본어만 제공",
+    fallbackNotice: "이 페이지는 현재 일본어로만 제공됩니다.",
+  },
 };
 
 const commonUiTextSupplementMap: Record<SiteLocale, Pick<CommonUiText, "rssFeed">> = {
@@ -96,6 +100,9 @@ const commonUiTextSupplementMap: Record<SiteLocale, Pick<CommonUiText, "rssFeed"
   },
   "zh-hant": {
     rssFeed: "RSS 摘要",
+  },
+  ko: {
+    rssFeed: "RSS 피드",
   },
 };
 
@@ -112,11 +119,13 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
         ja: "JA",
         en: "EN",
         "zh-hant": "ZH",
+        ko: "KO",
       },
       languageName: {
         ja: "日本語",
         en: "English",
         "zh-hant": "繁體中文",
+        ko: "한국어",
       },
     },
     footer: {
@@ -187,11 +196,13 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
         ja: "JA",
         en: "EN",
         "zh-hant": "ZH",
+        ko: "KO",
       },
       languageName: {
         ja: "Japanese",
         en: "English",
         "zh-hant": "Traditional Chinese",
+        ko: "Korean",
       },
     },
     footer: {
@@ -262,11 +273,13 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
         ja: "JA",
         en: "EN",
         "zh-hant": "ZH",
+        ko: "KO",
       },
       languageName: {
         ja: "日文",
         en: "English",
         "zh-hant": "繁體中文",
+        ko: "한국어",
       },
     },
     footer: {
@@ -325,6 +338,83 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       },
     },
   },
+  ko: {
+    header: {
+      primaryNavLabel: "글로벌 내비게이션",
+      toolsLabel: "헤더 도구",
+      menuToggle: "메뉴 열기",
+      searchOpen: "검색 열기",
+      themeToggle: "테마 전환",
+      languageMenu: "표시 언어 전환",
+      languageShortLabel: {
+        ja: "JA",
+        en: "EN",
+        "zh-hant": "ZH",
+        ko: "KO",
+      },
+      languageName: {
+        ja: "日本語",
+        en: "English",
+        "zh-hant": "繁體中文",
+        ko: "한국어",
+      },
+    },
+    footer: {
+      linksHeading: "외부 링크",
+      legalHeading: "정책",
+    },
+    article: {
+      publishedAt: "공개일",
+      updatedAt: "업데이트일",
+      tagsAriaLabel: "글 태그",
+      tocTitle: "목차",
+      tocNavLabel: "글 목차",
+      shareTitle: "공유",
+      copyLink: "링크 복사",
+      nativeShare: "공유하기",
+      twitter: "Twitter",
+      linkCopied: "링크를 복사했습니다",
+      copyFailed: "복사에 실패했습니다",
+    },
+    release: {
+      latestReleaseDate: "최신 릴리스 날짜",
+    },
+    game: {
+      linksAriaLabel: "링크",
+      screenshotsAriaLabel: "스크린샷",
+      screenshotTrailerTitle: " 트레일러",
+      featuresAriaLabel: "게임 특징",
+      basicInfoAriaLabel: "게임 기본 정보",
+      genre: "장르",
+      publishedAt: "공개일",
+      languages: "지원 언어",
+      platforms: "플랫폼",
+    },
+    search: {
+      pageDescription: "사이트 안의 글, 게임, 외부 글, 공개된 에셋을 검색할 수 있습니다.",
+      lead: "글 본문, 게임 상세, 외부 글, 공개된 에셋을 한 번에 검색할 수 있습니다.",
+      modalTitle: "검색",
+      inputLabel: "검색어",
+      inputPlaceholder: "키워드 입력",
+      submit: "검색",
+      close: "닫기",
+      openPage: "검색 페이지 열기",
+      noQueryTitle: "검색어를 입력해 주세요",
+      noQueryBody: "글 본문, 게임 상세, 외부 글, 공개된 에셋을 검색할 수 있습니다.",
+      loading: "검색 중...",
+      emptyTitle: "일치하는 결과가 없습니다",
+      emptyBody: "다른 키워드로 다시 시도해 보세요.",
+      errorTitle: "검색 결과를 불러올 수 없습니다",
+      errorBody: "잠시 후 다시 시도해 주세요.",
+      externalBadge: "외부",
+      typeLabel: {
+        article: "글",
+        game: "게임",
+        asset: "에셋",
+        page: "페이지",
+      },
+    },
+  },
 };
 
 export function getUiText(locale: SiteLocale) {
@@ -343,18 +433,21 @@ const articleCountFormatterMap: Record<SiteLocale, (count: number) => string> = 
   ja: (count) => `${count} 件の記事があります。`,
   en: (count) => `${count} article${count === 1 ? "" : "s"}`,
   "zh-hant": (count) => `共有 ${count} 篇文章`,
+  ko: (count) => `총 ${count}개의 글`,
 };
 
 const searchResultCountFormatterMap: Record<SiteLocale, (count: number) => string> = {
   ja: (count) => `${count} 件の検索結果`,
   en: (count) => `${count} search result${count === 1 ? "" : "s"}`,
   "zh-hant": (count) => `${count} 筆搜尋結果`,
+  ko: (count) => `${count}개의 검색 결과`,
 };
 
 const searchResultPreviewFormatterMap: Record<SiteLocale, (totalCount: number, visibleCount: number) => string> = {
   ja: (totalCount, visibleCount) => `${totalCount} 件の検索結果（上位 ${visibleCount} 件を表示）`,
   en: (totalCount, visibleCount) => `${totalCount} search result${totalCount === 1 ? "" : "s"} (showing top ${visibleCount})`,
   "zh-hant": (totalCount, visibleCount) => `${totalCount} 筆搜尋結果（顯示前 ${visibleCount} 筆）`,
+  ko: (totalCount, visibleCount) => `${totalCount}개의 검색 결과 (상위 ${visibleCount}개 표시)`,
 };
 
 export function formatArticleCountLabel(count: number, locale: SiteLocale) {

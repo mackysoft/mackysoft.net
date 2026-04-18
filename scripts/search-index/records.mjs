@@ -138,6 +138,10 @@ function getExternalArticleLocaleCandidates(locale) {
     return ["zh-hant", "en", "ja"];
   }
 
+  if (locale === "ko") {
+    return ["ko", "en", "ja"];
+  }
+
   return [locale, "ja"];
 }
 

@@ -66,6 +66,21 @@ export const siteVocabularyMap: Record<SiteLocale, SiteVocabularyBundle> = {
     },
     breadcrumb: englishVocabulary,
   },
+  ko: {
+    display: {
+      home: "홈",
+      about: "소개",
+      games: "게임",
+      assets: "에셋",
+      articles: "글",
+      search: "검색",
+      contact: "문의",
+      privacyPolicy: "개인정보 처리방침",
+      tag: "태그",
+      archive: "아카이브",
+    },
+    breadcrumb: englishVocabulary,
+  },
 };
 
 export function getSiteVocabulary(locale: SiteLocale) {

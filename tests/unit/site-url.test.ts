@@ -12,6 +12,7 @@ describe("site URL helpers", () => {
         { locale: "ja", path: "/articles/vision-introduction/" },
         { locale: "en", path: "/en/articles/vision-introduction/" },
         { locale: "zh-hant", path: "/zh-hant/articles/vision-introduction/" },
+        { locale: "ko", path: "/ko/articles/vision-introduction/" },
       ],
     })).toEqual({
       canonicalUrl: toAbsoluteSiteUrl(site, "/articles/vision-introduction/"),
@@ -20,6 +21,7 @@ describe("site URL helpers", () => {
         { locale: "ja", path: "/articles/vision-introduction/", href: toAbsoluteSiteUrl(site, "/articles/vision-introduction/") },
         { locale: "en", path: "/en/articles/vision-introduction/", href: toAbsoluteSiteUrl(site, "/en/articles/vision-introduction/") },
         { locale: "zh-hant", path: "/zh-hant/articles/vision-introduction/", href: toAbsoluteSiteUrl(site, "/zh-hant/articles/vision-introduction/") },
+        { locale: "ko", path: "/ko/articles/vision-introduction/", href: toAbsoluteSiteUrl(site, "/ko/articles/vision-introduction/") },
       ],
     });
   });

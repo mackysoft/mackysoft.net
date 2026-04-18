@@ -232,6 +232,82 @@ const aboutPageContentMap = {
       href: "/contact/",
     },
   },
+  ko: {
+    title: "소개 | Hiroya Aramaki / Makihiro",
+    description:
+      "Hiroya Aramaki / Makihiro의 프로필, 게임 개발을 중심으로 한 활동 영역, 사이트의 역할, 외부 링크, 연락 경로를 정리한 페이지입니다.",
+    hero: {
+      eyebrow: formatBreadcrumb("Home", "About"),
+      title: "소개",
+    },
+    whatIDo: {
+      heading: "무엇을 하고 있나",
+      paragraphs: [
+        "주된 활동은 게임 개발입니다. 개인 제작 게임 자체를 완성하는 것뿐 아니라, 제작을 지속하기 위해 필요한 설계, 구현, 도구 정비까지 꾸준히 쌓아 가고 있습니다.",
+        "또한 개발 과정에서 얻은 지식을 기술 글과 공개 저장소로 정리해, 게임 개발과 소프트웨어 개발에 다시 활용할 수 있는 형태로 남기고 있습니다.",
+      ],
+    },
+    domainsAndInterests: {
+      heading: "주요 분야와 관심사",
+      items: [
+        "게임 개발과 게임 시스템 설계",
+        "Unity 중심의 구현, 도구 정비, 개발 흐름 개선",
+        "에셋 제작과 제작 보조 시스템 구축",
+        "글과 OSS를 통한 지식 정리 및 공개",
+      ],
+    },
+    siteGuide: {
+      heading: "이 사이트에서 볼 수 있는 것",
+      paragraphs: [
+        "이 사이트는 제가 공개한 게임, 에셋, 글, 문의 경로를 한곳에 모아 둡니다.",
+      ],
+      items: [
+        {
+          label: "게임",
+          href: "/games/",
+          description: "제가 만든 게임과 공개 중인 작품을 볼 수 있습니다.",
+        },
+        {
+          label: "에셋",
+          href: "/assets/",
+          description: "재사용 가능한 개발용 에셋과 도구를 정리해 두었습니다.",
+        },
+        {
+          label: "글",
+          href: "/articles/",
+          description: "기술 글과 개발 관련 메모를 읽을 수 있습니다.",
+        },
+        {
+          label: "문의",
+          href: "/contact/",
+          description: "업무 상담, 문의, 연락 방법을 안내합니다.",
+        },
+      ],
+    },
+    externalLinksHeading: "외부 링크",
+    externalLinks: [
+      {
+        id: "github" as ExternalLinkId,
+        description: "OSS, 라이브러리, 공개 저장소를 모아 둔 곳입니다.",
+      },
+      {
+        id: "twitter" as ExternalLinkId,
+        description: "짧은 근황과 일상적인 발신은 이쪽에 올립니다.",
+      },
+      {
+        id: "zenn" as ExternalLinkId,
+        description: "기술 글과 조금 더 긴 정리 글을 공개하고 있습니다.",
+      },
+    ],
+    contact: {
+      heading: "업무 및 문의",
+      paragraphs: [
+        "업무 상담이나 OSS 관련 연락은 문의 페이지에서 받고 있습니다.",
+      ],
+      ctaLabel: "문의 페이지 보기",
+      href: "/contact/",
+    },
+  },
 } as const;
 
 export function getAboutPageContent(locale: SiteLocale) {

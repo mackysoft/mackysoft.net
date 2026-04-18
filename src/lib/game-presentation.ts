@@ -17,6 +17,11 @@ const gameStatusLabelMap: Record<SiteLocale, Record<GameStatus, string>> = {
     archived: "已封存",
     prototype: "原型",
   },
+  ko: {
+    active: "공개 중",
+    archived: "아카이브됨",
+    prototype: "프로토타입",
+  },
 };
 
 const gamePlatformLabelMap: Record<SiteLocale, Record<string, string>> = {
@@ -28,6 +33,9 @@ const gamePlatformLabelMap: Record<SiteLocale, Record<string, string>> = {
   },
   "zh-hant": {
     Browser: "瀏覽器",
+  },
+  ko: {
+    Browser: "브라우저",
   },
 };
 

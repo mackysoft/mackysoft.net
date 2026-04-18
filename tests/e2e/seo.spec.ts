@@ -15,9 +15,11 @@ const defaultImageUrl = "https://mackysoft.net/og/default.png";
 const defaultImageAltJa = "mackysoft.net のカバー画像";
 const defaultImageAltEn = "mackysoft.net cover image";
 const defaultImageAltZhHant = "mackysoft.net 封面圖片";
+const defaultImageAltKo = "mackysoft.net 커버 이미지";
 const generatedArticleImageJa = "https://mackysoft.net/og/articles/turnbased-gameloop.png";
 const generatedArticleImageEn = "https://mackysoft.net/en/og/articles/turnbased-gameloop.png";
 const generatedArticleImageZhHant = "https://mackysoft.net/zh-hant/og/articles/turnbased-gameloop.png";
+const generatedArticleImageKo = "https://mackysoft.net/ko/og/articles/turnbased-gameloop.png";
 
 const seoExpectations: SeoExpectation[] = [
   {
@@ -95,6 +97,7 @@ async function expectSeo(page: Page, expectation: SeoExpectation) {
   await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute("content", expectation.imageAlt);
   await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", "https://mackysoft.net/feed.xml");
   await expect(page.locator('link[rel="alternate"][hreflang="zh-Hant"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="alternate"][hreflang="ko"]')).toHaveCount(1);
 
   if (expectation.robotsContent) {
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", expectation.robotsContent);
@@ -134,11 +137,24 @@ test.describe("SEO metadata", () => {
     });
   });
 
+  test("renders shared SEO metadata for a Korean localized route", { tag: "@size:medium" }, async ({ page }) => {
+    await expectSeo(page, {
+      path: "/ko/about/",
+      title: "소개 | Hiroya Aramaki / Makihiro | mackysoft.net",
+      description:
+        "Hiroya Aramaki / Makihiro의 프로필, 게임 개발을 중심으로 한 활동 영역, 사이트의 역할, 외부 링크, 연락 경로를 정리한 페이지입니다.",
+      canonicalUrl: "https://mackysoft.net/ko/about/",
+      imageUrl: defaultImageUrl,
+      imageAlt: defaultImageAltKo,
+    });
+  });
+
   test("marks privacy policy pages as noindex", { tag: "@size:medium" }, async ({ page }) => {
     const expectations = [
       ["/privacy-policy/", "https://mackysoft.net/privacy-policy/"],
       ["/en/privacy-policy/", "https://mackysoft.net/en/privacy-policy/"],
       ["/zh-hant/privacy-policy/", "https://mackysoft.net/zh-hant/privacy-policy/"],
+      ["/ko/privacy-policy/", "https://mackysoft.net/ko/privacy-policy/"],
     ] as const;
 
     for (const [path, canonicalUrl] of expectations) {
@@ -153,6 +169,7 @@ test.describe("SEO metadata", () => {
       ["/contact/", "https://mackysoft.net/contact/"],
       ["/en/contact/", "https://mackysoft.net/en/contact/"],
       ["/zh-hant/contact/", "https://mackysoft.net/zh-hant/contact/"],
+      ["/ko/contact/", "https://mackysoft.net/ko/contact/"],
     ] as const;
 
     for (const [path, canonicalUrl] of expectations) {
@@ -219,6 +236,21 @@ test.describe("SEO metadata", () => {
     await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
       "content",
       "如何實作回合制的遊戲迴圈【C#】 的文章標題圖片",
+    );
+  });
+
+  test("uses a localized generated title card when a Korean article has no cover", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/ko/articles/turnbased-gameloop/");
+
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", generatedArticleImageKo);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      "턴제 게임 루프를 구현하는 방법 [C#] 글 제목 이미지",
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", generatedArticleImageKo);
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+      "content",
+      "턴제 게임 루프를 구현하는 방법 [C#] 글 제목 이미지",
     );
   });
 

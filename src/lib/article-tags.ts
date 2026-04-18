@@ -16,6 +16,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "アセット",
       en: "Asset",
       "zh-hant": "資產",
+      ko: "에셋",
     },
   },
   cinemachine: {
@@ -29,6 +30,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "終了判定",
       en: "Completion Detection",
       "zh-hant": "結束判定",
+      ko: "종료 판정",
     },
   },
   csharp: {
@@ -54,6 +56,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "ゲームデザイン",
       en: "Game Design",
       "zh-hant": "遊戲設計",
+      ko: "게임 디자인",
     },
   },
   keyframe: {
@@ -73,6 +76,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "雑記",
       en: "Misc",
       "zh-hant": "雜記",
+      ko: "잡담",
     },
   },
   modiferty: {
@@ -92,6 +96,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "プレイレビュー",
       en: "Play Review",
       "zh-hant": "遊玩評測",
+      ko: "플레이 리뷰",
     },
   },
   playfab: {
@@ -105,6 +110,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "スクリプト",
       en: "Script",
       "zh-hant": "腳本",
+      ko: "스크립트",
     },
   },
   stopaction: {
@@ -130,6 +136,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
       ja: "チュートリアル",
       en: "Tutorial",
       "zh-hant": "教學",
+      ko: "튜토리얼",
     },
   },
   "tsukuru-uozu": {
