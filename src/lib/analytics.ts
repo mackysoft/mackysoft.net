@@ -1,7 +1,6 @@
 const clickAnalyticsEventNames = [
   "theme_switch",
   "locale_switch",
-  "project_cta_click",
   "external_link_click",
 ] as const;
 

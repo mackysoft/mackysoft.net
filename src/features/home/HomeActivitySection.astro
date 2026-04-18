@@ -4,7 +4,6 @@ type Props = {
   heading: string;
   ctaHref: string;
   ctaLabel: string;
-  analyticsLocation?: string;
   gridClass?: string;
 };
 
@@ -13,7 +12,6 @@ const {
   heading,
   ctaHref,
   ctaLabel,
-  analyticsLocation = "home-activity-section",
   gridClass,
 } = Astro.props as Props;
 ---
@@ -24,15 +22,7 @@ const {
       <p class="eyebrow">{eyebrow}</p>
       <h2>{heading}</h2>
     </div>
-    <a
-      href={ctaHref}
-      class="button-link"
-      data-analytics-event="project_cta_click"
-      data-analytics-label={ctaLabel}
-      data-analytics-location={analyticsLocation}
-    >
-      {ctaLabel}
-    </a>
+    <a href={ctaHref} class="button-link">{ctaLabel}</a>
   </div>
   <div class:list={["content-grid", "home-activity-grid", gridClass]}>
     <slot />
