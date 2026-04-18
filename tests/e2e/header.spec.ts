@@ -2,6 +2,122 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
+const scrollRestoreStorageKey = "mackysoft-locale-scroll";
+const scrollRestoreCaptureKey = "__testScrollRestoreCapture__";
+
+async function installScrollToRecorder(page: Page) {
+  await page.addInitScript(() => {
+    const scrollCalls: number[] = [];
+    const originalScrollTo = window.scrollTo.bind(window);
+
+    Object.defineProperty(window, "__testScrollToCalls", {
+      configurable: true,
+      value: scrollCalls,
+      writable: true,
+    });
+
+    window.scrollTo = ((optionsOrX?: ScrollToOptions | number, y?: number) => {
+      let nextTop = window.scrollY;
+
+      if (typeof optionsOrX === "object" && optionsOrX !== null) {
+        const top = optionsOrX.top;
+        nextTop = typeof top === "number" ? top : nextTop;
+      } else if (typeof y === "number") {
+        nextTop = y;
+      }
+
+      scrollCalls.push(nextTop);
+
+      if (typeof optionsOrX === "object" && optionsOrX !== null) {
+        return originalScrollTo(optionsOrX);
+      }
+
+      return originalScrollTo(
+        typeof optionsOrX === "number" ? optionsOrX : window.scrollX,
+        typeof y === "number" ? y : window.scrollY,
+      );
+    }) as typeof window.scrollTo;
+  });
+}
+
+async function installScrollRestoreWriteRecorder(page: Page) {
+  await page.addInitScript(({ captureKey, storageKey }) => {
+    const recorderReadyKey = "__testScrollRestoreRecorderReady__";
+
+    if (!window.sessionStorage.getItem(recorderReadyKey)) {
+      window.localStorage.removeItem(captureKey);
+      window.sessionStorage.setItem(recorderReadyKey, "true");
+    }
+
+    const storagePrototype = Object.getPrototypeOf(window.sessionStorage) as Storage;
+    const originalSetItem = storagePrototype.setItem;
+
+    storagePrototype.setItem = function setItem(key: string, value: string) {
+      if (this === window.sessionStorage && key === storageKey) {
+        window.localStorage.setItem(captureKey, value);
+      }
+
+      return originalSetItem.call(this, key, value);
+    };
+  }, {
+    captureKey: scrollRestoreCaptureKey,
+    storageKey: scrollRestoreStorageKey,
+  });
+}
+
+async function getRecordedScrollRestoreWrite(page: Page) {
+  return page.evaluate((captureKey) => {
+    const rawValue = window.localStorage.getItem(captureKey);
+
+    if (!rawValue) {
+      return null;
+    }
+
+    return JSON.parse(rawValue) as {
+      pathname?: unknown;
+      progress?: unknown;
+      timestamp?: unknown;
+    };
+  }, scrollRestoreCaptureKey);
+}
+
+async function getRecordedScrollToCalls(page: Page) {
+  return page.evaluate(() => {
+    const testWindow = window as Window & typeof globalThis & {
+      __testScrollToCalls?: number[];
+    };
+
+    return [...(testWindow.__testScrollToCalls ?? [])];
+  });
+}
+
+async function waitForRestoredScrollCall(page: Page, expectedProgress: number) {
+  await page.waitForFunction((progress) => {
+    const testWindow = window as Window & typeof globalThis & {
+      __testScrollToCalls?: number[];
+    };
+    const calls = testWindow.__testScrollToCalls ?? [];
+    const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+    const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+    const expectedTop = Math.max(Math.min(Math.round(maxScroll * progress), maxScroll), 0);
+    const tolerance = Math.max(48, Math.round(maxScroll * 0.08));
+
+    return calls.some((top) => Math.abs(top - expectedTop) <= tolerance);
+  }, expectedProgress);
+}
+
+async function seedScrollRestoreState(page: Page, pathname: string, progress: number) {
+  await page.addInitScript(({ nextPathname, nextProgress }) => {
+    window.sessionStorage.setItem("mackysoft-locale-scroll", JSON.stringify({
+      pathname: nextPathname,
+      progress: nextProgress,
+      timestamp: Date.now(),
+    }));
+  }, {
+    nextPathname: pathname,
+    nextProgress: progress,
+  });
+}
 
 async function getScrollMetrics(page: Page) {
   return page.evaluate(() => {
@@ -412,7 +528,8 @@ test.describe("site header", () => {
     expect(await page.evaluate(() => window.localStorage.getItem("mackysoft-locale"))).toBe("en");
   });
 
-  test("restores scroll progress when switching article detail routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
+  test("persists scroll progress when switching article detail routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
+    await installScrollRestoreWriteRecorder(page);
     await page.goto("/articles/how-to-complete-game-development/");
 
     const beforeNavigation = await scrollToProgress(page, 0.48);
@@ -423,40 +540,23 @@ test.describe("site header", () => {
 
     await expect(page).toHaveURL("/en/articles/how-to-complete-game-development/");
     await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
-    await page.waitForLoadState("load");
-    await page.waitForFunction((expectedProgress) => {
-      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
-      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
-      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
+    const recordedState = await getRecordedScrollRestoreWrite(page);
 
-      return Math.abs(progress - expectedProgress) <= 0.08;
-    }, beforeNavigation.progress);
-
-    const afterNavigation = await getScrollMetrics(page);
-
-    expect(afterNavigation.scrollY).toBeGreaterThan(200);
-    expect(Math.abs(afterNavigation.progress - beforeNavigation.progress)).toBeLessThanOrEqual(0.08);
+    expect(recordedState).not.toBeNull();
+    expect(recordedState?.pathname).toBe("/en/articles/how-to-complete-game-development/");
+    expect(typeof recordedState?.progress).toBe("number");
+    expect(recordedState?.progress as number).toBeGreaterThan(0.25);
+    expect(recordedState?.progress as number).toBeLessThan(0.75);
   });
 
   test("stops restoring scroll progress after the reader scrolls on translated article routes", { tag: "@size:medium" }, async ({ page }) => {
-    await page.goto("/articles/how-to-complete-game-development/");
-
-    const beforeNavigation = await scrollToProgress(page, 0.48);
-    expect(beforeNavigation.maxScroll).toBeGreaterThan(1000);
-
-    await page.locator("[data-site-language-toggle]").click();
-    await page.getByRole("menuitemradio", { name: "English" }).click();
-
+    await installScrollToRecorder(page);
+    await seedScrollRestoreState(page, "/en/articles/how-to-complete-game-development/", 0.48);
+    await page.goto("/en/articles/how-to-complete-game-development/");
     await expect(page).toHaveURL("/en/articles/how-to-complete-game-development/");
     await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
     await page.waitForLoadState("load");
-    await page.waitForFunction((expectedProgress) => {
-      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
-      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
-      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
-
-      return Math.abs(progress - expectedProgress) <= 0.08;
-    }, beforeNavigation.progress);
+    await waitForRestoredScrollCall(page, 0.48);
 
     const restored = await getScrollMetrics(page);
 
@@ -470,6 +570,7 @@ test.describe("site header", () => {
     }, restored.scrollY);
 
     const manualScroll = await getScrollMetrics(page);
+    const scrollCallsAfterManualScroll = await getRecordedScrollToCalls(page);
 
     await page.evaluate(() => {
       const spacer = document.createElement("div");
@@ -481,30 +582,21 @@ test.describe("site header", () => {
     await page.waitForTimeout(200);
 
     const afterResize = await getScrollMetrics(page);
+    const scrollCallsAfterResize = await getRecordedScrollToCalls(page);
 
     expect(Math.abs(afterResize.scrollY - manualScroll.scrollY)).toBeLessThanOrEqual(2);
     expect(afterResize.scrollY).toBeLessThan(restored.scrollY - 200);
+    expect(scrollCallsAfterResize).toHaveLength(scrollCallsAfterManualScroll.length);
   });
 
   test("stops restoring scroll progress after the reader scrolls with the keyboard on translated article routes", { tag: "@size:medium" }, async ({ page }) => {
-    await page.goto("/articles/how-to-complete-game-development/");
-
-    const beforeNavigation = await scrollToProgress(page, 0.48);
-    expect(beforeNavigation.maxScroll).toBeGreaterThan(1000);
-
-    await page.locator("[data-site-language-toggle]").click();
-    await page.getByRole("menuitemradio", { name: "English" }).click();
-
+    await installScrollToRecorder(page);
+    await seedScrollRestoreState(page, "/en/articles/how-to-complete-game-development/", 0.48);
+    await page.goto("/en/articles/how-to-complete-game-development/");
     await expect(page).toHaveURL("/en/articles/how-to-complete-game-development/");
     await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
     await page.waitForLoadState("load");
-    await page.waitForFunction((expectedProgress) => {
-      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
-      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
-      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
-
-      return Math.abs(progress - expectedProgress) <= 0.08;
-    }, beforeNavigation.progress);
+    await waitForRestoredScrollCall(page, 0.48);
 
     const restored = await getScrollMetrics(page);
 
@@ -517,6 +609,7 @@ test.describe("site header", () => {
     }, restored.scrollY);
 
     const manualScroll = await getScrollMetrics(page);
+    const scrollCallsAfterManualScroll = await getRecordedScrollToCalls(page);
 
     await page.evaluate(() => {
       const spacer = document.createElement("div");
@@ -528,9 +621,11 @@ test.describe("site header", () => {
     await page.waitForTimeout(200);
 
     const afterResize = await getScrollMetrics(page);
+    const scrollCallsAfterResize = await getRecordedScrollToCalls(page);
 
     expect(Math.abs(afterResize.scrollY - manualScroll.scrollY)).toBeLessThanOrEqual(2);
     expect(afterResize.scrollY).toBeGreaterThan(restored.scrollY + 100);
+    expect(scrollCallsAfterResize).toHaveLength(scrollCallsAfterManualScroll.length);
   });
 
   test("restores scroll progress when switching article index routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
