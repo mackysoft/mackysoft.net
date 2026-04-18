@@ -307,13 +307,13 @@ function createResultCard(result: PagefindSearchResultData, locale: SiteLocale, 
   badges.className = "activity-card__badges";
 
   const typeBadge = document.createElement("span");
-  typeBadge.className = "activity-card__badge";
+  typeBadge.className = "activity-card__badge pill pill--badge";
   typeBadge.textContent = uiText.search.typeLabel[type];
   badges.append(typeBadge);
 
   if (external) {
     const externalBadge = document.createElement("span");
-    externalBadge.className = "activity-card__badge";
+    externalBadge.className = "activity-card__badge pill pill--badge";
     externalBadge.textContent = uiText.search.externalBadge;
     badges.append(externalBadge);
   }
