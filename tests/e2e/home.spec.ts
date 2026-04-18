@@ -37,61 +37,10 @@ const homePageContentEn = getHomePageContent("en");
 const homeHeroJa = getProfileContent("ja").home;
 const homeHeroEn = getProfileContent("en").home;
 const mobileViewport = { width: 375, height: 812 };
-const analyticsStorageKey = "__analytics_events__";
-const analyticsInitKey = "__analytics_capture_initialized__";
-
 async function setJapaneseLocale(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem("mackysoft-locale", "ja");
   });
-}
-
-async function setJapaneseLocaleWithAnalyticsCapture(page: Page) {
-  await page.addInitScript(({ storageKey, initKey }) => {
-    const dataLayer: unknown[] = [];
-    const originalPush = Array.prototype.push;
-
-    dataLayer.push = function push(...items: unknown[]) {
-      const result = originalPush.apply(this, items);
-      const storedEvents = JSON.parse(window.sessionStorage.getItem(storageKey) ?? "[]");
-      const serializedEvents = items.map((item) => {
-        if (!item || typeof item !== "object" || !("length" in item)) {
-          return item;
-        }
-
-        return Array.from(item as ArrayLike<unknown>, (value) => {
-          return value instanceof Date ? value.toISOString() : value;
-        });
-      });
-
-      storedEvents.push(...serializedEvents);
-      window.sessionStorage.setItem(storageKey, JSON.stringify(storedEvents));
-      return result;
-    };
-
-    if (window.sessionStorage.getItem(initKey) !== "true") {
-      window.sessionStorage.removeItem(storageKey);
-      window.sessionStorage.setItem(initKey, "true");
-    }
-
-    window.localStorage.setItem("mackysoft-locale", "ja");
-    Object.defineProperty(window, "dataLayer", {
-      configurable: true,
-      writable: true,
-      value: dataLayer,
-    });
-  }, { storageKey: analyticsStorageKey, initKey: analyticsInitKey });
-}
-
-async function getTrackedAnalyticsEvents(page: Page, eventName: string) {
-  return page.evaluate(({ storageKey, trackedEventName }) => {
-    const storedEvents = window.sessionStorage.getItem(storageKey);
-    const events = storedEvents ? JSON.parse(storedEvents) : [];
-
-    return events.filter((event: unknown) => {
-      return Array.isArray(event) && event[0] === "event" && event[1] === trackedEventName;
-    });
-  }, { storageKey: analyticsStorageKey, trackedEventName: eventName });
 }
 
 async function expectMobileHomeGridFullWidth(page: Page, gridSelector: string, itemSelector: string) {
@@ -303,42 +252,6 @@ test.describe("home page", () => {
 
     expect(homeHeroBox.y).toBeLessThan(latestArticlesHeadingBox.y);
     expect(latestReleasesHeadingBox.y).toBeLessThan(gamesHeadingBox.y);
-  });
-
-  test("tracks internal hero and section CTAs as project CTA clicks", { tag: "@size:medium" }, async ({ page }) => {
-    await setJapaneseLocaleWithAnalyticsCapture(page);
-    await page.goto("/");
-
-    await page.getByRole("link", { name: homePageContentJa.heroPrimaryCta, exact: true }).click();
-    await expect(page).toHaveURL("/about/");
-
-    await page.goBack();
-    await expect(page).toHaveURL("/");
-
-    await page.getByRole("link", { name: homePageContentJa.latestArticlesCta, exact: true }).click();
-    await expect(page).toHaveURL("/articles/");
-
-    const trackedEvents = await getTrackedAnalyticsEvents(page, "project_cta_click");
-
-    expect(trackedEvents).toHaveLength(2);
-    expect(trackedEvents[0]).toMatchObject([
-      "event",
-      "project_cta_click",
-      {
-        target_label: homePageContentJa.heroPrimaryCta,
-        ui_location: "home-hero",
-        target_href: "http://127.0.0.1:4322/about/",
-      },
-    ]);
-    expect(trackedEvents[1]).toMatchObject([
-      "event",
-      "project_cta_click",
-      {
-        target_label: homePageContentJa.latestArticlesCta,
-        ui_location: "home-latest-articles",
-        target_href: "http://127.0.0.1:4322/articles/",
-      },
-    ]);
   });
 
   test("shows an RSS shortcut on the right side of the footer", { tag: "@size:medium" }, async ({ page }) => {

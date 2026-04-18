@@ -1,4 +1,56 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+const analyticsStorageKey = "__analytics_events__";
+const analyticsInitKey = "__analytics_capture_initialized__";
+
+async function setJapaneseLocaleWithAnalyticsCapture(page: Page) {
+  await page.addInitScript(({ storageKey, initKey }) => {
+    const dataLayer: unknown[] = [];
+    const originalPush = Array.prototype.push;
+
+    dataLayer.push = function push(...items: unknown[]) {
+      const result = originalPush.apply(this, items);
+      const storedEvents = JSON.parse(window.sessionStorage.getItem(storageKey) ?? "[]");
+      const serializedEvents = items.map((item) => {
+        if (!item || typeof item !== "object" || !("length" in item)) {
+          return item;
+        }
+
+        return Array.from(item as ArrayLike<unknown>, (value) => {
+          return value instanceof Date ? value.toISOString() : value;
+        });
+      });
+
+      storedEvents.push(...serializedEvents);
+      window.sessionStorage.setItem(storageKey, JSON.stringify(storedEvents));
+      return result;
+    };
+
+    if (window.sessionStorage.getItem(initKey) !== "true") {
+      window.sessionStorage.removeItem(storageKey);
+      window.sessionStorage.setItem(initKey, "true");
+    }
+
+    window.localStorage.setItem("mackysoft-locale", "ja");
+    Object.defineProperty(window, "dataLayer", {
+      configurable: true,
+      writable: true,
+      value: dataLayer,
+    });
+  }, { storageKey: analyticsStorageKey, initKey: analyticsInitKey });
+}
+
+async function getTrackedAnalyticsEvents(page: Page, eventName: string) {
+  return page.evaluate(({ storageKey, trackedEventName }) => {
+    const storedEvents = window.sessionStorage.getItem(storageKey);
+    const events = storedEvents ? JSON.parse(storedEvents) : [];
+
+    return events.filter((event: unknown) => {
+      return Array.isArray(event) && event[0] === "event" && event[1] === trackedEventName;
+    });
+  }, { storageKey: analyticsStorageKey, trackedEventName: eventName });
+}
 
 test.describe("games page", () => {
   test("shows game cards with status labels on the index page", { tag: "@size:medium" }, async ({ page }) => {
@@ -178,5 +230,25 @@ test.describe("games page", () => {
       "href",
       "https://unityroom.com/games/treasure-rogue",
     );
+  });
+
+  test("tracks external game actions as external link clicks", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto("/games/treasure-rogue/");
+
+    await page.getByRole("link", { name: "unityroom で遊ぶ", exact: true }).click();
+
+    const trackedEvents = await getTrackedAnalyticsEvents(page, "external_link_click");
+
+    expect(trackedEvents).toHaveLength(1);
+    expect(trackedEvents[0]).toMatchObject([
+      "event",
+      "external_link_click",
+      {
+        target_label: "unityroom で遊ぶ",
+        ui_location: "game-action-panel",
+        target_href: "https://unityroom.com/games/treasure-rogue",
+      },
+    ]);
   });
 });

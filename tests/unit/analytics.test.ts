@@ -54,23 +54,7 @@ describe("analytics helpers", () => {
     });
   });
 
-  test("builds project and external link payloads from stable metadata", () => {
-    expect(
-      buildAnalyticsEventPayload({
-        eventName: "project_cta_click",
-        explicitLabel: "play",
-        location: "game-action-panel",
-        href: "https://unityroom.com/games/treasure-rogue",
-      }),
-    ).toEqual({
-      eventName: "project_cta_click",
-      params: {
-        target_label: "play",
-        ui_location: "game-action-panel",
-        target_href: "https://unityroom.com/games/treasure-rogue",
-      },
-    });
-
+  test("builds external link payloads from stable metadata", () => {
     expect(
       buildAnalyticsEventPayload({
         eventName: "external_link_click",
@@ -121,6 +105,13 @@ describe("analytics helpers", () => {
   });
 
   test("keeps the click payload builder scoped to click events", () => {
+    expect(
+      buildAnalyticsEventPayload({
+        eventName: "project_cta_click",
+        explicitLabel: "search",
+      }),
+    ).toBeNull();
+
     expect(
       buildAnalyticsEventPayload({
         eventName: "site_search",
