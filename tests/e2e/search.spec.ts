@@ -240,12 +240,28 @@ test.describe("site search", () => {
     await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
 
     await expect.poll(async () => (await getAnalyticsCommands(page, "config")).length).toBeGreaterThan(0);
+    const jsCommandIndex = await page.evaluate((storageKey) => {
+      const storedEvents = window.sessionStorage.getItem(storageKey);
+      const events = storedEvents ? JSON.parse(storedEvents) : [];
+      return events.findIndex((event: unknown) => {
+        return Array.isArray(event) && event[0] === "js";
+      });
+    }, analyticsStorageKey);
     const configCommands = await getAnalyticsCommands(page, "config");
     const configCommand = configCommands.find((command: unknown) => {
       return Array.isArray(command) && command[1] === "G-TEST123456";
     });
+    const configCommandIndex = await page.evaluate((storageKey) => {
+      const storedEvents = window.sessionStorage.getItem(storageKey);
+      const events = storedEvents ? JSON.parse(storedEvents) : [];
+      return events.findIndex((event: unknown) => {
+        return Array.isArray(event) && event[0] === "config" && event[1] === "G-TEST123456";
+      });
+    }, analyticsStorageKey);
 
     expect(configCommand).toBeDefined();
+    expect(jsCommandIndex).toBeGreaterThanOrEqual(0);
+    expect(configCommandIndex).toBeGreaterThan(jsCommandIndex);
 
     const pageLocation = Array.isArray(configCommand) && typeof configCommand[2] === "object" && configCommand[2] !== null
       ? (configCommand[2] as { page_location?: unknown }).page_location
@@ -421,60 +437,6 @@ test.describe("site search", () => {
 
     await inlinePanel.locator('[data-site-search-input]').press("Enter");
     await expect(page).toHaveURL(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
-
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(1);
-    const trackedEvents = await getTrackedAnalyticsEvents(page, "site_search");
-
-    expect(trackedEvents[0]).toMatchObject([
-      "event",
-      "site_search",
-      {
-        search_term: localSearchQuery,
-        ui_location: "site-header-search",
-      },
-    ]);
-  });
-
-  test("replays inline search submissions on the search page when analytics was not ready", { tag: "@size:medium" }, async ({ page }) => {
-    await setJapaneseLocaleWithAnalyticsCapture(page);
-    await page.goto("/");
-
-    await page.evaluate(() => {
-      const analyticsWindow = window as Window & typeof globalThis & {
-        __mackysoftAnalyticsScriptLoaded?: boolean;
-      };
-
-      analyticsWindow.__mackysoftAnalyticsScriptLoaded = false;
-    });
-
-    await page.locator('[data-site-search-trigger]').click();
-    const inlinePanel = page.locator('[data-site-search-inline]');
-
-    await page.evaluate((query) => {
-      const input = document.querySelector('[data-site-search-inline] [data-site-search-input]');
-
-      if (!(input instanceof HTMLInputElement)) {
-        throw new Error("inline search input must exist");
-      }
-
-      input.value = query;
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    }, localSearchQuery);
-
-    await expect.poll(async () => inlinePanel.locator(".site-search-card").count()).toBeGreaterThan(0);
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(0);
-
-    await inlinePanel.locator('[data-site-search-input]').press("Enter");
-    await expect(page).toHaveURL(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
-
-    await page.evaluate(() => {
-      const analyticsWindow = window as Window & typeof globalThis & {
-        __mackysoftAnalyticsScriptLoaded?: boolean;
-      };
-
-      analyticsWindow.__mackysoftAnalyticsScriptLoaded = true;
-      window.dispatchEvent(new Event("mackysoft:analytics-ready"));
-    });
 
     await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(1);
     const trackedEvents = await getTrackedAnalyticsEvents(page, "site_search");

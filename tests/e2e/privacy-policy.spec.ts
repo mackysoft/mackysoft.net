@@ -28,8 +28,6 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("テーマ切替");
     await expect(main).toContainText("言語切替");
     await expect(main).toContainText("サイト内検索で送信された検索語");
-    await expect(main).toContainText("ページ閲覧・操作計測のパラメータ");
-    await expect(main.locator("code", { hasText: "__pending_analytics_events__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "外部サービス" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
@@ -65,15 +63,6 @@ test.describe("privacy policy page", () => {
         }
       }, gaMeasurementId),
     ).toBe(true);
-    expect(
-      await page.evaluate(() => {
-        return Array.from(document.head.querySelectorAll("script")).some((script) => {
-          return script instanceof HTMLScriptElement
-            && script.src === ""
-            && (script.textContent ?? "").includes("__pending_analytics_events__");
-        });
-      }),
-    ).toBe(true);
   });
 
   test("renders the English privacy policy with the same scope", { tag: "@size:medium" }, async ({ page }) => {
@@ -97,8 +86,6 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("theme switches");
     await expect(main).toContainText("language switches");
     await expect(main).toContainText("search terms submitted through on-site search");
-    await expect(main).toContainText("Page-view and interaction analytics parameters");
-    await expect(main.locator("code", { hasText: "__pending_analytics_events__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "External Services" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
@@ -133,15 +120,20 @@ test.describe("privacy policy page", () => {
     await expect(main.getByRole("heading", { level: 2, name: "流量分析" })).toBeVisible();
     await expect(main).toContainText("Google Analytics 4");
     await expect(main).toContainText("Google signals");
+    await expect(main).toContainText("不使用 Google signals 或用於廣告的個人化功能");
     await expect(main).toContainText("主題切換");
     await expect(main).toContainText("語言切換");
     await expect(main).toContainText("站內搜尋的送出");
     await expect(main).toContainText("在站內搜尋中送出的搜尋詞");
-    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "外部服務" })).toBeVisible();
+    await expect(main).toContainText("Cloudflare Workers");
+    await expect(main).toContainText("Google Fonts");
+    await expect(main).toContainText("youtube-nocookie.com");
     await expect(main).toContainText("公開儲存庫資訊與 Release 資訊");
     await expect(main.getByRole("heading", { level: 2, name: "由海外業者進行的處理" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "使用者可採取的控制方式" })).toBeVisible();
+    await expect(main).toContainText("localStorage");
+    await expect(main).toContainText("sessionStorage");
     await expect(main).toContainText("制定日: 2026年4月12日");
     await expect(main).toContainText("最後更新日: 2026年4月19日");
   });
@@ -160,15 +152,20 @@ test.describe("privacy policy page", () => {
     await expect(main.getByRole("heading", { level: 2, name: "분석" })).toBeVisible();
     await expect(main).toContainText("Google Analytics 4");
     await expect(main).toContainText("Google signals");
+    await expect(main).toContainText("광고 개인화 기능은 사용하지 않습니다");
     await expect(main).toContainText("테마 전환");
     await expect(main).toContainText("언어 전환");
     await expect(main).toContainText("사이트 내 검색 제출");
     await expect(main).toContainText("사이트 내 검색에서 제출된 검색어");
-    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "외부 서비스" })).toBeVisible();
+    await expect(main).toContainText("Cloudflare Workers");
+    await expect(main).toContainText("Google Fonts");
+    await expect(main).toContainText("youtube-nocookie.com");
     await expect(main).toContainText("공개 저장소 정보와 릴리스 정보");
     await expect(main.getByRole("heading", { level: 2, name: "해외 사업자에 의한 처리" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "이용자의 통제 방법" })).toBeVisible();
+    await expect(main).toContainText("localStorage");
+    await expect(main).toContainText("sessionStorage");
     await expect(main).toContainText("시행일: 2026년 4월 12일");
     await expect(main).toContainText("최종 업데이트: 2026년 4월 19일");
   });
