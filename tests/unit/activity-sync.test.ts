@@ -608,7 +608,7 @@ describe("sync-activity", () => {
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
     const outputPath = path.join(tempDir, "activity.json");
     const coverOutputDir = path.join(tempDir, "activity-covers");
-    const fetchImpl = async (input, init) => {
+    const fetchImpl = async (input: string | URL | Request, init?: RequestInit) => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
 
       if (url === "https://opengraph.githubassets.com/mock/alpha") {
