@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import {
   buildAnalyticsEventPayload,
-  buildSearchResultsAnalyticsEventPayload,
+  buildSiteSearchAnalyticsEventPayload,
   getAnalyticsMeasurementId,
   isAnalyticsEnabled,
 } from "../../src/lib/analytics";
@@ -105,17 +105,17 @@ describe("analytics helpers", () => {
     });
   });
 
-  test("builds the search results payload from fixed metadata only", () => {
+  test("builds the site search payload from the submitted query and location", () => {
     expect(
-      buildSearchResultsAnalyticsEventPayload({
+      buildSiteSearchAnalyticsEventPayload({
+        searchTerm: "BoundingSphereUpdateMode",
         location: "search-page",
-        resultsCount: 24,
       }),
     ).toEqual({
-      eventName: "view_search_results",
+      eventName: "site_search",
       params: {
+        search_term: "BoundingSphereUpdateMode",
         ui_location: "search-page",
-        results_count: 24,
       },
     });
   });
@@ -123,7 +123,7 @@ describe("analytics helpers", () => {
   test("keeps the click payload builder scoped to click events", () => {
     expect(
       buildAnalyticsEventPayload({
-        eventName: "view_search_results",
+        eventName: "site_search",
         explicitLabel: "search",
       }),
     ).toBeNull();

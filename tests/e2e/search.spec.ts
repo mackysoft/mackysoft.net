@@ -189,25 +189,13 @@ test.describe("site search", () => {
     await expect(page.locator(".site-search__summary")).toContainText("件の検索結果");
   });
 
-  test("tracks dedicated search result views once per rendered state", { tag: "@size:medium" }, async ({ page }) => {
+  test("tracks dedicated search submissions only when the form is submitted", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocaleWithAnalyticsCapture(page);
     await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
 
     const pagePanel = page.locator('[data-search-mode="page"]').first();
     await expect.poll(async () => pagePanel.locator(".site-search-card").count()).toBeGreaterThan(0);
-    const resultCount = await pagePanel.locator(".site-search-card").count();
-
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
-    let trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
-
-    expect(trackedEvents[0]).toMatchObject([
-      "event",
-      "view_search_results",
-      {
-        ui_location: "search-page",
-        results_count: resultCount,
-      },
-    ]);
+    const form = pagePanel.locator("[data-site-search-form]");
 
     await page.evaluate(() => {
       const input = document.querySelector('[data-search-mode="page"] [data-site-search-input]');
@@ -219,9 +207,27 @@ test.describe("site search", () => {
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
-    trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
-    expect(trackedEvents).toHaveLength(1);
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(0);
+
+    await form.evaluate((formElement) => {
+      if (!(formElement instanceof HTMLFormElement)) {
+        throw new Error("search page form must exist");
+      }
+
+      formElement.requestSubmit();
+    });
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(1);
+    const trackedEvents = await getTrackedAnalyticsEvents(page, "site_search");
+
+    expect(trackedEvents[0]).toMatchObject([
+      "event",
+      "site_search",
+      {
+        search_term: localSearchQuery,
+        ui_location: "search-page",
+      },
+    ]);
   });
 
   test("sanitizes the search page location before the initial GA4 page view", { tag: "@size:medium" }, async ({ page }) => {
@@ -385,7 +391,7 @@ test.describe("site search", () => {
     expect(inlineSummaryText).toContain("上位 20 件を表示");
   });
 
-  test("tracks inline search result views once per rendered state", { tag: "@size:medium" }, async ({ page }) => {
+  test("tracks inline search submissions when the form is submitted", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocaleWithAnalyticsCapture(page);
     await page.goto("/");
 
@@ -404,48 +410,22 @@ test.describe("site search", () => {
     }, localSearchQuery);
 
     await expect.poll(async () => inlinePanel.locator(".site-search-card").count()).toBeGreaterThan(0);
-    const resultCount = await inlinePanel.locator(".site-search-card").count();
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(0);
 
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
-    let trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
+    await inlinePanel.locator('[data-site-search-input]').press("Enter");
+    await expect(page).toHaveURL(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(1);
+    const trackedEvents = await getTrackedAnalyticsEvents(page, "site_search");
 
     expect(trackedEvents[0]).toMatchObject([
       "event",
-      "view_search_results",
+      "site_search",
       {
+        search_term: localSearchQuery,
         ui_location: "site-header-search",
-        results_count: resultCount,
       },
     ]);
-
-    await page.evaluate(() => {
-      const input = document.querySelector('[data-site-search-inline] [data-site-search-input]');
-
-      if (!(input instanceof HTMLInputElement)) {
-        throw new Error("inline search input must exist");
-      }
-
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
-    trackedEvents = await getTrackedAnalyticsEvents(page, "view_search_results");
-    expect(trackedEvents).toHaveLength(1);
-  });
-
-  test("tracks the same query again after another query interrupts the search flow", { tag: "@size:medium" }, async ({ page }) => {
-    await setJapaneseLocaleWithAnalyticsCapture(page);
-    await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
-
-    const pagePanel = page.locator('[data-search-mode="page"]').first();
-    const input = pagePanel.locator("[data-site-search-input]");
-
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
-
-    await input.fill("Serialize");
-    await input.fill(localSearchQuery);
-
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(2);
   });
 
   test("tracks the same query again when the page search form is submitted again", { tag: "@size:medium" }, async ({ page }) => {
@@ -455,7 +435,7 @@ test.describe("site search", () => {
     const pagePanel = page.locator('[data-search-mode="page"]').first();
     const form = pagePanel.locator("[data-site-search-form]");
 
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(0);
 
     await form.evaluate((formElement) => {
       if (!(formElement instanceof HTMLFormElement)) {
@@ -465,7 +445,17 @@ test.describe("site search", () => {
       formElement.requestSubmit();
     });
 
-    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(2);
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(1);
+
+    await form.evaluate((formElement) => {
+      if (!(formElement instanceof HTMLFormElement)) {
+        throw new Error("search page form must exist");
+      }
+
+      formElement.requestSubmit();
+    });
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "site_search")).length).toBe(2);
   });
 
   test("does not include Japanese-only local pages in English search", { tag: "@size:medium" }, async ({ page }) => {
