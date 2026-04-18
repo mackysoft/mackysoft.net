@@ -23,7 +23,11 @@ import {
   openDropdownPanel,
   prepareDropdownPanel,
 } from "./site-dropdown";
-import { trackSiteSearchSubmit } from "./site-search-analytics";
+import {
+  buildInlineSearchNavigationUrl,
+  consumeInlineSearchPageVisit,
+  trackSiteSearchSubmit,
+} from "./site-search-analytics";
 
 type PagefindResult = {
   id: string;
@@ -196,14 +200,7 @@ function createMetaItem(text: string) {
 }
 
 function navigateToSearchPage(elements: SearchPanelElements, query: string) {
-  const nextUrl = new URL(elements.searchPath, window.location.href);
-
-  if (query) {
-    nextUrl.searchParams.set("q", query);
-  } else {
-    nextUrl.searchParams.delete("q");
-  }
-
+  const nextUrl = buildInlineSearchNavigationUrl(elements.searchPath, query);
   window.location.assign(`${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
 }
 
@@ -421,9 +418,28 @@ function initSearchPanel(root: HTMLElement) {
   const initialQueryFromUrl = elements.mode === "page"
     ? new URL(window.location.href).searchParams.get("q")?.trim() ?? ""
     : "";
+  const initialPageVisit = elements.mode === "page"
+    ? consumeInlineSearchPageVisit(new URL(window.location.href))
+    : null;
 
   if (initialQueryFromUrl && elements.input.value !== initialQueryFromUrl) {
     elements.input.value = initialQueryFromUrl;
+  }
+
+  if (initialPageVisit) {
+    const currentUrl = new URL(window.location.href);
+
+    if (
+      currentUrl.pathname !== initialPageVisit.sanitizedUrl.pathname
+      || currentUrl.search !== initialPageVisit.sanitizedUrl.search
+      || currentUrl.hash !== initialPageVisit.sanitizedUrl.hash
+    ) {
+      window.history.replaceState(
+        null,
+        "",
+        `${initialPageVisit.sanitizedUrl.pathname}${initialPageVisit.sanitizedUrl.search}${initialPageVisit.sanitizedUrl.hash}`,
+      );
+    }
   }
 
   const searchPagefind = async (pagefind: PagefindModule, queryVariants: ReturnType<typeof createSearchQueryVariants>, immediate: boolean) => {
@@ -533,18 +549,11 @@ function initSearchPanel(root: HTMLElement) {
 
     if (elements.mode === "inline") {
       event.preventDefault();
-      trackSiteSearchSubmit(elements.mode, query, {
-        onComplete: () => {
-          navigateToSearchPage(elements, query);
-        },
-        searchPath: elements.searchPath,
-      });
+      navigateToSearchPage(elements, query);
       return;
     }
 
-    trackSiteSearchSubmit(elements.mode, query, {
-      searchPath: elements.searchPath,
-    });
+    trackSiteSearchSubmit(elements.mode, query);
     event.preventDefault();
     void runSearch(query, true);
   });

@@ -1,7 +1,4 @@
 (() => {
-  const analyticsReadyEventName = "mackysoft:analytics-ready";
-  const pendingAnalyticsStorageKey = "__pending_analytics_events__";
-  const pendingAnalyticsCallLimit = 20;
   const analyticsConfigElementId = "site-analytics-config";
   const analyticsScriptAttribute = "data-site-analytics-script";
   const clickAnalyticsEventNames = new Set([
@@ -96,282 +93,27 @@
     };
   }
 
-  function isAnalyticsParams(value) {
-    if (typeof value !== "object" || value === null) {
-      return false;
-    }
-
-    return Object.values(value).every((entry) => {
-      return typeof entry === "string" || typeof entry === "number" || typeof entry === "boolean";
-    });
-  }
-
-  function isPendingAnalyticsReplayCondition(value) {
-    if (typeof value !== "object" || value === null) {
-      return false;
-    }
-
-    return (
-      value.kind === "search-page"
-      && typeof value.pathname === "string"
-      && typeof value.searchParam === "string"
-      && typeof value.value === "string"
-    );
-  }
-
-  function isPendingAnalyticsCall(value) {
-    if (typeof value !== "object" || value === null) {
-      return false;
-    }
-
-    return (
-      (value.command === "config" || value.command === "event")
-      && typeof value.target === "string"
-      && isAnalyticsParams(value.params)
-      && (
-        value.replayCondition === undefined
-        || (value.command === "event" && isPendingAnalyticsReplayCondition(value.replayCondition))
-      )
-    );
-  }
-
-  function readPendingAnalyticsCalls() {
-    try {
-      const rawValue = window.sessionStorage.getItem(pendingAnalyticsStorageKey);
-
-      if (!rawValue) {
-        return [];
-      }
-
-      const parsedValue = JSON.parse(rawValue);
-
-      if (!Array.isArray(parsedValue)) {
-        clearPendingAnalyticsCalls();
-        return [];
-      }
-
-      const calls = parsedValue.filter(isPendingAnalyticsCall);
-
-      if (calls.length !== parsedValue.length) {
-        clearPendingAnalyticsCalls();
-        return [];
-      }
-
-      return calls;
-    } catch {
-      clearPendingAnalyticsCalls();
-      return [];
-    }
-  }
-
-  function writePendingAnalyticsCalls(calls) {
-    try {
-      window.sessionStorage.setItem(
-        pendingAnalyticsStorageKey,
-        JSON.stringify(calls.slice(-pendingAnalyticsCallLimit)),
-      );
-    } catch {
-      // Ignore storage failures and keep analytics best-effort.
-    }
-  }
-
-  function persistPendingAnalyticsCall(call) {
-    const pendingCalls = readPendingAnalyticsCalls();
-    pendingCalls.push(call);
-    writePendingAnalyticsCalls(pendingCalls);
-  }
-
-  function clearPendingAnalyticsCalls() {
-    try {
-      window.sessionStorage.removeItem(pendingAnalyticsStorageKey);
-    } catch {
-      // Ignore storage failures and keep analytics best-effort.
-    }
-  }
-
-  function getPendingAnalyticsCallDisposition(call, location) {
-    if (call.command !== "event" || !call.replayCondition) {
-      return "flush";
-    }
-
-    if (call.replayCondition.kind === "search-page") {
-      if (location.pathname !== call.replayCondition.pathname) {
-        return "retain";
-      }
-
-      const currentValue = location.searchParams.get(call.replayCondition.searchParam)?.trim() ?? "";
-      return currentValue === call.replayCondition.value ? "flush" : "drop";
-    }
-
-    return "flush";
-  }
-
-  function isCurrentPageConfigCall(call, location) {
-    if (call.command !== "config" || typeof call.params.page_location !== "string") {
-      return false;
-    }
-
-    try {
-      return new URL(call.params.page_location).pathname === location.pathname;
-    } catch {
-      return false;
-    }
-  }
-
-  function findCurrentPageConfigIndex(calls, location) {
-    for (let index = calls.length - 1; index >= 0; index -= 1) {
-      if (isCurrentPageConfigCall(calls[index], location)) {
-        return index;
-      }
-    }
-
-    return -1;
-  }
-
-  function flushPendingAnalyticsEventCalls(calls) {
-    if (typeof window.gtag !== "function") {
-      return;
-    }
-
-    for (const call of calls) {
-      window.gtag(call.command, call.target, call.params);
-    }
-  }
-
   function initAnalyticsWindow() {
-    window.__mackysoftAnalyticsScriptLoaded = false;
     window.dataLayer = window.dataLayer || [];
     window.gtag = window.gtag || function gtag(...args) {
       window.dataLayer.push(args);
     };
   }
 
-  function isAnalyticsReady() {
-    return window.__mackysoftAnalyticsScriptLoaded === true && typeof window.gtag === "function";
+  function queueAnalyticsConfig(measurementId, params) {
+    window.gtag?.("config", measurementId, params);
   }
 
-  function flushPendingAnalyticsCalls() {
-    if (!isAnalyticsReady()) {
-      return;
-    }
+  function queueAnalyticsBootstrap() {
+    window.gtag?.("js", new Date());
+  }
 
-    const pendingCalls = readPendingAnalyticsCalls();
-
-    if (pendingCalls.length === 0 || typeof window.gtag !== "function") {
-      return;
-    }
-
-    const currentLocation = new URL(window.location.href);
-    const remainingCalls = [];
-    const delayedReplayCalls = [];
-    const currentPageConfigIndex = findCurrentPageConfigIndex(pendingCalls, currentLocation);
-    let didFlushCurrentPageConfig = false;
-
-    for (const [index, call] of pendingCalls.entries()) {
-      const disposition = getPendingAnalyticsCallDisposition(call, currentLocation);
-
-      if (disposition === "retain") {
-        remainingCalls.push(call);
-        continue;
-      }
-
-      if (disposition === "drop") {
-        continue;
-      }
-
-      if (call.command === "event" && call.replayCondition) {
-        if (didFlushCurrentPageConfig) {
-          window.gtag(call.command, call.target, call.params);
-          continue;
-        }
-
-        delayedReplayCalls.push(call);
-        continue;
-      }
-
-      window.gtag(call.command, call.target, call.params);
-
-      if (index === currentPageConfigIndex) {
-        didFlushCurrentPageConfig = true;
-
-        if (delayedReplayCalls.length > 0) {
-          flushPendingAnalyticsEventCalls(delayedReplayCalls);
-          delayedReplayCalls.length = 0;
-        }
-      }
-    }
-
-    if (delayedReplayCalls.length > 0) {
-      flushPendingAnalyticsEventCalls(delayedReplayCalls);
-    }
-
-    if (remainingCalls.length > 0) {
-      writePendingAnalyticsCalls(remainingCalls);
-      return;
-    }
-
-    clearPendingAnalyticsCalls();
+  function trackAnalyticsEvent(eventName, params) {
+    window.gtag?.("event", eventName, params);
   }
 
   function markAnalyticsReady() {
     window.__mackysoftAnalyticsScriptLoaded = true;
-    flushPendingAnalyticsCalls();
-    window.dispatchEvent(new Event(analyticsReadyEventName));
-  }
-
-  function queueAnalyticsConfig(measurementId, params) {
-    if (isAnalyticsReady()) {
-      window.gtag?.("config", measurementId, params);
-      return;
-    }
-
-    persistPendingAnalyticsCall({
-      command: "config",
-      target: measurementId,
-      params,
-    });
-  }
-
-  function sendAnalyticsEvent(eventName, params, options) {
-    const { onComplete, persistWhenUnavailable = true, replayCondition } = options ?? {};
-
-    if (!isAnalyticsReady() || typeof window.gtag !== "function") {
-      if (persistWhenUnavailable) {
-        persistPendingAnalyticsCall({
-          command: "event",
-          target: eventName,
-          params,
-          replayCondition,
-        });
-      }
-
-      onComplete?.();
-      return false;
-    }
-
-    if (!onComplete) {
-      window.gtag("event", eventName, params);
-      return true;
-    }
-
-    let completed = false;
-    const complete = () => {
-      if (completed) {
-        return;
-      }
-
-      completed = true;
-      onComplete();
-    };
-
-    window.gtag("event", eventName, {
-      ...params,
-      event_callback: complete,
-      transport_type: "beacon",
-    });
-    window.setTimeout(complete, 1000);
-
-    return true;
   }
 
   function isSiteAnalyticsConfig(value) {
@@ -441,8 +183,6 @@
       return;
     }
 
-    window.gtag?.("js", new Date());
-
     const analyticsScript = document.createElement("script");
     analyticsScript.async = true;
     analyticsScript.src = analyticsScriptUrl;
@@ -505,7 +245,7 @@
           return;
         }
 
-        sendAnalyticsEvent(payload.eventName, payload.params, { persistWhenUnavailable: true });
+        trackAnalyticsEvent(payload.eventName, payload.params);
       },
       { capture: true },
     );
@@ -519,6 +259,7 @@
     }
 
     initAnalyticsWindow();
+    queueAnalyticsBootstrap();
     queueAnalyticsConfig(analyticsConfig.measurementId, buildAnalyticsConfigOptions(analyticsConfig));
     scheduleAnalyticsScriptLoad(analyticsConfig.analyticsScriptUrl);
     registerAnalyticsClickTracking();
