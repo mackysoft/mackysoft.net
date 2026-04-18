@@ -19,7 +19,7 @@ description: 이 사이트에서 실제로 다루는 정보의 처리 방식을 
 - 초기 표시 언어를 결정하는 데 사용하는 `navigator.languages` 같은 브라우저 언어 설정
 - 테마와 언어 설정을 유지하기 위해 `localStorage`에 저장하는 `mackysoft-theme`와 `mackysoft-locale`
 - 언어 전환 후 스크롤 위치를 복원하기 위해 `sessionStorage`에 저장하는 `mackysoft-locale-scroll`
-- 사이트 내 검색 측정을 완료하기 위해 `sessionStorage`의 `__pending_site_search__`에 임시 저장하는 검색어와 분석 파라미터
+- 헤더 검색에서 검색 결과 페이지로 이동한 뒤 같은 탭 안에서 검색 제출 측정을 한 번만 완료하기 위해 `sessionStorage`에 잠시 저장하는 값
 
 이메일 또는 GitHub를 통해 운영자에게 연락하면, 사이트는 이름, 이메일 주소, 계정명, 제목, 본문, 그리고 사용자가 직접 보내는 기타 정보를 받을 수 있습니다.
 
@@ -59,7 +59,7 @@ GitHub, X, Zenn 같은 외부 사이트로 이동한 뒤에는 각 서비스 사
 
 ## 이용자의 통제 방법
 
-쿠키, `localStorage`, `sessionStorage`의 저장은 사용자가 브라우저 설정에서 삭제하거나 비활성화할 수 있습니다. 다만 이 경우 테마와 언어 설정 유지, 언어 전환 후 화면 복원, 일부 측정 기능이 제대로 동작하지 않을 수 있습니다.
+쿠키, `localStorage`, `sessionStorage`의 저장은 사용자가 브라우저 설정에서 삭제하거나 비활성화할 수 있습니다. 다만 이 경우 테마와 언어 설정 유지, 언어 전환 후 화면 복원, 일부 검색 제출 측정이 제대로 동작하지 않을 수 있습니다.
 
 Google Analytics에 의한 정보 수집을 중지하려면 Google이 제공하는 옵트아웃 애드온 등의 도구를 사용해 주세요.
 
