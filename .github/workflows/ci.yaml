@@ -32,12 +32,16 @@ jobs:
         run: npm ci
 
       - name: Run Astro check
+        env:
+          PUBLIC_GA4_MEASUREMENT_ID: ${{ vars.PUBLIC_GA4_MEASUREMENT_ID }}
         run: npm run check
 
       - name: Run unit tests
         run: npm run test:unit
 
       - name: Build site
+        env:
+          PUBLIC_GA4_MEASUREMENT_ID: ${{ vars.PUBLIC_GA4_MEASUREMENT_ID }}
         run: npm run build
 
   e2e:
@@ -62,6 +66,8 @@ jobs:
         run: npm run test:e2e:setup
 
       - name: Build site
+        env:
+          PUBLIC_GA4_MEASUREMENT_ID: ${{ vars.PUBLIC_GA4_MEASUREMENT_ID }}
         run: npm run build
 
       - name: Run E2E tests
