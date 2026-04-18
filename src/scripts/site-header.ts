@@ -7,8 +7,10 @@ import {
 
 const scrollRestoreStorageKey = "mackysoft-locale-scroll";
 const scrollRestoreMaxAgeMs = 15_000;
-const scrollRestoreObserveDurationMs = 4_000;
+const scrollRestoreObserveDurationMs = 8_000;
 const scrollRestoreIgnoreScrollWindowMs = 250;
+const scrollRestoreReapplyIntervalMs = 150;
+const scrollRestoreProgressTolerance = 0.01;
 const scrollRestoreNavigationKeys = new Set([
   "ArrowDown",
   "ArrowUp",
@@ -110,10 +112,15 @@ function applyScrollProgress(progress: number) {
 function scheduleScrollRestore(progress: number) {
   let observer: ResizeObserver | null = null;
   let disconnectTimeout: number | null = null;
+  let reapplyInterval: number | null = null;
   let isDisposed = false;
   let ignoreScrollEventsUntil = 0;
-  const applyRestoredScroll = () => {
+  const applyRestoredScroll = (force = false) => {
     if (isDisposed) {
+      return;
+    }
+
+    if (!force && Math.abs(getScrollProgress() - progress) <= scrollRestoreProgressTolerance) {
       return;
     }
 
@@ -124,7 +131,7 @@ function scheduleScrollRestore(progress: number) {
   };
   const handleLoad = () => {
     if (!isDisposed) {
-      applyRestoredScroll();
+      applyRestoredScroll(true);
     }
   };
   const handleScroll = () => {
@@ -147,6 +154,10 @@ function scheduleScrollRestore(progress: number) {
       window.clearTimeout(disconnectTimeout);
     }
 
+    if (reapplyInterval !== null) {
+      window.clearInterval(reapplyInterval);
+    }
+
     window.removeEventListener("wheel", dispose);
     window.removeEventListener("pointerdown", dispose);
     window.removeEventListener("touchmove", dispose);
@@ -161,23 +172,23 @@ function scheduleScrollRestore(progress: number) {
     }
   };
 
-  const scheduleApply = () => {
+  const scheduleApply = (force = false) => {
     if (isDisposed) {
       return;
     }
 
     window.requestAnimationFrame(() => {
-      applyRestoredScroll();
+      applyRestoredScroll(force);
     });
   };
 
-  scheduleApply();
+  scheduleApply(true);
   window.addEventListener("load", handleLoad, { once: true });
 
   if ("fonts" in document) {
     document.fonts.ready.then(() => {
       if (!isDisposed) {
-        applyRestoredScroll();
+        applyRestoredScroll(true);
       }
     });
   }
@@ -188,9 +199,13 @@ function scheduleScrollRestore(progress: number) {
   window.addEventListener("keydown", disposeOnNavigationKey);
   window.addEventListener("scroll", handleScroll, { passive: true });
 
+  reapplyInterval = window.setInterval(() => {
+    applyRestoredScroll();
+  }, scrollRestoreReapplyIntervalMs);
+
   if ("ResizeObserver" in window) {
     observer = new ResizeObserver(() => {
-      scheduleApply();
+      scheduleApply(true);
     });
 
     observer.observe(document.documentElement);
