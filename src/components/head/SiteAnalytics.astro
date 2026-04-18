@@ -1,5 +1,6 @@
 ---
 import { getAnalyticsMeasurementId } from "../../lib/analytics";
+import { localizePath, supportedLocales } from "../../lib/i18n";
 
 type Props = {
   pageLocation?: string;
@@ -10,13 +11,14 @@ const measurementId = getAnalyticsMeasurementId(import.meta.env.PUBLIC_GA4_MEASU
 const analyticsScriptUrl = measurementId
   ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`
   : null;
+const searchPaths = supportedLocales.map((locale) => localizePath("/search/", locale));
 ---
 
 {
   measurementId && analyticsScriptUrl && (
     <>
       <script is:inline async src={analyticsScriptUrl}></script>
-      <script is:inline define:vars={{ measurementId, pageLocation }}>
+      <script is:inline define:vars={{ measurementId, pageLocation, searchPaths }}>
         window.dataLayer = window.dataLayer || [];
         window.gtag = function gtag() {
           window.dataLayer.push(arguments);
@@ -30,6 +32,24 @@ const analyticsScriptUrl = measurementId
 
         if (typeof pageLocation === "string" && pageLocation.length > 0) {
           configOptions.page_location = pageLocation;
+        }
+
+        if (Array.isArray(searchPaths) && typeof document.referrer === "string" && document.referrer.length > 0) {
+          try {
+            const currentUrl = new URL(window.location.href);
+            const referrerUrl = new URL(document.referrer);
+
+            if (
+              referrerUrl.origin === currentUrl.origin
+              && searchPaths.includes(referrerUrl.pathname)
+              && referrerUrl.searchParams.has("q")
+            ) {
+              referrerUrl.search = "";
+              configOptions.page_referrer = referrerUrl.toString();
+            }
+          } catch {
+            // Ignore invalid referrers and keep the default analytics behavior.
+          }
         }
 
         window.gtag("js", new Date());

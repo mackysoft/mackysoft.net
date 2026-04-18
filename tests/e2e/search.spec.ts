@@ -245,6 +245,41 @@ test.describe("site search", () => {
     expect(pageLocation).not.toContain("?q=");
   });
 
+  test("sanitizes the search page referrer before the next GA4 page view", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
+
+    const card = page.locator(".site-search-card").filter({
+      has: page.locator('.activity-card__link-layer[href*="vision-introduction"]'),
+    }).first();
+
+    await expect(card).toBeVisible();
+    await card.locator(".activity-card__link-layer").click();
+    await expect(page).toHaveURL(/\/articles\/vision-introduction\/(#.*)?$/);
+
+    await expect.poll(async () => (await getAnalyticsCommands(page, "config")).length).toBeGreaterThan(1);
+    const configCommands = await getAnalyticsCommands(page, "config");
+    const destinationConfigCommand = [...configCommands].reverse().find((command: unknown) => {
+      return Array.isArray(command)
+        && command[1] === "G-TEST123456"
+        && typeof command[2] === "object"
+        && command[2] !== null
+        && "page_referrer" in command[2];
+    });
+
+    expect(destinationConfigCommand).toBeDefined();
+
+    const pageReferrer = Array.isArray(destinationConfigCommand)
+      && typeof destinationConfigCommand[2] === "object"
+      && destinationConfigCommand[2] !== null
+      ? (destinationConfigCommand[2] as { page_referrer?: unknown }).page_referrer
+      : null;
+
+    expect(typeof pageReferrer).toBe("string");
+    expect(pageReferrer).toContain("/search/");
+    expect(pageReferrer).not.toContain("?q=");
+  });
+
   test("prioritizes exact Japanese title matches over broader body matches", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocale(page);
     await page.goto(`/search/?q=${encodeURIComponent("ゲームデザイン")}`);
@@ -409,6 +444,26 @@ test.describe("site search", () => {
 
     await input.fill("Serialize");
     await input.fill(localSearchQuery);
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(2);
+  });
+
+  test("tracks the same query again when the page search form is submitted again", { tag: "@size:medium" }, async ({ page }) => {
+    await setJapaneseLocaleWithAnalyticsCapture(page);
+    await page.goto(`/search/?q=${encodeURIComponent(localSearchQuery)}`);
+
+    const pagePanel = page.locator('[data-search-mode="page"]').first();
+    const form = pagePanel.locator("[data-site-search-form]");
+
+    await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(1);
+
+    await form.evaluate((formElement) => {
+      if (!(formElement instanceof HTMLFormElement)) {
+        throw new Error("search page form must exist");
+      }
+
+      formElement.requestSubmit();
+    });
 
     await expect.poll(async () => (await getTrackedAnalyticsEvents(page, "view_search_results")).length).toBe(2);
   });

@@ -581,6 +581,7 @@ function initSearchPanel(root: HTMLElement) {
     }
 
     event.preventDefault();
+    lastTrackedSearchState = null;
     void runSearch(elements.input.value, true);
   });
 
