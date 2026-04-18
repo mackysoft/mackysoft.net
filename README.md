@@ -23,6 +23,26 @@ npm ci
 
 ローカル開発では追加の環境変数は不要です。GA4 の動作確認が必要な場合だけ `PUBLIC_GA4_MEASUREMENT_ID` を指定してください。GitHub の公開リポジトリ README を検索インデックスへ取り込みたい場合は、任意で `GITHUB_TOKEN` または `GH_TOKEN` を設定します。
 
+### アナリティクス設定
+
+このサイトの GA4 は `PUBLIC_GA4_MEASUREMENT_ID` を使って有効化します。値は `G-XXXXXXXXXX` 形式の Measurement ID をそのまま指定します。
+
+ローカルで確認するときは、リポジトリ直下の `.env.local` に設定します。
+
+```env
+PUBLIC_GA4_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+本番では GitHub Actions の repository variable に同名で設定します。
+
+- `Settings > Secrets and variables > Actions > Variables`
+- Name: `PUBLIC_GA4_MEASUREMENT_ID`
+- Value: `G-XXXXXXXXXX`
+
+`PUBLIC_GA4_MEASUREMENT_ID` はシークレットではありませんが、環境ごとに切り替えやすくするため、ソースコードへ直書きせず環境変数で管理します。現在の workflow では `CI` と `Deploy Workers` の build step にこの変数を渡しています。
+
+GA4 管理画面では、このサイトの検索計測がコード側の手動イベントと重複しないよう、Web データストリームの Enhanced measurement にある site search を無効化してください。検索イベントはコード側で `site_search` を送っています。
+
 ## 開発とプレビュー
 
 開発サーバーを起動します。
@@ -159,6 +179,7 @@ npm run deploy:workers
 
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_API_TOKEN`
+- `PUBLIC_GA4_MEASUREMENT_ID`（GitHub Actions repository variable）
 - Release checklist: [`docs/cloudflare-workers-release-checklist.md`](docs/cloudflare-workers-release-checklist.md)
 
 `workers.dev` の URL は `workers_dev: true` の設定により Cloudflare 側で払い出されますが、この README では正規の利用先として案内しません。公開導線はカスタムドメイン側に寄せて管理してください。
