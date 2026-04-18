@@ -16,6 +16,9 @@ const siteContentMap: Record<SiteLocale, { description: string }> = {
   en: {
     description: "An activity hub for games, assets, and technical articles.",
   },
+  "zh-hant": {
+    description: "整理遊戲、資產與技術文章的活動樞紐。",
+  },
 };
 
 export function getSiteContent(locale: SiteLocale) {

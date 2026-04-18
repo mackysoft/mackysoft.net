@@ -81,6 +81,10 @@ const commonUiTextOverrides: Record<SiteLocale, Pick<CommonUiText, "japaneseOnly
     japaneseOnlyBadge: "Japanese only",
     fallbackNotice: "This page is currently available only in Japanese.",
   },
+  "zh-hant": {
+    japaneseOnlyBadge: "僅提供日文",
+    fallbackNotice: "此頁面目前僅提供日文。",
+  },
 };
 
 const commonUiTextSupplementMap: Record<SiteLocale, Pick<CommonUiText, "rssFeed">> = {
@@ -89,6 +93,9 @@ const commonUiTextSupplementMap: Record<SiteLocale, Pick<CommonUiText, "rssFeed"
   },
   en: {
     rssFeed: "RSS feed",
+  },
+  "zh-hant": {
+    rssFeed: "RSS 摘要",
   },
 };
 
@@ -104,10 +111,12 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       languageShortLabel: {
         ja: "JP",
         en: "EN",
+        "zh-hant": "ZH-HANT",
       },
       languageName: {
         ja: "日本語",
         en: "English",
+        "zh-hant": "繁體中文",
       },
     },
     footer: {
@@ -177,10 +186,12 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       languageShortLabel: {
         ja: "JP",
         en: "EN",
+        "zh-hant": "ZH-HANT",
       },
       languageName: {
         ja: "Japanese",
         en: "English",
+        "zh-hant": "Traditional Chinese",
       },
     },
     footer: {
@@ -239,6 +250,81 @@ const uiTextMap: Record<SiteLocale, Omit<UiText, "common" | "breadcrumb">> = {
       },
     },
   },
+  "zh-hant": {
+    header: {
+      primaryNavLabel: "全域導覽",
+      toolsLabel: "頁首工具",
+      menuToggle: "開啟選單",
+      searchOpen: "開啟搜尋",
+      themeToggle: "切換主題",
+      languageMenu: "切換顯示語言",
+      languageShortLabel: {
+        ja: "JP",
+        en: "EN",
+        "zh-hant": "ZH-HANT",
+      },
+      languageName: {
+        ja: "日文",
+        en: "English",
+        "zh-hant": "繁體中文",
+      },
+    },
+    footer: {
+      linksHeading: "外部連結",
+      legalHeading: "政策",
+    },
+    article: {
+      publishedAt: "發布日",
+      updatedAt: "更新日",
+      tagsAriaLabel: "文章標籤",
+      tocTitle: "目錄",
+      tocNavLabel: "文章目錄",
+      shareTitle: "分享",
+      copyLink: "複製連結",
+      nativeShare: "分享",
+      twitter: "Twitter",
+      linkCopied: "已複製連結",
+      copyFailed: "複製失敗",
+    },
+    release: {
+      latestReleaseDate: "最新發佈日",
+    },
+    game: {
+      linksAriaLabel: "連結",
+      screenshotsAriaLabel: "截圖",
+      screenshotTrailerTitle: " 的預告片",
+      featuresAriaLabel: "遊戲特色",
+      basicInfoAriaLabel: "遊戲資訊",
+      genre: "類型",
+      publishedAt: "發布日",
+      languages: "支援語言",
+      platforms: "平台",
+    },
+    search: {
+      pageDescription: "可搜尋站內文章、遊戲、外部文章與已公開資產。",
+      lead: "可跨文章正文、遊戲詳情、外部文章與已公開資產進行搜尋。",
+      modalTitle: "搜尋",
+      inputLabel: "搜尋關鍵字",
+      inputPlaceholder: "輸入關鍵字",
+      submit: "搜尋",
+      close: "關閉",
+      openPage: "開啟搜尋頁面",
+      noQueryTitle: "請輸入搜尋關鍵字",
+      noQueryBody: "可搜尋文章正文、遊戲詳情、外部文章與已公開資產。",
+      loading: "搜尋中...",
+      emptyTitle: "找不到相符結果",
+      emptyBody: "請嘗試其他關鍵字。",
+      errorTitle: "無法載入搜尋結果",
+      errorBody: "請稍後再試。",
+      externalBadge: "外部",
+      typeLabel: {
+        article: "文章",
+        game: "遊戲",
+        asset: "資產",
+        page: "頁面",
+      },
+    },
+  },
 };
 
 export function getUiText(locale: SiteLocale) {
@@ -256,16 +342,19 @@ export function getUiText(locale: SiteLocale) {
 const articleCountFormatterMap: Record<SiteLocale, (count: number) => string> = {
   ja: (count) => `${count} 件の記事があります。`,
   en: (count) => `${count} article${count === 1 ? "" : "s"}`,
+  "zh-hant": (count) => `共有 ${count} 篇文章`,
 };
 
 const searchResultCountFormatterMap: Record<SiteLocale, (count: number) => string> = {
   ja: (count) => `${count} 件の検索結果`,
   en: (count) => `${count} search result${count === 1 ? "" : "s"}`,
+  "zh-hant": (count) => `${count} 筆搜尋結果`,
 };
 
 const searchResultPreviewFormatterMap: Record<SiteLocale, (totalCount: number, visibleCount: number) => string> = {
   ja: (totalCount, visibleCount) => `${totalCount} 件の検索結果（上位 ${visibleCount} 件を表示）`,
   en: (totalCount, visibleCount) => `${totalCount} search result${totalCount === 1 ? "" : "s"} (showing top ${visibleCount})`,
+  "zh-hant": (totalCount, visibleCount) => `${totalCount} 筆搜尋結果（顯示前 ${visibleCount} 筆）`,
 };
 
 export function formatArticleCountLabel(count: number, locale: SiteLocale) {

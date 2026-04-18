@@ -1,5 +1,5 @@
 import { getContentYear, getContentYearMonth } from "../content-date";
-import { localizePath, type SiteLocale } from "../i18n";
+import { getNonDefaultLocales, localizePath, type SiteLocale } from "../i18n";
 import { createTranslationMap } from "../localized-entry";
 import { toAbsoluteSiteUrl } from "../site-url.mjs";
 
@@ -11,12 +11,12 @@ type TranslationMapEntry = {
 type PublicDetailRoute = {
   slug: string;
   lastmod?: Date;
-  hasEnglishVersion: boolean;
+  localizedLocales: SiteLocale[];
 };
 
 type PublicPageRoute = {
   slug: string;
-  hasEnglishVersion: boolean;
+  localizedLocales: SiteLocale[];
 };
 
 export type PublicUrlEntry = {
@@ -40,6 +40,7 @@ const publicStaticPaths = [
   "/games/",
 ] as const;
 const nonIndexablePageSlugs = new Set(["privacy-policy"]);
+const publicNonDefaultLocales = getNonDefaultLocales();
 
 function sortBySlug<T extends { slug: string }>(entries: readonly T[]) {
   return [...entries].sort((left, right) => left.slug.localeCompare(right.slug, "ja"));
@@ -68,7 +69,10 @@ function pushUrlEntry(
 
 function addLocalizedIndexPathEntries(entries: PublicUrlEntry[], seenLocations: Set<string>, site: URL, path: string) {
   pushUrlEntry(entries, seenLocations, site, path);
-  pushUrlEntry(entries, seenLocations, site, localizePath(path, "en"));
+
+  for (const locale of publicNonDefaultLocales) {
+    pushUrlEntry(entries, seenLocations, site, localizePath(path, locale));
+  }
 }
 
 function addLocalizedContentPageEntries(
@@ -85,8 +89,8 @@ function addLocalizedContentPageEntries(
     const path = `/${page.slug}/`;
     pushUrlEntry(entries, seenLocations, site, path);
 
-    if (page.hasEnglishVersion) {
-      pushUrlEntry(entries, seenLocations, site, localizePath(path, "en"));
+    for (const locale of page.localizedLocales) {
+      pushUrlEntry(entries, seenLocations, site, localizePath(path, locale));
     }
   }
 }
@@ -102,8 +106,8 @@ function addLocalizedDetailEntries(
     const path = `${prefix}${detail.slug}/`;
     pushUrlEntry(entries, seenLocations, site, path, detail.lastmod);
 
-    if (detail.hasEnglishVersion) {
-      pushUrlEntry(entries, seenLocations, site, localizePath(path, "en"), detail.lastmod);
+    for (const locale of detail.localizedLocales) {
+      pushUrlEntry(entries, seenLocations, site, localizePath(path, locale), detail.lastmod);
     }
   }
 }
@@ -116,7 +120,10 @@ function addLocalizedPathEntries(
 ) {
   for (const path of sortPaths(paths)) {
     pushUrlEntry(entries, seenLocations, site, path);
-    pushUrlEntry(entries, seenLocations, site, localizePath(path, "en"));
+
+    for (const locale of publicNonDefaultLocales) {
+      pushUrlEntry(entries, seenLocations, site, localizePath(path, locale));
+    }
   }
 }
 
@@ -193,9 +200,15 @@ export async function getPublicUrlEntries(site: URL) {
     getCollection("pageTranslations", ({ data }) => !data.draft),
   ]);
 
-  const englishArticleSlugs = getTranslatedSlugSet(articleTranslations, "src/content/articles/", "en");
-  const englishGameSlugs = getTranslatedSlugSet(gameTranslations, "src/content/games/", "en");
-  const englishPageSlugs = getTranslatedSlugSet(pageTranslations, "src/content/pages/", "en");
+  const translatedArticleSlugsByLocale = new Map(
+    publicNonDefaultLocales.map((locale) => [locale, getTranslatedSlugSet(articleTranslations, "src/content/articles/", locale)]),
+  );
+  const translatedGameSlugsByLocale = new Map(
+    publicNonDefaultLocales.map((locale) => [locale, getTranslatedSlugSet(gameTranslations, "src/content/games/", locale)]),
+  );
+  const translatedPageSlugsByLocale = new Map(
+    publicNonDefaultLocales.map((locale) => [locale, getTranslatedSlugSet(pageTranslations, "src/content/pages/", locale)]),
+  );
 
   const tagPaths = Array.from(new Set(articles.flatMap((article) => article.data.tags))).map((tag) => `/tags/${tag}/`);
   const archivePaths = Array.from(
@@ -212,16 +225,16 @@ export async function getPublicUrlEntries(site: URL) {
     articleDetails: articles.map((article) => ({
       slug: article.id,
       lastmod: article.data.updatedAt ?? article.data.publishedAt,
-      hasEnglishVersion: englishArticleSlugs.has(article.id),
+      localizedLocales: publicNonDefaultLocales.filter((locale) => translatedArticleSlugsByLocale.get(locale)?.has(article.id)),
     })),
     gameDetails: games.map((game) => ({
       slug: game.id,
       lastmod: game.data.updatedAt ?? game.data.publishedAt,
-      hasEnglishVersion: englishGameSlugs.has(game.id),
+      localizedLocales: publicNonDefaultLocales.filter((locale) => translatedGameSlugsByLocale.get(locale)?.has(game.id)),
     })),
     contentPages: pages.map((page) => ({
       slug: page.id,
-      hasEnglishVersion: englishPageSlugs.has(page.id),
+      localizedLocales: publicNonDefaultLocales.filter((locale) => translatedPageSlugsByLocale.get(locale)?.has(page.id)),
     })),
     tagPaths,
     archivePaths,

@@ -75,32 +75,32 @@ describe("publishing helpers", () => {
     expect(lastBuildDate).toEqual(new Date("2025-12-01T00:00:00+09:00"));
   });
 
-  test("includes only canonical english detail routes in sitemap entries", () => {
+  test("includes only canonical translated detail routes in sitemap entries", () => {
     const site = new URL("https://mackysoft.net");
     const entries = buildSitemapEntries(site, {
       articleDetails: [
         {
           slug: "vision-introduction",
           lastmod: new Date("2021-03-18T00:00:00+09:00"),
-          hasEnglishVersion: true,
+          localizedLocales: ["en", "zh-hant"],
         },
         {
           slug: "debug-context",
           lastmod: new Date("2026-01-06T12:05:01+09:00"),
-          hasEnglishVersion: false,
+          localizedLocales: [],
         },
       ],
       gameDetails: [
         {
           slug: "treasure-rogue",
           lastmod: new Date("2020-05-21T00:00:00+09:00"),
-          hasEnglishVersion: true,
+          localizedLocales: ["en", "zh-hant"],
         },
       ],
       contentPages: [
         {
           slug: "privacy-policy",
-          hasEnglishVersion: true,
+          localizedLocales: ["en", "zh-hant"],
         },
       ],
       tagPaths: ["/tags/unity/"],
@@ -110,10 +110,15 @@ describe("publishing helpers", () => {
     const locations = entries.map((entry) => entry.loc);
 
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/zh-hant/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/articles/vision-introduction/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/zh-hant/articles/vision-introduction/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/games/treasure-rogue/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/zh-hant/games/treasure-rogue/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/tags/unity/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/zh-hant/tags/unity/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/en/archive/2021/03/"));
+    expect(locations).toContain(toAbsoluteSiteUrl(site, "/zh-hant/archive/2021/03/"));
     expect(locations).toContain(toAbsoluteSiteUrl(site, "/articles/debug-context/"));
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/contact/"));
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/contact/"));
@@ -121,7 +126,9 @@ describe("publishing helpers", () => {
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/search/"));
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/privacy-policy/"));
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/privacy-policy/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/zh-hant/privacy-policy/"));
     expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/en/articles/debug-context/"));
+    expect(locations).not.toContain(toAbsoluteSiteUrl(site, "/zh-hant/articles/debug-context/"));
   });
 
   test("renders robots.txt and llms.txt from the configured public site", () => {
@@ -134,6 +141,7 @@ describe("publishing helpers", () => {
     expect(llms).toContain(`[About](${toAbsoluteSiteUrl(site, "/about/")})`);
     expect(llms).toContain(`- Japanese: ${toAbsoluteSiteUrl(site, "/")}`);
     expect(llms).toContain(`- English: ${toAbsoluteSiteUrl(site, "/en/")}`);
+    expect(llms).toContain(`- Traditional Chinese: ${toAbsoluteSiteUrl(site, "/zh-hant/")}`);
     expect(llms).toContain(`[Sitemap](${toAbsoluteSiteUrl(site, "/sitemap.xml")})`);
     expect(llms).toContain(`[RSS Feed](${toAbsoluteSiteUrl(site, "/feed.xml")})`);
     expect(llms).not.toContain("English About");

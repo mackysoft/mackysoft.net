@@ -232,6 +232,29 @@ test.describe("games page", () => {
     );
   });
 
+  test("renders the translated zh-hant game detail page without fallback UI", { tag: "@size:medium" }, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 960 });
+    await page.goto("/zh-hant/games/treasure-rogue/");
+
+    const main = page.getByRole("main");
+    const hero = main.locator(".game-hero");
+    const detailTable = main.locator('.game-detail-table[aria-label="遊戲資訊"]');
+
+    await expect(page.locator(".game-fallback-notice")).toHaveCount(0);
+    await expect(main.locator(".game-page__eyebrow")).toHaveText("Home / Games");
+    await expect(hero.getByRole("heading", { level: 1, name: "Treasure Rogue" })).toBeVisible();
+    await expect(hero).toContainText("活用一路撿到的道具來擊敗敵人並持續深入吧！ 你能前進到多深的地方呢？");
+    await expect(hero).toContainText("已封存");
+    await expect(detailTable).toContainText("類型");
+    await expect(detailTable).toContainText("Roguelike");
+    await expect(detailTable).toContainText("發布日");
+    await expect(detailTable).toContainText("2020/04/09");
+    await expect(detailTable).toContainText("支援語言");
+    await expect(detailTable).toContainText("日文 / 英文");
+    await expect(detailTable).toContainText("平台");
+    await expect(detailTable).toContainText("Android（已停止發佈） / 瀏覽器");
+  });
+
   test("tracks external game actions as external link clicks", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocaleWithAnalyticsCapture(page);
     await page.goto("/games/treasure-rogue/");

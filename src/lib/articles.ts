@@ -3,12 +3,11 @@ import type { CollectionEntry } from "astro:content";
 
 import activityData from "../generated/activity.json";
 import { resolveLocalArticleCardImage, type SocialImage } from "../features/site/social-image";
-import { defaultLocale, localizePath, type SiteLocale } from "./i18n";
+import { defaultLocale, localizePath, supportedLocales, type SiteLocale } from "./i18n";
 import {
   createTranslationMap,
   type TranslationEntryMap,
   resolveLocalizedEntryBySlug,
-  resolveLocalizedFallbackState,
 } from "./localized-entry";
 import { getSiteMeta } from "./site";
 
@@ -110,13 +109,24 @@ function mergeArticleData(baseEntry: ArticleEntry, translationEntry?: ArticleTra
   };
 }
 
+function getExternalArticleLocaleFallbackOrder(locale: SiteLocale): SiteLocale[] {
+  if (locale === "zh-hant") {
+    return ["zh-hant", "en", defaultLocale];
+  }
+
+  return [locale, defaultLocale];
+}
+
 function getArticleVariant(article: ArticleActivity, locale: SiteLocale) {
-  const fallbackState = resolveLocalizedFallbackState(locale, Object.keys(article.locales) as SiteLocale[]);
-  const variant = article.locales[fallbackState.contentLocale] ?? article.locales[defaultLocale];
+  const availableLocaleSet = new Set(Object.keys(article.locales) as SiteLocale[]);
+  const contentLocale = getExternalArticleLocaleFallbackOrder(locale).find((candidate) => availableLocaleSet.has(candidate)) ?? defaultLocale;
+  const variant = article.locales[contentLocale] ?? article.locales[defaultLocale];
 
   return {
     variant,
-    ...fallbackState,
+    contentLocale,
+    isFallback: locale !== contentLocale,
+    availableLocales: supportedLocales.filter((candidate) => availableLocaleSet.has(candidate)),
   };
 }
 

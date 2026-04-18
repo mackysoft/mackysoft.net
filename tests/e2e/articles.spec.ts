@@ -315,6 +315,22 @@ test.describe("articles page", () => {
     );
   });
 
+  test("renders translated zh-hant local article routes without fallback notice", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/zh-hant/articles/vision-introduction/");
+
+    const breadcrumb = page.locator(".article-page-header .eyebrow");
+
+    await expect(page).toHaveURL("/zh-hant/articles/vision-introduction/");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1, name: "【Unity】更輕鬆地實作 CullingGroup【Vision】" })).toBeVisible();
+    await expect(breadcrumb).toHaveText("Home / Articles");
+    await expect(page.locator(".article-content")).toContainText("什麼是 CullingGroup API？");
+    await expect(page.locator(".article-content__tags").getByRole("link", { name: "資產", exact: true })).toHaveAttribute(
+      "href",
+      "/zh-hant/tags/asset/",
+    );
+  });
+
   test("renders localized tag pages while keeping key-based URLs", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/tags/game-design/");
 
@@ -361,5 +377,18 @@ test.describe("articles page", () => {
       expect(imageState.src || imageState.currentSrc).toBeTruthy();
       expect(imageState.currentSrc.length).toBeGreaterThan(0);
     }
+  });
+
+  test("shows English external metadata on the zh-hant article index", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/zh-hant/articles/");
+
+    const translatedZennCard = page.locator(".article-card").filter({ hasText: latestZennArticleEn.title }).first();
+
+    await expect(page.getByRole("heading", { level: 1, name: "文章" })).toBeVisible();
+    await expect(translatedZennCard).toContainText(formatContentDate(new Date(latestZennArticle.publishedAt), "zh-hant"));
+    await expect(translatedZennCard.getByRole("link", { name: latestZennArticleEn.title, exact: true })).toHaveAttribute(
+      "href",
+      latestZennArticleEn.url,
+    );
   });
 });

@@ -15,6 +15,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "アセット",
       en: "Asset",
+      "zh-hant": "資產",
     },
   },
   cinemachine: {
@@ -27,6 +28,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "終了判定",
       en: "Completion Detection",
+      "zh-hant": "結束判定",
     },
   },
   csharp: {
@@ -51,6 +53,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "ゲームデザイン",
       en: "Game Design",
+      "zh-hant": "遊戲設計",
     },
   },
   keyframe: {
@@ -69,6 +72,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "雑記",
       en: "Misc",
+      "zh-hant": "雜記",
     },
   },
   modiferty: {
@@ -87,6 +91,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "プレイレビュー",
       en: "Play Review",
+      "zh-hant": "遊玩評測",
     },
   },
   playfab: {
@@ -99,6 +104,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "スクリプト",
       en: "Script",
+      "zh-hant": "腳本",
     },
   },
   stopaction: {
@@ -123,6 +129,7 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
     label: {
       ja: "チュートリアル",
       en: "Tutorial",
+      "zh-hant": "教學",
     },
   },
   "tsukuru-uozu": {
@@ -164,5 +171,8 @@ export const articleTagDefinitions: Record<string, ArticleTagDefinition> = {
 };
 
 export function getArticleTagLabel(tagKey: string, locale: SiteLocale = defaultLocale) {
-  return articleTagDefinitions[tagKey]?.label[locale] ?? tagKey;
+  return articleTagDefinitions[tagKey]?.label[locale]
+    ?? articleTagDefinitions[tagKey]?.label.en
+    ?? articleTagDefinitions[tagKey]?.label[defaultLocale]
+    ?? tagKey;
 }

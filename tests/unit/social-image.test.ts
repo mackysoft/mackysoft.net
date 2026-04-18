@@ -118,6 +118,17 @@ describe("social image helpers", () => {
       height: articleTitleCardImageHeight,
     });
 
+    expect(resolveLocalArticleSocialImage({
+      slug: "turnbased-gameloop",
+      title: "如何實作回合制遊戲循環【C#】",
+      contentLocale: "zh-hant",
+    })).toEqual({
+      src: "/zh-hant/og/articles/turnbased-gameloop.png",
+      alt: "如何實作回合制遊戲循環【C#】 的文章標題圖片",
+      width: 1200,
+      height: 630,
+    });
+
     const authoredCover = {
       src: "/_astro/authored-cover.webp",
       width: 1200,

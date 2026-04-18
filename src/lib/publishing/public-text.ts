@@ -1,4 +1,5 @@
 import { siteName } from "../site";
+import { localizePath, supportedLocales, type SiteLocale } from "../i18n";
 import { toAbsoluteSiteUrl } from "../site-url.mjs";
 
 const llmsPrimaryPages = [
@@ -16,6 +17,12 @@ const llmsStructuredEndpoints = [
   { label: "GitHub", href: "https://github.com/mackysoft", description: "Open-source repositories and libraries." },
   { label: "Zenn", href: "https://zenn.dev/makihiro_dev", description: "External technical articles." },
 ] as const;
+
+const languageLabelMap: Record<SiteLocale, string> = {
+  ja: "Japanese",
+  en: "English",
+  "zh-hant": "Traditional Chinese",
+};
 
 export function renderRobotsTxt(site: URL) {
   return [
@@ -41,8 +48,7 @@ export function renderLlmsTxt(site: URL) {
     "",
     "## Supported Languages",
     "",
-    `- Japanese: ${toAbsoluteSiteUrl(site, "/")}`,
-    `- English: ${toAbsoluteSiteUrl(site, "/en/")}`,
+    ...supportedLocales.map((locale) => `- ${languageLabelMap[locale]}: ${toAbsoluteSiteUrl(site, localizePath("/", locale))}`),
     "",
     "## Structured Endpoints",
     "",

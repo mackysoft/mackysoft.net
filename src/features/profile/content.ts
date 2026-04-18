@@ -32,6 +32,21 @@ const profileContentMap = {
       summary: "I am an indie developer building games and development assets, and I keep publishing what I learn along the way.",
     },
   },
+  "zh-hant": {
+    avatarLinkAriaLabel: "開啟 Twitter",
+    avatar: {
+      alt: "Makihiro 頭像",
+    },
+    primaryExternalLinkId: "twitter" as ExternalLinkId,
+    home: {
+      name: "Makihiro",
+      summary: "Makihiro 是一位製作遊戲與開發資產的獨立開發者，這個網站整理了作品、資產與文章。",
+    },
+    about: {
+      name: "Hiroya Aramaki / Makihiro",
+      summary: "我是一位開發遊戲與開發資產的獨立開發者，也持續整理並公開在過程中獲得的知識。",
+    },
+  },
 } as const;
 
 export function getProfileContent(locale: SiteLocale) {

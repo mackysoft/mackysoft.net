@@ -42,6 +42,11 @@ describe("localized entry helpers", () => {
       isFallback: true,
       availableLocales: ["ja"],
     });
+    expect(resolveLocalizedFallbackState("zh-hant", ["en"])).toEqual({
+      contentLocale: "ja",
+      isFallback: true,
+      availableLocales: ["ja", "en"],
+    });
   });
 
   test("resolves a localized entry by slug with English fallback handling", async () => {

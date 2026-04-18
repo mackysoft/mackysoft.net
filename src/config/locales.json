@@ -12,5 +12,12 @@
     "languageTag": "en",
     "intlLocale": "en-US",
     "browserMatchPrefixes": ["en"]
+  },
+  "zh-hant": {
+    "code": "zh-hant",
+    "pathPrefix": "zh-hant",
+    "languageTag": "zh-Hant",
+    "intlLocale": "zh-Hant",
+    "browserMatchPrefixes": ["zh-hant", "zh-tw", "zh-hk", "zh-mo"]
   }
 }
