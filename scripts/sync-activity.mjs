@@ -25,6 +25,8 @@ export {
 } from "./activity-sync/github.mjs";
 export {
   activityPath,
+  activityCoverPublicBasePath,
+  activityCoverPublicDir,
   articleDescriptionMaxLength,
   fetchJson,
   githubApiBaseUrl,
@@ -38,6 +40,17 @@ export {
   summarizeDescription,
   zennFeedUrl,
 } from "./activity-sync/shared.mjs";
+export {
+  createReleaseCoverRelativePath,
+  createReleaseCoverSlug,
+  createVersionedLocalCoverUrl,
+  fetchReleaseCoverAsset,
+  getReleaseCoverRelativePathFromUrl,
+  pruneUnusedReleaseCoverAssets,
+  readPreviousReleaseCoverUrls,
+  resolveLocalCoverPath,
+  syncReleaseCoverAssets,
+} from "./activity-sync/covers.mjs";
 export {
   createArticleId,
   createLocalizedArticleActivity,

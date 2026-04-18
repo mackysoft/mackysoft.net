@@ -92,12 +92,12 @@
       "repo": "mackysoft/Unity-SerializeReferenceExtensions",
       "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
       "license": "MIT",
-      "stargazerCount": 1250,
+      "stargazerCount": 1253,
       "name": "1.7.0",
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
       "publishedAt": "2026-01-18T14:37:19Z",
-      "coverUrl": "https://opengraph.githubassets.com/515b770ec82af03cb10c45bac34dbf6b9c467b4bcffeba9210da1974d5d00437/mackysoft/Unity-SerializeReferenceExtensions",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-unity-serializereferenceextensions.png?v=fa014069a742",
       "coverAlt": "mackysoft/Unity-SerializeReferenceExtensions のリポジトリサムネイル"
     },
     {
@@ -106,12 +106,12 @@
       "repo": "mackysoft/MasterTools",
       "description": "An import tool for importing tables from excel or spreadsheet to generate a database.",
       "license": "MIT",
-      "stargazerCount": 8,
+      "stargazerCount": 9,
       "name": "1.0.0",
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/MasterTools/releases/tag/1.0.0",
       "publishedAt": "2024-08-15T16:19:05Z",
-      "coverUrl": "https://opengraph.githubassets.com/047490f2a4ad3563b3ddfcf27d50405b30dbd866afce989883c2f3823d289130/mackysoft/MasterTools",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-mastertools.png?v=6c55e0f40d67",
       "coverAlt": "mackysoft/MasterTools のリポジトリサムネイル"
     },
     {
@@ -120,12 +120,12 @@
       "repo": "mackysoft/Navigathena",
       "description": "Scene management framework for Unity. Provides a new generation of scene management.",
       "license": "MIT",
-      "stargazerCount": 167,
+      "stargazerCount": 166,
       "name": "1.1.0",
       "version": "1.1.0",
       "url": "https://github.com/mackysoft/Navigathena/releases/tag/1.1.0",
       "publishedAt": "2024-02-14T12:02:45Z",
-      "coverUrl": "https://repository-images.githubusercontent.com/703056380/d12762cb-a193-4856-b79e-f885862aa212",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-navigathena.png?v=e4a4fc59bee1",
       "coverAlt": "mackysoft/Navigathena のリポジトリサムネイル"
     },
     {
@@ -139,7 +139,7 @@
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/UnityCapture-URP/releases/tag/1.0.0",
       "publishedAt": "2022-12-25T14:49:51Z",
-      "coverUrl": "https://opengraph.githubassets.com/754cadae913c210bb2966856dc5e70f095b04dc4faf93cf33bc20bb495b64295/mackysoft/UnityCapture-URP",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-unitycapture-urp.png?v=ada9ba9e85c4",
       "coverAlt": "mackysoft/UnityCapture-URP のリポジトリサムネイル"
     },
     {
@@ -153,7 +153,7 @@
       "version": "1.2.3",
       "url": "https://github.com/mackysoft/Choice/releases/tag/1.2.3",
       "publishedAt": "2022-10-27T16:34:43Z",
-      "coverUrl": "https://repository-images.githubusercontent.com/330675720/0097a980-6451-11eb-9c78-aacc073d1bae",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-choice.png?v=53d271d3ab73",
       "coverAlt": "mackysoft/Choice のリポジトリサムネイル"
     },
     {
@@ -167,7 +167,7 @@
       "version": "0.1.1",
       "url": "https://github.com/mackysoft/XPool/releases/tag/0.1.1",
       "publishedAt": "2022-03-04T12:02:09Z",
-      "coverUrl": "https://repository-images.githubusercontent.com/453590991/4a5f2fbc-77d6-4423-b8b3-8024396c107a",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-xpool.png?v=b6f824b8d4f5",
       "coverAlt": "mackysoft/XPool のリポジトリサムネイル"
     },
     {
@@ -181,7 +181,7 @@
       "version": "1.1.2",
       "url": "https://github.com/mackysoft/Modiferty/releases/tag/1.1.2",
       "publishedAt": "2021-05-15T19:27:16Z",
-      "coverUrl": "https://repository-images.githubusercontent.com/265178664/087ffc80-9a2e-11ea-8773-447d1a2559e8",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-modiferty.png?v=dc8f728b5089",
       "coverAlt": "mackysoft/Modiferty のリポジトリサムネイル"
     },
     {
@@ -195,7 +195,7 @@
       "version": "1.2.1",
       "url": "https://github.com/mackysoft/Vision/releases/tag/1.2.1",
       "publishedAt": "2021-04-25T07:30:07Z",
-      "coverUrl": "https://repository-images.githubusercontent.com/347625853/1616ed80-853e-11eb-92bb-ff2be88019d7",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-vision.png?v=902c11be011e",
       "coverAlt": "mackysoft/Vision のリポジトリサムネイル"
     }
   ]

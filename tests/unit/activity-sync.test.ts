@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -17,6 +17,9 @@ import {
 } from "../../src/lib/releases";
 import type { ReleaseActivity } from "../../src/lib/releases";
 import {
+  createReleaseCoverRelativePath,
+  createVersionedLocalCoverUrl,
+  resolveLocalCoverPath,
   parseZennArticlePage,
   githubApiBaseUrl,
   githubGraphqlUrl,
@@ -29,6 +32,10 @@ import {
 } from "../../scripts/sync-activity.mjs";
 
 const zennFeedFixturePath = path.join(import.meta.dirname, "../fixtures/zenn-feed.xml");
+const tinyPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9sX6s2sAAAAASUVORK5CYII=",
+  "base64",
+);
 
 test("re-exports shared GitHub activity sync constants", () => {
   expect(githubApiBaseUrl).toBe("https://api.github.com");
@@ -134,6 +141,15 @@ async function createSuccessfulFetchMock(): Promise<(input: string | URL | Reque
 
     if (url === `${zennFeedUrl}`) {
       return createTextResponse(xml);
+    }
+
+    if (url.startsWith("https://opengraph.githubassets.com/mock/") || url.startsWith("https://repository-images.githubusercontent.com/mock/")) {
+      return new Response(tinyPng, {
+        status: 200,
+        headers: {
+          "Content-Type": "image/png",
+        },
+      });
     }
 
     if (url === "https://zenn.dev/makihiro_dev/articles/first-article?locale=en") {
@@ -437,10 +453,16 @@ describe("sync-activity", () => {
     const fetchImpl = await createSuccessfulFetchMock();
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
     const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
+    const expectedVersionedCoverUrl = createVersionedLocalCoverUrl(
+      createReleaseCoverRelativePath("mackysoft/Alpha", ".png"),
+      tinyPng,
+    );
 
     const activity = await syncActivity({
       fetchImpl,
       outputPath,
+      coverOutputDir,
     });
 
     expect(activity.releases).toEqual([
@@ -455,7 +477,7 @@ describe("sync-activity", () => {
         version: "1.8.5",
         url: "https://github.com/mackysoft/Alpha/releases/tag/1.8.5",
         publishedAt: "2026-01-20T00:00:00.000Z",
-        coverUrl: "https://opengraph.githubassets.com/mock/alpha",
+        coverUrl: expectedVersionedCoverUrl,
         coverAlt: "mackysoft/Alpha のリポジトリサムネイル",
       },
       {
@@ -469,7 +491,7 @@ describe("sync-activity", () => {
         version: "1.0.0",
         url: "https://github.com/mackysoft/Beta/releases/tag/1.0.0",
         publishedAt: "2024-08-15T16:19:05.000Z",
-        coverUrl: "https://opengraph.githubassets.com/mock/beta",
+        coverUrl: createVersionedLocalCoverUrl(createReleaseCoverRelativePath("mackysoft/Beta", ".png"), tinyPng),
         coverAlt: "mackysoft/Beta のリポジトリサムネイル",
       },
       {
@@ -483,14 +505,131 @@ describe("sync-activity", () => {
         version: "1.1.0",
         url: "https://github.com/mackysoft/Gamma/releases/tag/1.1.0",
         publishedAt: "2024-02-14T12:02:45.000Z",
-        coverUrl: "https://opengraph.githubassets.com/mock/gamma",
+        coverUrl: createVersionedLocalCoverUrl(createReleaseCoverRelativePath("mackysoft/Gamma", ".png"), tinyPng),
         coverAlt: "mackysoft/Gamma のリポジトリサムネイル",
       },
     ]);
     expect(activity.releases.some((release) => release.repo === "mackysoft/Unity-GitHubActions-ExportPackage-Example")).toBe(false);
     expect(activity.releases.some((release) => release.repo === "mackysoft/ArchivedRepo")).toBe(false);
 
-    await expect(readFile(outputPath, "utf8")).resolves.toContain("\"coverUrl\": \"https://opengraph.githubassets.com/mock/alpha\"");
+    await expect(readFile(resolveLocalCoverPath(coverOutputDir, createReleaseCoverRelativePath("mackysoft/Alpha", ".png")))).resolves.toEqual(tinyPng);
+    await expect(readFile(outputPath, "utf8")).resolves.toContain(`"coverUrl": "${expectedVersionedCoverUrl}"`);
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
+  test("retries cover downloads and keeps the previous cached cover when the latest fetch still fails", async () => {
+    const xml = await readFile(zennFeedFixturePath, "utf8");
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
+    const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
+    const existingRelativePath = createReleaseCoverRelativePath("mackysoft/Alpha", ".png");
+    const existingContent = Buffer.from("previous-cover");
+    const existingCoverUrl = createVersionedLocalCoverUrl(existingRelativePath, existingContent);
+    const existing = serializeActivity({
+      articles: [],
+      releases: [
+        {
+          groupId: "GitHub:mackysoft/Alpha",
+          source: "GitHub",
+          repo: "mackysoft/Alpha",
+          description: "Existing release",
+          license: "MIT",
+          stargazerCount: 10,
+          name: "1.0.0",
+          version: "1.0.0",
+          url: "https://github.com/mackysoft/Alpha/releases/tag/1.0.0",
+          publishedAt: "2024-01-01T00:00:00.000Z",
+          coverUrl: existingCoverUrl,
+          coverAlt: "mackysoft/Alpha のリポジトリサムネイル",
+        },
+      ],
+    });
+    let alphaCoverFetchCount = 0;
+    const successfulFetch = await createSuccessfulFetchMock();
+
+    await writeFile(outputPath, existing, "utf8");
+    await mkdir(path.dirname(resolveLocalCoverPath(coverOutputDir, existingRelativePath)), { recursive: true });
+    await writeFile(resolveLocalCoverPath(coverOutputDir, existingRelativePath), existingContent);
+
+    const fetchImpl = async (input: string | URL | Request, init?: RequestInit) => {
+      const url = input instanceof Request ? input.url : String(input);
+
+      if (url === zennFeedUrl) {
+        return createTextResponse(xml);
+      }
+
+      if (url === "https://opengraph.githubassets.com/mock/alpha") {
+        alphaCoverFetchCount += 1;
+        return createJsonResponse(
+          { message: "Service Unavailable" },
+          {
+            status: 503,
+            statusText: "Service Unavailable",
+          },
+        );
+      }
+
+      return successfulFetch(input, init);
+    };
+
+    const activity = await syncActivity({
+      fetchImpl,
+      outputPath,
+      coverOutputDir,
+    });
+
+    expect(alphaCoverFetchCount).toBe(3);
+    expect(activity.releases.find((release) => release.repo === "mackysoft/Alpha")?.coverUrl).toBe(existingCoverUrl);
+    await expect(readFile(resolveLocalCoverPath(coverOutputDir, existingRelativePath))).resolves.toEqual(existingContent);
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
+  test("fails sync when the fetched cover cannot be written locally", async () => {
+    const fetchImpl = await createSuccessfulFetchMock();
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
+    const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
+    const blockingPath = path.join(coverOutputDir, "github");
+
+    await mkdir(coverOutputDir, { recursive: true });
+    await writeFile(blockingPath, "not-a-directory", "utf8");
+
+    await expect(syncActivity({
+      fetchImpl,
+      outputPath,
+      coverOutputDir,
+    })).rejects.toThrow();
+
+    await rm(tempDir, { recursive: true, force: true });
+  });
+
+  test("fails sync when a release cover download fails without a previous cached cover", async () => {
+    const successfulFetch = await createSuccessfulFetchMock();
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
+    const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
+    const fetchImpl = async (input: string | URL | Request, init?: RequestInit) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+
+      if (url === "https://opengraph.githubassets.com/mock/alpha") {
+        return createJsonResponse(
+          { message: "Service Unavailable" },
+          {
+            status: 503,
+            statusText: "Service Unavailable",
+          },
+        );
+      }
+
+      return successfulFetch(input, init);
+    };
+
+    await expect(syncActivity({
+      fetchImpl,
+      outputPath,
+      coverOutputDir,
+    })).rejects.toThrow("Failed to localize release cover for mackysoft/Alpha");
+
     await rm(tempDir, { recursive: true, force: true });
   });
 
@@ -498,10 +637,12 @@ describe("sync-activity", () => {
     const fetchImpl = await createSuccessfulFetchMock();
     const tempDir = await mkdtemp(path.join(os.tmpdir(), "sync-activity-"));
     const outputPath = path.join(tempDir, "activity.json");
+    const coverOutputDir = path.join(tempDir, "activity-covers");
 
     const activity = await syncActivity({
       fetchImpl,
       outputPath,
+      coverOutputDir,
     });
 
     expect(activity.articles).toEqual([
