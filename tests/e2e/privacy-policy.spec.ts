@@ -29,11 +29,12 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("テーマ切替");
     await expect(main).toContainText("言語切替");
     await expect(main).toContainText("サイト内検索で送信された検索語");
+    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "外部サービス" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
     await expect(main).toContainText("youtube-nocookie.com");
-    await expect(main).toContainText("GitHub のプロフィール画像");
+    await expect(main).toContainText("公開リポジトリ情報やリリース情報");
     await expect(main).toContainText("GitHub、X、Zenn");
     await expect(main.locator("code", { hasText: "youtube-nocookie.com" })).toBeVisible();
     await expect(main.locator("code", { hasText: "mackysoft-theme" })).toBeVisible();
@@ -46,7 +47,7 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("オプトアウト アドオン");
     await expect(main.getByRole("heading", { level: 2, name: "改定日" })).toBeVisible();
     await expect(main).toContainText("制定日: 2026年4月12日");
-    await expect(main).toContainText("最終更新日: 2026年4月18日");
+    await expect(main).toContainText("最終更新日: 2026年4月19日");
     await expect(page.locator(`script[src*="googletagmanager.com/gtag/js?id=${gaMeasurementId}"]`)).toHaveCount(1);
     expect(await page.evaluate(() => typeof (window as AnalyticsWindow).gtag)).toBe("function");
     expect(
@@ -78,11 +79,12 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("theme switches");
     await expect(main).toContainText("language switches");
     await expect(main).toContainText("search terms submitted through on-site search");
+    await expect(main.locator("code", { hasText: "__pending_site_search__" })).toBeVisible();
     await expect(main.getByRole("heading", { level: 2, name: "External Services" })).toBeVisible();
     await expect(main).toContainText("Cloudflare Workers");
     await expect(main).toContainText("Google Fonts");
     await expect(main).toContainText("youtube-nocookie.com");
-    await expect(main).toContainText("profile images from GitHub");
+    await expect(main).toContainText("public GitHub repository and release information");
     await expect(main).toContainText("GitHub, X, or Zenn");
     await expect(main.locator("code", { hasText: "youtube-nocookie.com" })).toBeVisible();
     await expect(main.locator("code", { hasText: "mackysoft-theme" })).toBeVisible();
@@ -95,6 +97,6 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("opt-out browser add-on");
     await expect(main.getByRole("heading", { level: 2, name: "Revision Date" })).toBeVisible();
     await expect(main).toContainText("Effective date: April 12, 2026");
-    await expect(main).toContainText("Last updated: April 18, 2026");
+    await expect(main).toContainText("Last updated: April 19, 2026");
   });
 });
