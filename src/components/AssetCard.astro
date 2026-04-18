@@ -5,7 +5,12 @@ import { getUiText } from "../lib/ui-text";
 import type { SiteLocale } from "../lib/i18n";
 import { formatContentDate } from "../lib/content-date";
 import { formatReleaseStargazerCount, getReleaseRepoName, type ReleaseActivity } from "../lib/releases";
-import { releaseCoverWidths, resolveReleaseCoverImageUrl } from "../features/releases/cover-image";
+import {
+  releaseCoverHeight,
+  releaseCoverWidth,
+  releaseCoverWidths,
+  resolveReleaseCoverImageUrl,
+} from "../features/releases/cover-image";
 
 type Props = {
   release: ReleaseActivity;
@@ -34,9 +39,10 @@ const coverSrc = resolveReleaseCoverImageUrl(release.coverUrl, Astro.site ?? Ast
     <Image
       src={coverSrc}
       alt={release.coverAlt}
+      width={releaseCoverWidth}
+      height={releaseCoverHeight}
       widths={releaseCoverWidths}
       sizes="(max-width: 720px) 100vw, 28rem"
-      inferSize
       loading="lazy"
       decoding="async"
       onerror="this.parentElement?.setAttribute('data-cover-state', 'error')"

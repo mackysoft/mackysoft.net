@@ -8,11 +8,6 @@ export default defineConfig({
     remotePatterns: [
       {
         protocol: "https",
-        hostname: new URL(canonicalSiteUrl).hostname,
-        pathname: "/generated/activity-covers/**",
-      },
-      {
-        protocol: "https",
         hostname: "res.cloudinary.com",
         pathname: "/zenn/image/upload/**",
       },

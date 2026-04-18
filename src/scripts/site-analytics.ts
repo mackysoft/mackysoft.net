@@ -9,6 +9,13 @@ type AnalyticsParamValue = AnalyticsEventParamValue | boolean;
 
 type AnalyticsParams = Record<string, AnalyticsParamValue>;
 
+type PendingAnalyticsReplayCondition = {
+  kind: "search-page";
+  pathname: string;
+  searchParam: string;
+  value: string;
+};
+
 type PendingAnalyticsCall =
   | {
     command: "config";
@@ -19,6 +26,7 @@ type PendingAnalyticsCall =
     command: "event";
     target: string;
     params: AnalyticsParams;
+    replayCondition?: PendingAnalyticsReplayCondition;
   };
 
 type AnalyticsWindow = Window & typeof globalThis & {
@@ -26,6 +34,26 @@ type AnalyticsWindow = Window & typeof globalThis & {
   dataLayer: unknown[];
   gtag?: (...args: unknown[]) => void;
 };
+
+function isPendingAnalyticsReplayCondition(value: unknown): value is PendingAnalyticsReplayCondition {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const candidate = value as {
+    kind?: unknown;
+    pathname?: unknown;
+    searchParam?: unknown;
+    value?: unknown;
+  };
+
+  return (
+    candidate.kind === "search-page"
+    && typeof candidate.pathname === "string"
+    && typeof candidate.searchParam === "string"
+    && typeof candidate.value === "string"
+  );
+}
 
 function isAnalyticsParams(value: unknown): value is AnalyticsParams {
   if (typeof value !== "object" || value === null) {
@@ -50,12 +78,17 @@ function isPendingAnalyticsCall(value: unknown): value is PendingAnalyticsCall {
     command?: unknown;
     target?: unknown;
     params?: unknown;
+    replayCondition?: unknown;
   };
 
   return (
     (candidate.command === "config" || candidate.command === "event")
     && typeof candidate.target === "string"
     && isAnalyticsParams(candidate.params)
+    && (
+      candidate.replayCondition === undefined
+      || (candidate.command === "event" && isPendingAnalyticsReplayCondition(candidate.replayCondition))
+    )
   );
 }
 
@@ -114,6 +147,23 @@ function getAnalyticsWindow() {
   return window as AnalyticsWindow;
 }
 
+function getPendingAnalyticsCallDisposition(call: PendingAnalyticsCall, location: URL) {
+  if (call.command !== "event" || !call.replayCondition) {
+    return "flush" as const;
+  }
+
+  if (call.replayCondition.kind === "search-page") {
+    if (location.pathname !== call.replayCondition.pathname) {
+      return "retain" as const;
+    }
+
+    const currentValue = location.searchParams.get(call.replayCondition.searchParam)?.trim() ?? "";
+    return currentValue === call.replayCondition.value ? "flush" as const : "drop" as const;
+  }
+
+  return "flush" as const;
+}
+
 export function initAnalyticsWindow() {
   const analyticsWindow = getAnalyticsWindow();
 
@@ -141,11 +191,30 @@ export function flushPendingAnalyticsCalls() {
     return;
   }
 
-  clearPendingAnalyticsCalls();
+  const currentLocation = new URL(window.location.href);
+  const remainingCalls: PendingAnalyticsCall[] = [];
 
   for (const call of pendingCalls) {
+    const disposition = getPendingAnalyticsCallDisposition(call, currentLocation);
+
+    if (disposition === "retain") {
+      remainingCalls.push(call);
+      continue;
+    }
+
+    if (disposition === "drop") {
+      continue;
+    }
+
     analyticsWindow.gtag(call.command, call.target, call.params);
   }
+
+  if (remainingCalls.length > 0) {
+    writePendingAnalyticsCalls(remainingCalls);
+    return;
+  }
+
+  clearPendingAnalyticsCalls();
 }
 
 export function markAnalyticsReady() {
@@ -174,9 +243,10 @@ export function sendAnalyticsEvent(
   options?: {
     onComplete?: () => void;
     persistWhenUnavailable?: boolean;
+    replayCondition?: PendingAnalyticsReplayCondition;
   },
 ) {
-  const { onComplete, persistWhenUnavailable = true } = options ?? {};
+  const { onComplete, persistWhenUnavailable = true, replayCondition } = options ?? {};
   const analyticsWindow = getAnalyticsWindow();
 
   if (!isAnalyticsReady() || typeof analyticsWindow.gtag !== "function") {
@@ -185,6 +255,7 @@ export function sendAnalyticsEvent(
         command: "event",
         target: eventName,
         params,
+        replayCondition,
       });
     }
 

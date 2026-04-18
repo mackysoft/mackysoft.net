@@ -533,13 +533,18 @@ function initSearchPanel(root: HTMLElement) {
 
     if (elements.mode === "inline") {
       event.preventDefault();
-      trackSiteSearchSubmit(elements.mode, query, () => {
-        navigateToSearchPage(elements, query);
+      trackSiteSearchSubmit(elements.mode, query, {
+        onComplete: () => {
+          navigateToSearchPage(elements, query);
+        },
+        searchPath: elements.searchPath,
       });
       return;
     }
 
-    trackSiteSearchSubmit(elements.mode, query);
+    trackSiteSearchSubmit(elements.mode, query, {
+      searchPath: elements.searchPath,
+    });
     event.preventDefault();
     void runSearch(query, true);
   });
