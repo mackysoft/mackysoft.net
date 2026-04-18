@@ -31,6 +31,7 @@ type Props = {
   locale?: SiteLocale;
   contentLocale?: SiteLocale;
   canonicalPath?: string;
+  robotsContent?: string;
   alternateLocales?: AlternateLocaleLink[];
   isFallback?: boolean;
   enableLocaleRedirectOnRoot?: boolean;
@@ -46,6 +47,7 @@ const {
   locale = "ja",
   contentLocale = locale,
   canonicalPath = Astro.url.pathname,
+  robotsContent,
   alternateLocales = [],
   isFallback = false,
   enableLocaleRedirectOnRoot = false,
@@ -101,6 +103,7 @@ const socialImageHeight = imageHeight ?? (typeof image === "object" ? image.heig
       description={description}
       siteName={siteMeta.name}
       canonicalUrl={canonicalUrl}
+      robotsContent={robotsContent}
       rssFeedUrl={rssFeedUrl}
       rssFeedTitle={`${siteMeta.name} - ${uiText.common.rssFeed}`}
       alternateLocaleUrls={alternateLocaleUrls}

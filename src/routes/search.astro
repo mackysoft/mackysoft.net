@@ -23,6 +23,7 @@ const analyticsPageLocation = new URL(searchPath, Astro.url).toString();
   description={uiText.search.pageDescription}
   locale={locale}
   canonicalPath={searchPath}
+  robotsContent="noindex, follow"
   alternateLocales={createAlternateLocaleLinks("/search/")}
   analyticsPageLocation={analyticsPageLocation}
 >

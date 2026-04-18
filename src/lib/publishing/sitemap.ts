@@ -37,10 +37,9 @@ const publicStaticPaths = [
   "/about/",
   "/articles/",
   "/assets/",
-  "/contact/",
   "/games/",
-  "/search/",
 ] as const;
+const nonIndexablePageSlugs = new Set(["privacy-policy"]);
 
 function sortBySlug<T extends { slug: string }>(entries: readonly T[]) {
   return [...entries].sort((left, right) => left.slug.localeCompare(right.slug, "ja"));
@@ -79,6 +78,10 @@ function addLocalizedContentPageEntries(
   contentPages: readonly PublicPageRoute[],
 ) {
   for (const page of sortBySlug(contentPages)) {
+    if (nonIndexablePageSlugs.has(page.slug)) {
+      continue;
+    }
+
     const path = `/${page.slug}/`;
     pushUrlEntry(entries, seenLocations, site, path);
 

@@ -7,6 +7,7 @@ type SeoExpectation = {
   canonicalUrl: string;
   imageUrl: string;
   imageAlt: string;
+  robotsContent?: string;
 };
 
 const sharedSiteName = "mackysoft.net";
@@ -65,6 +66,7 @@ const seoExpectations: SeoExpectation[] = [
     canonicalUrl: "https://mackysoft.net/search/",
     imageUrl: defaultImageUrl,
     imageAlt: defaultImageAltJa,
+    robotsContent: "noindex, follow",
   },
 ];
 
@@ -90,6 +92,12 @@ async function expectSeo(page: Page, expectation: SeoExpectation) {
   await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", expectation.imageUrl);
   await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute("content", expectation.imageAlt);
   await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", "https://mackysoft.net/feed.xml");
+
+  if (expectation.robotsContent) {
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", expectation.robotsContent);
+  } else {
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  }
 }
 
 test.describe("SEO metadata", () => {
@@ -109,6 +117,26 @@ test.describe("SEO metadata", () => {
       imageUrl: defaultImageUrl,
       imageAlt: defaultImageAltEn,
     });
+  });
+
+  test("marks privacy policy pages as noindex", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/privacy-policy/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/privacy-policy/");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+
+    await page.goto("/en/privacy-policy/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/en/privacy-policy/");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+  });
+
+  test("marks contact pages as noindex", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/contact/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/contact/");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+
+    await page.goto("/en/contact/");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/en/contact/");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
   });
 
   test("uses the article cover when a local article defines one", { tag: "@size:medium" }, async ({ page }) => {

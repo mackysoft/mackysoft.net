@@ -13,6 +13,7 @@ type Props = {
   description: string;
   siteName: string;
   canonicalUrl: string;
+  robotsContent?: string;
   alternateLocaleUrls?: AlternateLocaleLink[];
   rssFeedUrl?: string;
   rssFeedTitle?: string;
@@ -27,6 +28,7 @@ const {
   description,
   siteName,
   canonicalUrl,
+  robotsContent,
   alternateLocaleUrls = [],
   rssFeedUrl,
   rssFeedTitle,
@@ -41,6 +43,7 @@ const resolvedImageHeight = imageHeight ?? (typeof image === "object" ? image.he
 ---
 
 <link rel="canonical" href={canonicalUrl} />
+{robotsContent && <meta name="robots" content={robotsContent} />}
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:title" content={title} />
