@@ -13,45 +13,40 @@ const { status, size = "card", locale = "ja" } = Astro.props as Props;
 const label = getGameStatusLabel(status, locale);
 ---
 
-<span class:list={["game-status-badge", `game-status-badge--${size}`, `game-status-badge--${status}`]}>{label}</span>
+<span class:list={["pill", "game-status-badge", `game-status-badge--${size}`, `game-status-badge--${status}`]}>{label}</span>
 
 <style>
   .game-status-badge {
-    display: inline-flex;
-    width: fit-content;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--status-neutral-border-color);
-    border-radius: 999px;
-    background: var(--status-neutral-bg-color);
-    color: var(--text-color);
-    font-family: var(--font-mono);
-    font-weight: 500;
+    --pill-border-color: var(--status-neutral-border-color);
+    --pill-bg-color: var(--status-neutral-bg-color);
+    --pill-text-color: var(--text-color);
   }
 
   .game-status-badge--card {
-    font-size: 0.82rem;
+    --pill-font-size: 0.82rem;
   }
 
   .game-status-badge--hero {
-    padding: 0.36rem 0.65rem;
-    font-size: 0.8rem;
+    --pill-padding-y: 0.36rem;
+    --pill-padding-x: 0.65rem;
+    --pill-font-size: 0.8rem;
   }
 
   .game-status-badge--active {
-    border-color: var(--accent-border-color);
-    background: var(--accent-surface-color);
-    color: var(--accent-color);
+    --pill-border-color: var(--accent-border-color);
+    --pill-bg-color: var(--accent-surface-color);
+    --pill-text-color: var(--accent-color);
   }
 
   .game-status-badge--archived {
-    border-color: var(--status-archived-border-color);
-    background: var(--status-archived-bg-color);
-    color: var(--status-archived-text-color);
+    --pill-border-color: var(--status-archived-border-color);
+    --pill-bg-color: var(--status-archived-bg-color);
+    --pill-text-color: var(--status-archived-text-color);
   }
 
   .game-status-badge--prototype {
-    border-color: var(--status-prototype-border-color);
-    background: var(--status-prototype-bg-color);
-    color: var(--status-prototype-text-color);
+    --pill-border-color: var(--status-prototype-border-color);
+    --pill-bg-color: var(--status-prototype-bg-color);
+    --pill-text-color: var(--status-prototype-text-color);
   }
 </style>

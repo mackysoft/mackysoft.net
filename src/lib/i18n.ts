@@ -1,4 +1,4 @@
-import localeDefinitionsData from "../config/locales.json";
+import localeDefinitionsData from "../config/locales.json" with { type: "json" };
 
 type LocaleDefinition = {
   code: string;

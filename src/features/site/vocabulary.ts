@@ -51,6 +51,21 @@ export const siteVocabularyMap: Record<SiteLocale, SiteVocabularyBundle> = {
     display: englishVocabulary,
     breadcrumb: englishVocabulary,
   },
+  "zh-hant": {
+    display: {
+      home: "首頁",
+      about: "個人簡介",
+      games: "遊戲",
+      assets: "資產",
+      articles: "文章",
+      search: "搜尋",
+      contact: "聯絡",
+      privacyPolicy: "隱私權政策",
+      tag: "標籤",
+      archive: "歸檔",
+    },
+    breadcrumb: englishVocabulary,
+  },
 };
 
 export function getSiteVocabulary(locale: SiteLocale) {

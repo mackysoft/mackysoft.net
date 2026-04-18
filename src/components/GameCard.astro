@@ -47,9 +47,9 @@ const uiText = getUiText(locale);
       )}
       <div class="game-card__metrics">
         <GameStatusBadge status={game.data.status} size="card" locale={locale} />
-        {game.isFallback && locale !== defaultLocale && <p class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</p>}
+        {game.isFallback && locale !== defaultLocale && <p class="activity-card__badge pill pill--badge">{uiText.common.japaneseOnlyBadge}</p>}
         {platforms.map((platform) => (
-          <p class="game-card__platform">{getGamePlatformLabel(platform, locale)}</p>
+          <p class="game-card__platform pill">{getGamePlatformLabel(platform, locale)}</p>
         ))}
       </div>
     </div>
@@ -115,15 +115,7 @@ const uiText = getUiText(locale);
   }
 
   .game-card__platform {
-    width: fit-content;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--surface-soft-border-color);
-    border-radius: 999px;
-    background: var(--surface-soft-color);
-    color: var(--muted-color);
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 500;
+    margin: 0;
   }
 
   .game-card__date {
@@ -175,8 +167,9 @@ const uiText = getUiText(locale);
   }
 
   .game-card--compact .game-card__platform {
-    padding: 0.3rem 0.55rem;
-    font-size: 0.76rem;
+    --pill-padding-y: 0.3rem;
+    --pill-padding-x: 0.55rem;
+    --pill-font-size: 0.76rem;
   }
 
   @media (max-width: 759px) {

@@ -2,12 +2,12 @@
 import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 
+import ArticleTagList from "../../components/ArticleTagList.astro";
 import ArticleShare from "../../components/ArticleShare.astro";
 import ArticleToc from "../../components/ArticleToc.astro";
 import LocalizedHtmlLinks from "../../components/LocalizedHtmlLinks.astro";
 import SearchMetadata from "../../components/search/SearchMetadata.astro";
 import { resolveLocalArticlePageImages } from "../../features/site/social-image";
-import { getArticleTagLabel } from "../../lib/article-tags";
 import { getUiText } from "../../lib/ui-text";
 import { formatNumericDate } from "../../lib/content-date";
 import { resolveLocalizedArticleBySlug } from "../../lib/articles";
@@ -110,13 +110,7 @@ const { social: articleImage, search: searchImage } = resolveLocalArticlePageIma
       )}
 
       <section class="content-panel prose article-content" data-pagefind-body>
-        {article.data.tags.length > 0 && (
-          <ul class="tags article-content__tags" aria-label={uiText.article.tagsAriaLabel}>
-            {article.data.tags.map((tag) => (
-              <li><a href={localizePath(`/tags/${tag}/`, locale)}>{getArticleTagLabel(tag, locale)}</a></li>
-            ))}
-          </ul>
-        )}
+        {article.data.tags.length > 0 && <ArticleTagList tags={article.data.tags} locale={locale} class="article-content__tags" />}
         <LocalizedHtmlLinks locale={locale}>
           <Content />
         </LocalizedHtmlLinks>
@@ -180,24 +174,6 @@ const { social: articleImage, search: searchImage } = resolveLocalArticlePageIma
     width: fit-content;
     max-width: 100%;
     text-align: left;
-  }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .tags a {
-    display: inline-flex;
-    padding: 0.25rem 0.7rem;
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
-    color: var(--muted-color);
-    text-decoration: none;
   }
 
   .cover {

@@ -50,6 +50,18 @@ describe("content date formatting", () => {
     expect(formatContentDate(publishedAt, "en")).toBe("2021/03/16");
   });
 
+  test("keeps zh-hant dates on the same YYYY/MM/DD format", () => {
+    const publishedAt = new Date("2021-03-16T00:00:00+09:00");
+
+    expect(getContentDateParts(publishedAt, "zh-hant")).toEqual({
+      year: "2021",
+      month: "03",
+      day: "16",
+    });
+    expect(formatNumericDate(publishedAt, "zh-hant")).toBe("2021/03/16");
+    expect(formatContentDate(publishedAt, "zh-hant")).toBe("2021/03/16");
+  });
+
   test("parses date-only input as JST midnight", () => {
     const publishedAt = parseContentDateInput("2026-04-14");
 

@@ -894,6 +894,73 @@ h3,
   color: var(--muted-color);
 }
 
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pill-list > li {
+  margin: 0;
+}
+
+.pill {
+  --pill-padding-y: 0.35rem;
+  --pill-padding-x: 0.6rem;
+  --pill-border-color: var(--surface-soft-border-color);
+  --pill-bg-color: var(--surface-soft-color);
+  --pill-text-color: var(--muted-color);
+  --pill-font-size: 0.82rem;
+  --pill-font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  padding: var(--pill-padding-y) var(--pill-padding-x);
+  border: 1px solid var(--pill-border-color);
+  border-radius: 999px;
+  background: var(--pill-bg-color);
+  color: var(--pill-text-color);
+  font-family: var(--font-mono);
+  font-size: var(--pill-font-size);
+  font-weight: var(--pill-font-weight);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.pill--interactive:hover,
+.pill--interactive:focus-visible {
+  border-color: var(--border-strong-color);
+  color: var(--text-color);
+}
+
+.pill--badge {
+  --pill-padding-y: 0.28rem;
+  --pill-padding-x: 0.55rem;
+  --pill-font-size: 0.74rem;
+  --pill-font-weight: 600;
+}
+
+.pill--compact {
+  --pill-padding-y: 0.3rem;
+  --pill-padding-x: 0.55rem;
+}
+
+.pill--accent {
+  --pill-border-color: var(--accent-border-color);
+  --pill-bg-color: var(--accent-surface-color);
+  --pill-text-color: var(--accent-color);
+}
+
+.pill--accent-outline {
+  --pill-border-color: var(--accent-border-color);
+  --pill-bg-color: transparent;
+  --pill-text-color: var(--text-color);
+}
+
 .activity-card__badges {
   display: flex;
   flex-wrap: wrap;
@@ -901,17 +968,7 @@ h3,
 }
 
 .activity-card__badge {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  padding: 0.28rem 0.55rem;
-  border: 1px solid var(--surface-soft-border-color);
-  border-radius: 999px;
-  background: var(--surface-soft-color);
-  color: var(--muted-color);
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
+  margin: 0;
 }
 
 .site-search-inline {

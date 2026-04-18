@@ -133,8 +133,17 @@ function createSearchRecord({
   };
 }
 
+function getExternalArticleLocaleCandidates(locale) {
+  if (locale === "zh-hant") {
+    return ["zh-hant", "en", "ja"];
+  }
+
+  return [locale, "ja"];
+}
+
 async function resolveExternalArticleContent(article, locale, fetchImpl = fetch) {
-  const localizedArticle = article.locales[locale];
+  const resolvedLocale = getExternalArticleLocaleCandidates(locale).find((candidate) => article.locales[candidate]);
+  const localizedArticle = resolvedLocale ? article.locales[resolvedLocale] : null;
 
   if (!localizedArticle) {
     return null;
@@ -146,7 +155,7 @@ async function resolveExternalArticleContent(article, locale, fetchImpl = fetch)
 
   if (article.source === "Zenn") {
     try {
-      const html = await fetchZennArticleHtml(article.locales.ja.url, locale, fetchImpl);
+      const html = await fetchZennArticleHtml(article.locales.ja.url, resolvedLocale ?? locale, fetchImpl);
       const localizedPage = parseZennArticlePage(html);
       content = localizedPage.content || localizedPage.description || localizedArticle.description;
       image = localizedPage.coverUrl ?? image;
@@ -185,7 +194,7 @@ export async function createExternalArticleSearchRecord(article, locale, fetchIm
 export async function createExternalArticleSearchRecords(articles, fetchImpl = fetch) {
   const records = await Promise.all(
     articles.flatMap((article) =>
-      Object.keys(article.locales).map((locale) => createExternalArticleSearchRecord(article, locale, fetchImpl)),
+      searchRecordLanguages.map((locale) => createExternalArticleSearchRecord(article, locale, fetchImpl)),
     ),
   );
 

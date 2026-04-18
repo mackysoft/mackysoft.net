@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 
+import ArticleTagList from "./ArticleTagList.astro";
 import { getUiText } from "../lib/ui-text";
 import { defaultLocale, type SiteLocale } from "../lib/i18n";
 import { formatContentDate } from "../lib/content-date";
@@ -23,6 +24,9 @@ const verticalCoverStyle = layout === "vertical" ? `--article-cover-ratio: ${cov
 const coverSizes = layout === "vertical" ? "(max-width: 720px) 100vw, 20rem" : "(max-width: 720px) 100vw, 28rem";
 const publishedAtLabel = formatContentDate(article.publishedAt, locale);
 const uiText = getUiText(locale);
+const showFallbackBadge = article.isFallback && locale !== defaultLocale;
+const showTags = layout === "horizontal" && article.tags.length > 0;
+const showMetrics = showFallbackBadge || showTags;
 ---
 
 <article class:list={["article-card", "activity-card", layout === "vertical" && "activity-card--compact", `article-card--${layout}`, !cover && "article-card--no-cover"]}>
@@ -61,19 +65,22 @@ const uiText = getUiText(locale);
   )}
   <div class="article-card__body activity-card__body">
     <h3 class="activity-card__title">{article.title}</h3>
-    {article.isFallback && locale !== defaultLocale && (
-      <div class="activity-card__badges">
-        <span class="activity-card__badge">{uiText.common.japaneseOnlyBadge}</span>
-      </div>
-    )}
     {showDescription && <p class="article-card__description">{article.description}</p>}
-    <p class="article-card__meta activity-card__meta">
-      <span class="article-card__meta-date">
-        <span class="article-card__meta-label">{uiText.article.publishedAt}</span>
-        <span>{publishedAtLabel}</span>
-      </span>
-      <span>{article.source}</span>
-    </p>
+    <div class="article-card__footer">
+      <p class="article-card__meta activity-card__meta">
+        <span class="article-card__meta-date">
+          <span class="article-card__meta-label">{uiText.article.publishedAt}</span>
+          <span>{publishedAtLabel}</span>
+        </span>
+        <span>{article.source}</span>
+      </p>
+      {showMetrics && (
+        <div class="article-card__metrics">
+          {showFallbackBadge && <p class="activity-card__badge pill pill--badge">{uiText.common.japaneseOnlyBadge}</p>}
+          {showTags && <ArticleTagList tags={article.tags} locale={locale} class="article-card__tags" />}
+        </div>
+      )}
+    </div>
   </div>
 </article>
 
@@ -108,6 +115,19 @@ const uiText = getUiText(locale);
     font-size: 0.92rem;
   }
 
+  .article-card__footer {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: auto;
+  }
+
+  .article-card__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
   .article-card h3 {
     margin: 0;
     font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
@@ -123,10 +143,6 @@ const uiText = getUiText(locale);
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
-  }
-
-  .article-card__meta {
-    margin-top: auto;
   }
 
   .article-card--vertical .article-card__cover,
@@ -148,7 +164,6 @@ const uiText = getUiText(locale);
 
   .article-card--vertical .article-card__meta {
     font-size: 0.84rem;
-    margin-top: 0;
   }
 
   @media (max-width: 759px) {
@@ -165,7 +180,7 @@ const uiText = getUiText(locale);
     .article-card--horizontal {
       grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
       align-items: start;
-      height: 15rem;
+      min-height: 15rem;
     }
 
     .article-card--horizontal .article-card__description {

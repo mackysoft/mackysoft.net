@@ -43,4 +43,25 @@ describe("ui text", () => {
     expect(uiText.common.privacyPolicy).toBe(uiText.breadcrumb.privacyPolicy);
     expect(uiText.common.rssFeed).toBe("RSS feed");
   });
+
+  test("uses zh-hant labels while keeping breadcrumb labels unchanged", () => {
+    const uiText = getUiText("zh-hant");
+
+    expect(uiText.header.primaryNavLabel).toBe("全域導覽");
+    expect(uiText.header.menuToggle).toBe("開啟選單");
+    expect(uiText.header.languageShortLabel["zh-hant"]).toBe("ZH-HANT");
+    expect(uiText.header.languageName["zh-hant"]).toBe("繁體中文");
+    expect(uiText.common.home).toBe("首頁");
+    expect(uiText.common.about).toBe("個人簡介");
+    expect(uiText.common.games).toBe("遊戲");
+    expect(uiText.common.assets).toBe("資產");
+    expect(uiText.common.articles).toBe("文章");
+    expect(uiText.common.search).toBe("搜尋");
+    expect(uiText.common.contact).toBe("聯絡");
+    expect(uiText.common.privacyPolicy).toBe("隱私權政策");
+    expect(uiText.common.rssFeed).toBe("RSS 摘要");
+
+    expect(uiText.breadcrumb.home).toBe("Home");
+    expect(uiText.breadcrumb.about).toBe("About");
+  });
 });

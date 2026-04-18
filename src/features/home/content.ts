@@ -39,6 +39,25 @@ const homePageContentMap = {
     aboutCta: "About",
     homeHeading: "Home",
   },
+  "zh-hant": {
+    pageTitle: undefined,
+    latestArticlesEyebrow: "Latest Articles",
+    latestArticlesHeading: "最新文章",
+    latestArticlesCta: "查看文章列表",
+    latestReleasesEyebrow: "Latest Releases",
+    latestReleasesHeading: "最新發佈",
+    latestReleasesCta: "查看資產列表",
+    gamesEyebrow: "Games",
+    gamesHeading: "遊戲",
+    gamesCta: "查看遊戲列表",
+    heroPrimaryCta: "查看個人簡介",
+    heroContactCta: "聯絡",
+    aboutEyebrow: "About",
+    aboutHeading: "把持續中的活動集中在同一個正本",
+    aboutBody: "這個網站正在重整為一個可以在同一處追蹤個人簡介、作品、文章與聯絡方式的據點，避免過度依賴外部服務。",
+    aboutCta: "查看個人簡介",
+    homeHeading: "首頁",
+  },
 } as const;
 
 export function getHomePageContent(locale: SiteLocale) {

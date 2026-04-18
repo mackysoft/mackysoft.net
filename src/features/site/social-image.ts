@@ -5,11 +5,13 @@ import { localizePath, type SiteLocale } from "../../lib/i18n";
 const defaultSocialImageAltMap: Record<SiteLocale, string> = {
   ja: "mackysoft.net のカバー画像",
   en: "mackysoft.net cover image",
+  "zh-hant": "mackysoft.net 封面圖片",
 };
 
 const articleTitleSocialImageAltMap: Record<SiteLocale, (title: string) => string> = {
   ja: (title) => `${title} の記事タイトル画像`,
   en: (title) => `Title card for ${title}`,
+  "zh-hant": (title) => `${title} 的文章標題圖片`,
 };
 
 export const defaultSocialImagePath = "/og/default.png";

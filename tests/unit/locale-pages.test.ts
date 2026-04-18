@@ -9,6 +9,9 @@ describe("locale page helpers", () => {
       {
         params: { locale: getLocalePathPrefix("en") },
       },
+      {
+        params: { locale: getLocalePathPrefix("zh-hant") },
+      },
     ]);
   });
 
@@ -23,6 +26,10 @@ describe("locale page helpers", () => {
     ).toEqual([
       {
         params: { locale: getLocalePathPrefix("en"), slug: "vision-introduction" },
+        props: { slug: "vision-introduction" },
+      },
+      {
+        params: { locale: getLocalePathPrefix("zh-hant"), slug: "vision-introduction" },
         props: { slug: "vision-introduction" },
       },
     ]);

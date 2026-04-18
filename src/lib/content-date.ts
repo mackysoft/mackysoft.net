@@ -1,11 +1,11 @@
-import type { SiteLocale } from "./i18n";
+import { getIntlLocale, type SiteLocale } from "./i18n";
 
 const CONTENT_TIME_ZONE = "Asia/Tokyo";
 const dateOnlyPattern = /^(\d{4})-(\d{2})-(\d{2})$/;
 const dateTimeMinutePattern = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/;
 
-function getNumericDateFormatter() {
-  return new Intl.DateTimeFormat("ja-JP", {
+function getNumericDateFormatter(locale: SiteLocale) {
+  return new Intl.DateTimeFormat(getIntlLocale(locale), {
     calendar: "gregory",
     timeZone: CONTENT_TIME_ZONE,
     year: "numeric",
@@ -21,8 +21,7 @@ type ContentDateParts = {
 };
 
 export function getContentDateParts(date: Date, locale: SiteLocale = "ja"): ContentDateParts {
-  void locale;
-  const parts = getNumericDateFormatter().formatToParts(date);
+  const parts = getNumericDateFormatter(locale).formatToParts(date);
   let year = "";
   let month = "";
   let day = "";
@@ -54,7 +53,6 @@ export function formatContentDate(date: Date, locale: SiteLocale = "ja"): string
 }
 
 export function formatNumericDate(date: Date, locale: SiteLocale = "ja"): string {
-  void locale;
   const { year, month, day } = getContentDateParts(date, locale);
 
   return `${year}/${month}/${day}`;

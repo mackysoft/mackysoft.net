@@ -75,6 +75,42 @@ const contactPageContentMap = {
       ],
     },
   },
+  "zh-hant": {
+    title: "聯絡",
+    description: "整理工作洽談、一般諮詢與 OSS 相關聯絡方式，以及目前的回覆方針。",
+    hero: {
+      eyebrow: formatBreadcrumb("Home", "Contact"),
+      title: "聯絡",
+    },
+    lead: "請依照內容選擇最合適的聯絡管道。",
+    channels: [
+      {
+        heading: "工作與諮詢",
+        description: "工作洽談、顧問需求或一般聯絡，請以電子郵件為主。",
+        action: {
+          type: "email",
+          href: "mailto:mackysoft0129@gmail.com",
+          label: "寄送電子郵件",
+        },
+      },
+      {
+        heading: "OSS 與資產",
+        description: "錯誤回報與技術討論較適合透過 GitHub 進行。",
+        action: {
+          type: "external",
+          externalLinkId: "github" as ExternalLinkId,
+          label: "開啟 GitHub",
+        },
+      },
+    ],
+    replyPolicy: {
+      heading: "回覆方針",
+      paragraphs: [
+        "我不一定能回覆所有訊息。",
+        "有些內容可能需要較多時間確認或判斷。",
+      ],
+    },
+  },
 } as const;
 
 export function getContactPageContent(locale: SiteLocale) {

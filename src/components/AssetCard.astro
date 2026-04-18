@@ -55,9 +55,9 @@ const uiText = getUiText(locale);
         </span>
       </p>
       <div class="asset-card__metrics">
-        {release.license && <p class="asset-card__license">{release.license}</p>}
-        <p class="asset-card__version">{release.version}</p>
-        <span class="asset-card__stars" aria-label={`GitHub stars ${stargazerCount}`}>
+        {release.license && <p class="asset-card__license pill">{release.license}</p>}
+        <p class="asset-card__version pill pill--accent">{release.version}</p>
+        <span class="asset-card__stars pill pill--accent-outline" aria-label={`GitHub stars ${stargazerCount}`}>
           <svg class="asset-card__star-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 3.25 14.703 8.728l6.047.879-4.375 4.265 1.033 6.022L12 17.051l-5.408 2.843 1.033-6.022-4.375-4.265 6.047-.879L12 3.25Z" />
           </svg>
@@ -184,43 +184,15 @@ const uiText = getUiText(locale);
   }
 
   .asset-card__version {
-    width: fit-content;
-    padding: 0.35rem 0.6rem;
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 500;
+    --pill-text-color: var(--accent-color);
   }
 
   .asset-card__license {
-    width: fit-content;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--surface-soft-border-color);
-    border-radius: 999px;
-    background: var(--surface-soft-color);
-    color: var(--muted-color);
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 500;
-  }
-
-  .asset-card__version {
-    background: var(--accent-surface-color);
-    color: var(--accent-color);
+    margin: 0;
   }
 
   .asset-card__stars {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    width: fit-content;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--accent-border-color);
-    border-radius: 999px;
-    color: var(--text-color);
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 500;
+    margin: 0;
   }
 
   .asset-card__star-icon {

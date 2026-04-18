@@ -33,4 +33,19 @@ test.describe("contact page", () => {
     await expect(replyPolicy.getByRole("heading", { level: 2, name: "返信について" })).toBeVisible();
     await expect(replyPolicy.locator("p")).toHaveCount(2);
   });
+
+  test("shows zh-hant contact channels and the reply policy", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/zh-hant/contact/");
+
+    await expect(page).toHaveTitle("聯絡 | mackysoft.net");
+
+    const main = page.getByRole("main");
+    const contactCards = main.locator(".contact-card");
+
+    await expect(main.getByText("Home / Contact", { exact: true })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 1, name: "聯絡" })).toBeVisible();
+    await expect(contactCards.first().getByRole("link", { name: "寄送電子郵件" })).toHaveAttribute("href", "mailto:mackysoft0129@gmail.com");
+    await expect(contactCards.nth(1).getByRole("link", { name: "開啟 GitHub" })).toHaveAttribute("href", "https://github.com/mackysoft");
+    await expect(main.locator(".reply-policy").getByRole("heading", { level: 2, name: "回覆方針" })).toBeVisible();
+  });
 });

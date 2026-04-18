@@ -14,8 +14,10 @@ const sharedSiteName = "mackysoft.net";
 const defaultImageUrl = "https://mackysoft.net/og/default.png";
 const defaultImageAltJa = "mackysoft.net のカバー画像";
 const defaultImageAltEn = "mackysoft.net cover image";
+const defaultImageAltZhHant = "mackysoft.net 封面圖片";
 const generatedArticleImageJa = "https://mackysoft.net/og/articles/turnbased-gameloop.png";
 const generatedArticleImageEn = "https://mackysoft.net/en/og/articles/turnbased-gameloop.png";
+const generatedArticleImageZhHant = "https://mackysoft.net/zh-hant/og/articles/turnbased-gameloop.png";
 
 const seoExpectations: SeoExpectation[] = [
   {
@@ -92,6 +94,7 @@ async function expectSeo(page: Page, expectation: SeoExpectation) {
   await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", expectation.imageUrl);
   await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute("content", expectation.imageAlt);
   await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", "https://mackysoft.net/feed.xml");
+  await expect(page.locator('link[rel="alternate"][hreflang="zh-Hant"]')).toHaveCount(1);
 
   if (expectation.robotsContent) {
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", expectation.robotsContent);
@@ -119,24 +122,44 @@ test.describe("SEO metadata", () => {
     });
   });
 
-  test("marks privacy policy pages as noindex", { tag: "@size:medium" }, async ({ page }) => {
-    await page.goto("/privacy-policy/");
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/privacy-policy/");
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+  test("renders shared SEO metadata for a zh-hant localized route", { tag: "@size:medium" }, async ({ page }) => {
+    await expectSeo(page, {
+      path: "/zh-hant/about/",
+      title: "個人簡介 | Hiroya Aramaki / Makihiro | mackysoft.net",
+      description:
+        "整理 Hiroya Aramaki / Makihiro 的個人簡介、以遊戲開發為核心的活動領域、網站定位、外部連結與聯絡方式的頁面。",
+      canonicalUrl: "https://mackysoft.net/zh-hant/about/",
+      imageUrl: defaultImageUrl,
+      imageAlt: defaultImageAltZhHant,
+    });
+  });
 
-    await page.goto("/en/privacy-policy/");
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/en/privacy-policy/");
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+  test("marks privacy policy pages as noindex", { tag: "@size:medium" }, async ({ page }) => {
+    const expectations = [
+      ["/privacy-policy/", "https://mackysoft.net/privacy-policy/"],
+      ["/en/privacy-policy/", "https://mackysoft.net/en/privacy-policy/"],
+      ["/zh-hant/privacy-policy/", "https://mackysoft.net/zh-hant/privacy-policy/"],
+    ] as const;
+
+    for (const [path, canonicalUrl] of expectations) {
+      await page.goto(path);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonicalUrl);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+    }
   });
 
   test("marks contact pages as noindex", { tag: "@size:medium" }, async ({ page }) => {
-    await page.goto("/contact/");
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/contact/");
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+    const expectations = [
+      ["/contact/", "https://mackysoft.net/contact/"],
+      ["/en/contact/", "https://mackysoft.net/en/contact/"],
+      ["/zh-hant/contact/", "https://mackysoft.net/zh-hant/contact/"],
+    ] as const;
 
-    await page.goto("/en/contact/");
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mackysoft.net/en/contact/");
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+    for (const [path, canonicalUrl] of expectations) {
+      await page.goto(path);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonicalUrl);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, follow");
+    }
   });
 
   test("uses the article cover when a local article defines one", { tag: "@size:medium" }, async ({ page }) => {
@@ -181,6 +204,21 @@ test.describe("SEO metadata", () => {
     await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
       "content",
       "Title card for How to Implement a Turn-Based Game Loop [C#]",
+    );
+  });
+
+  test("uses a localized generated title card when a zh-hant article has no cover", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/zh-hant/articles/turnbased-gameloop/");
+
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", generatedArticleImageZhHant);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      "content",
+      "如何實作回合制的遊戲迴圈【C#】 的文章標題圖片",
+    );
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", generatedArticleImageZhHant);
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute(
+      "content",
+      "如何實作回合制的遊戲迴圈【C#】 的文章標題圖片",
     );
   });
 

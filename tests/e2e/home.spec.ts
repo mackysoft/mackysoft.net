@@ -35,8 +35,10 @@ const latestRelease = activityData.releases[0]!;
 const latestReleaseRepoName = latestRelease.repo.split("/").at(-1)!;
 const homePageContentJa = getHomePageContent("ja");
 const homePageContentEn = getHomePageContent("en");
+const homePageContentZhHant = getHomePageContent("zh-hant");
 const homeHeroJa = getProfileContent("ja").home;
 const homeHeroEn = getProfileContent("en").home;
+const homeHeroZhHant = getProfileContent("zh-hant").home;
 const mobileViewport = { width: 375, height: 812 };
 const tinyPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9sX6s2sAAAAASUVORK5CYII=",
@@ -326,6 +328,42 @@ test.describe("home page", () => {
     await expect(page.getByRole("main").locator(".game-card").first()).toContainText("Treasure Rogue");
     await expect(page.locator(".content-panel").first()).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(page.locator(".site-header")).toHaveCSS("background-color", "rgba(240, 249, 255, 0.94)");
+  });
+
+  test("redirects the first root visit to /zh-hant/ when Traditional Chinese is preferred", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.removeItem("mackysoft-locale");
+      Object.defineProperty(window.navigator, "languages", {
+        configurable: true,
+        value: ["zh-TW"],
+      });
+      Object.defineProperty(window.navigator, "language", {
+        configurable: true,
+        value: "zh-TW",
+      });
+    });
+
+    await page.goto("/");
+
+    const homeHero = page.getByRole("main").locator("[data-home-hero]");
+
+    await expect(page).toHaveURL(/\/zh-hant\/$/);
+    await expect(page.locator("html")).toHaveAttribute("data-ui-locale", "zh-hant");
+    await expect(homeHero).toBeVisible();
+    await expect(homeHero.getByRole("img", { name: "Makihiro 頭像" })).toBeVisible();
+    await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroZhHant.name);
+    await expect(homeHero).toContainText(homeHeroZhHant.summary);
+    await expect(homeHero.getByRole("link", { name: homePageContentZhHant.heroPrimaryCta, exact: true })).toHaveAttribute(
+      "href",
+      "/zh-hant/about/",
+    );
+    await expect(homeHero.getByRole("link", { name: homePageContentZhHant.heroContactCta, exact: true })).toHaveAttribute(
+      "href",
+      "/zh-hant/contact/",
+    );
+    await expect(page.getByRole("heading", { level: 2, name: "最新文章" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "遊戲" })).toBeVisible();
+    await expect(page.getByRole("link", { name: homePageContentZhHant.gamesCta, exact: true })).toHaveAttribute("href", "/zh-hant/games/");
   });
 
   test("tracks the redirected English root visit only once", async ({ page }) => {

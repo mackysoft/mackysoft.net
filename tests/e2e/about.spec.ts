@@ -30,4 +30,23 @@ test.describe("about page", () => {
     await expect(main.getByRole("link", { name: "YouTube" })).toHaveCount(0);
     await expect(main.locator(".section-grid").getByRole("link", { name: "問い合わせ先を見る", exact: true })).toHaveAttribute("href", "/contact/");
   });
+
+  test("renders the zh-hant about page", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/zh-hant/about/");
+
+    await expect(page).toHaveTitle("個人簡介 | Hiroya Aramaki / Makihiro | mackysoft.net");
+
+    const main = page.getByRole("main");
+
+    await expect(main.getByText("Home / About", { exact: true })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 1, name: "個人簡介" })).toBeVisible();
+    await expect(main.getByRole("img", { name: "Makihiro 頭像" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "我在做什麼" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "主要領域與興趣" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "這個網站可以看到什麼" })).toBeVisible();
+    await expect(main.locator(".section-grid").getByRole("link", { name: "開啟聯絡頁面", exact: true })).toHaveAttribute(
+      "href",
+      "/zh-hant/contact/",
+    );
+  });
 });

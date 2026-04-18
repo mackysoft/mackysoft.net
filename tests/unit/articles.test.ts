@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { toLocalizedLocalArticleItem, type LocalizedArticleEntry } from "../../src/lib/articles";
+import { toExternalArticleItem, toLocalizedLocalArticleItem, type ArticleActivity, type LocalizedArticleEntry } from "../../src/lib/articles";
 
 function createLocalizedArticleEntry(
   overrides: Partial<LocalizedArticleEntry["data"]> & {
@@ -68,6 +68,47 @@ describe("article item helpers", () => {
       alt: "著者指定カバー",
       width: 1200,
       height: 630,
+    });
+  });
+
+  test("prefers English metadata for zh-hant external article cards before Japanese fallback", () => {
+    const externalArticle: ArticleActivity = {
+      id: "zenn:test",
+      source: "Zenn",
+      publishedAt: "2026-01-06T03:05:01.000Z",
+      locales: {
+        ja: {
+          title: "日本語記事",
+          description: "日本語概要",
+          url: "https://zenn.dev/makihiro_dev/articles/test",
+        },
+        en: {
+          title: "English article",
+          description: "English summary",
+          url: "https://zenn.dev/makihiro_dev/articles/test?locale=en",
+        },
+      },
+    };
+
+    expect(toExternalArticleItem(externalArticle, "zh-hant")).toMatchObject({
+      title: "English article",
+      description: "English summary",
+      href: "https://zenn.dev/makihiro_dev/articles/test?locale=en",
+      contentLocale: "en",
+      isFallback: true,
+    });
+
+    expect(toExternalArticleItem({
+      ...externalArticle,
+      locales: {
+        ja: externalArticle.locales.ja,
+      },
+    }, "zh-hant")).toMatchObject({
+      title: "日本語記事",
+      description: "日本語概要",
+      href: "https://zenn.dev/makihiro_dev/articles/test",
+      contentLocale: "ja",
+      isFallback: true,
     });
   });
 });

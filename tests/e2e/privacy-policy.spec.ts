@@ -99,4 +99,26 @@ test.describe("privacy policy page", () => {
     await expect(main).toContainText("Effective date: April 12, 2026");
     await expect(main).toContainText("Last updated: April 19, 2026");
   });
+
+  test("renders the zh-hant privacy policy with the same scope", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/zh-hant/privacy-policy/");
+
+    await expect(page).toHaveTitle("隱私權政策 | mackysoft.net");
+
+    const main = page.getByRole("main");
+
+    await expect(main.getByText("Home / Privacy Policy", { exact: true })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "營運者資訊與聯絡方式" })).toBeVisible();
+    await expect(main).toContainText("Hiroya Aramaki（荒牧裕也）/ Makihiro");
+    await expect(main.getByRole("link", { name: "聯絡方式" })).toHaveAttribute("href", "/zh-hant/contact/");
+    await expect(main.getByRole("heading", { level: 2, name: "流量分析" })).toBeVisible();
+    await expect(main).toContainText("Google Analytics 4");
+    await expect(main).toContainText("主題切換");
+    await expect(main).toContainText("語言切換");
+    await expect(main.getByRole("heading", { level: 2, name: "外部服務" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "由海外業者進行的處理" })).toBeVisible();
+    await expect(main.getByRole("heading", { level: 2, name: "使用者可採取的控制方式" })).toBeVisible();
+    await expect(main).toContainText("制定日: 2026年4月12日");
+    await expect(main).toContainText("最後更新日: 2026年4月14日");
+  });
 });

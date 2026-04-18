@@ -24,6 +24,7 @@ const activity = activityData as unknown as ReleaseActivityData;
 const releaseStarCountFormatterMap: Record<SiteLocale, Intl.NumberFormat> = {
   ja: new Intl.NumberFormat("ja-JP"),
   en: new Intl.NumberFormat("en-US"),
+  "zh-hant": new Intl.NumberFormat("zh-Hant"),
 };
 
 export function sortReleaseActivities(releases: ReleaseActivity[]) {
