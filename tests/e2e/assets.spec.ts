@@ -136,13 +136,13 @@ test.describe("assets page", () => {
   });
 
   test("falls back to a local cover treatment when release images fail", { tag: "@size:medium" }, async ({ page }) => {
-    await page.route(createCoverRoutePattern(latestRelease.coverUrl), async (route) => {
-      await route.abort();
-    });
     await page.goto("/assets/");
 
     const firstCard = page.locator(".asset-card").first();
     const firstFallback = firstCard.locator(".asset-card__cover-fallback");
+    await firstCard.locator(".asset-card__cover img").evaluate((image) => {
+      image.dispatchEvent(new Event("error"));
+    });
 
     await expect(firstCard.locator(".asset-card__cover")).toHaveAttribute("data-cover-state", "error");
     await expect(firstFallback).toBeVisible();

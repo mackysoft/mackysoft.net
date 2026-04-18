@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 
-import { activityCoverPublicBasePath, activityCoverPublicDir } from "./shared.mjs";
+import { activityCoverPublicBasePath, activityCoverPublicDir, activityCoverSourceDir } from "./shared.mjs";
 
 const releaseCoverDirectoryName = "github";
 const releaseCoverRetryStatuses = new Set([408, 425, 429, 500, 502, 503, 504]);
@@ -245,6 +245,33 @@ export async function pruneUnusedReleaseCoverAssets(usedRelativePaths, coverOutp
       return;
     }
 
-    throw error;
+  throw error;
   }
+}
+
+export async function syncReleaseCoverSourceAssets(
+  releases,
+  {
+    sourceCoverDir = activityCoverPublicDir,
+    outputDir = activityCoverSourceDir,
+  } = {},
+) {
+  const usedRelativePaths = new Set();
+
+  for (const release of releases) {
+    const relativePath = getReleaseCoverRelativePathFromUrl(release.coverUrl);
+
+    if (!relativePath) {
+      continue;
+    }
+
+    const sourcePath = resolveLocalCoverPath(sourceCoverDir, relativePath);
+    const outputPath = resolveLocalCoverPath(outputDir, relativePath);
+
+    usedRelativePaths.add(relativePath);
+    await mkdir(path.dirname(outputPath), { recursive: true });
+    await copyFile(sourcePath, outputPath);
+  }
+
+  await pruneUnusedReleaseCoverAssets(usedRelativePaths, outputDir);
 }

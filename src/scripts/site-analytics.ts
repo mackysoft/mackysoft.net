@@ -35,6 +35,8 @@ type AnalyticsWindow = Window & typeof globalThis & {
   gtag?: (...args: unknown[]) => void;
 };
 
+type PendingAnalyticsEventCall = Extract<PendingAnalyticsCall, { command: "event" }>;
+
 function isPendingAnalyticsReplayCondition(value: unknown): value is PendingAnalyticsReplayCondition {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -164,6 +166,28 @@ function getPendingAnalyticsCallDisposition(call: PendingAnalyticsCall, location
   return "flush" as const;
 }
 
+function isCurrentPageConfigCall(call: PendingAnalyticsCall, location: URL) {
+  if (call.command !== "config" || typeof call.params.page_location !== "string") {
+    return false;
+  }
+
+  try {
+    return new URL(call.params.page_location).pathname === location.pathname;
+  } catch {
+    return false;
+  }
+}
+
+function flushPendingAnalyticsEventCalls(analyticsWindow: AnalyticsWindow, calls: PendingAnalyticsEventCall[]) {
+  if (typeof analyticsWindow.gtag !== "function") {
+    return;
+  }
+
+  for (const call of calls) {
+    analyticsWindow.gtag(call.command, call.target, call.params);
+  }
+}
+
 export function initAnalyticsWindow() {
   const analyticsWindow = getAnalyticsWindow();
 
@@ -193,6 +217,8 @@ export function flushPendingAnalyticsCalls() {
 
   const currentLocation = new URL(window.location.href);
   const remainingCalls: PendingAnalyticsCall[] = [];
+  const delayedReplayCalls: PendingAnalyticsEventCall[] = [];
+  let didFlushCurrentPageConfig = false;
 
   for (const call of pendingCalls) {
     const disposition = getPendingAnalyticsCallDisposition(call, currentLocation);
@@ -206,7 +232,30 @@ export function flushPendingAnalyticsCalls() {
       continue;
     }
 
+    if (call.command === "event" && call.replayCondition) {
+      if (didFlushCurrentPageConfig) {
+        analyticsWindow.gtag(call.command, call.target, call.params);
+        continue;
+      }
+
+      delayedReplayCalls.push(call);
+      continue;
+    }
+
     analyticsWindow.gtag(call.command, call.target, call.params);
+
+    if (isCurrentPageConfigCall(call, currentLocation)) {
+      didFlushCurrentPageConfig = true;
+
+      if (delayedReplayCalls.length > 0) {
+        flushPendingAnalyticsEventCalls(analyticsWindow, delayedReplayCalls);
+        delayedReplayCalls.length = 0;
+      }
+    }
+  }
+
+  if (delayedReplayCalls.length > 0) {
+    flushPendingAnalyticsEventCalls(analyticsWindow, delayedReplayCalls);
   }
 
   if (remainingCalls.length > 0) {

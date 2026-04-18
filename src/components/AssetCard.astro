@@ -6,10 +6,8 @@ import type { SiteLocale } from "../lib/i18n";
 import { formatContentDate } from "../lib/content-date";
 import { formatReleaseStargazerCount, getReleaseRepoName, type ReleaseActivity } from "../lib/releases";
 import {
-  releaseCoverHeight,
-  releaseCoverWidth,
   releaseCoverWidths,
-  resolveReleaseCoverImageUrl,
+  resolveReleaseCoverImage,
 } from "../features/releases/cover-image";
 
 type Props = {
@@ -21,7 +19,7 @@ const { release, locale = "ja" } = Astro.props as Props;
 const repoName = getReleaseRepoName(release.repo);
 const stargazerCount = formatReleaseStargazerCount(release.stargazerCount, locale);
 const uiText = getUiText(locale);
-const coverSrc = resolveReleaseCoverImageUrl(release.coverUrl, Astro.site ?? Astro.url);
+const coverSource = resolveReleaseCoverImage(release.coverUrl, Astro.site ?? Astro.url);
 ---
 
 <article class="asset-card activity-card">
@@ -36,17 +34,40 @@ const coverSrc = resolveReleaseCoverImageUrl(release.coverUrl, Astro.site ?? Ast
     data-analytics-location="asset-card"
   ></a>
   <div class="asset-card__cover activity-card__cover" data-cover-state="ready">
-    <Image
-      src={coverSrc}
-      alt={release.coverAlt}
-      width={releaseCoverWidth}
-      height={releaseCoverHeight}
-      widths={releaseCoverWidths}
-      sizes="(max-width: 720px) 100vw, 28rem"
-      loading="lazy"
-      decoding="async"
-      onerror="this.parentElement?.setAttribute('data-cover-state', 'error')"
-    />
+    {
+      coverSource.kind === "optimized" ? (
+        <Image
+          src={coverSource.src}
+          alt={release.coverAlt}
+          widths={releaseCoverWidths}
+          sizes="(max-width: 720px) 100vw, 28rem"
+          loading="lazy"
+          decoding="async"
+          onerror="this.parentElement?.setAttribute('data-cover-state', 'error')"
+        />
+      ) : coverSource.kind === "remote" ? (
+        <Image
+          src={coverSource.src}
+          alt={release.coverAlt}
+          widths={releaseCoverWidths}
+          sizes="(max-width: 720px) 100vw, 28rem"
+          inferSize
+          loading="lazy"
+          decoding="async"
+          onerror="this.parentElement?.setAttribute('data-cover-state', 'error')"
+        />
+      ) : (
+        <img
+          src={coverSource.src}
+          alt={release.coverAlt}
+          width={480}
+          height={252}
+          loading="lazy"
+          decoding="async"
+          onerror="this.parentElement?.setAttribute('data-cover-state', 'error')"
+        />
+      )
+    }
     <div class="asset-card__cover-fallback" aria-hidden="true">
       <span class="asset-card__cover-kicker">GitHub</span>
       <strong class="asset-card__cover-title">{repoName}</strong>

@@ -8,6 +8,7 @@ export const repoRoot = path.resolve(fileURLToPath(new URL("../..", import.meta.
 export const activityPath = path.join(repoRoot, "src/generated/activity.json");
 export const activityCoverPublicBasePath = "/generated/activity-covers";
 export const activityCoverPublicDir = path.join(repoRoot, "public", "generated", "activity-covers");
+export const activityCoverSourceDir = path.join(repoRoot, "src", "generated", "activity-covers");
 export const zennFeedUrl = "https://zenn.dev/makihiro_dev/feed?all=1";
 export const githubApiBaseUrl = "https://api.github.com";
 export const githubGraphqlUrl = `${githubApiBaseUrl}/graphql`;

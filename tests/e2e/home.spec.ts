@@ -481,13 +481,13 @@ test.describe("home page", () => {
   });
 
   test("falls back to a local cover treatment when release images fail", async ({ page }) => {
-    await page.route(createCoverRoutePattern(latestRelease.coverUrl), async (route) => {
-      await route.abort();
-    });
     await page.goto("/");
 
     const firstReleaseCard = page.locator(".release-card").first();
     const firstFallback = firstReleaseCard.locator(".release-card__cover-fallback");
+    await firstReleaseCard.locator(".release-card__cover img").evaluate((image) => {
+      image.dispatchEvent(new Event("error"));
+    });
 
     await expect(firstReleaseCard.locator(".release-card__cover")).toHaveAttribute("data-cover-state", "error");
     await expect(firstFallback).toBeVisible();
