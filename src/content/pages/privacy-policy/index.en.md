@@ -32,7 +32,7 @@ Collected information is not used for advertising features or account management
 
 This site uses Google Analytics 4. Google Analytics 4 uses the Google tag, cookie-based identifiers such as `_ga` and `_ga_<container-id>`, and related technical data to collect usage information, which Google may process.
 
-In addition to basic page-view measurement, this site measures search result views, theme switches, language switches, project CTA clicks, and external link clicks. This may send fixed information such as page URL, referrer URL, page title, screen resolution, result counts, UI location, clicked labels, destination URL, target theme, and target locale to Google Analytics 4. Search terms themselves are not sent.
+In addition to basic page-view measurement, this site measures on-site search submissions, theme switches, language switches, project CTA clicks, and external link clicks. This may send information such as page URL, referrer URL, page title, screen resolution, search terms submitted through on-site search, UI location, clicked labels, destination URL, target theme, and target locale to Google Analytics 4.
 
 Google signals and advertising personalization features are not used.
 
@@ -68,4 +68,4 @@ If you want to stop information collection by Google Analytics, use Google's opt
 
 Effective date: April 12, 2026
 
-Last updated: April 17, 2026
+Last updated: April 18, 2026
