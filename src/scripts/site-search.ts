@@ -23,7 +23,7 @@ import {
   openDropdownPanel,
   prepareDropdownPanel,
 } from "./site-dropdown";
-import { replayPendingSiteSearch, trackSiteSearchSubmit } from "./site-search-analytics";
+import { trackSiteSearchSubmit } from "./site-search-analytics";
 
 type PagefindResult = {
   id: string;
@@ -424,10 +424,6 @@ function initSearchPanel(root: HTMLElement) {
 
   if (initialQueryFromUrl && elements.input.value !== initialQueryFromUrl) {
     elements.input.value = initialQueryFromUrl;
-  }
-
-  if (elements.mode === "page") {
-    replayPendingSiteSearch(initialQueryFromUrl);
   }
 
   const searchPagefind = async (pagefind: PagefindModule, queryVariants: ReturnType<typeof createSearchQueryVariants>, immediate: boolean) => {
