@@ -49,7 +49,9 @@ describe("ui text", () => {
 
     expect(uiText.header.primaryNavLabel).toBe("全域導覽");
     expect(uiText.header.menuToggle).toBe("開啟選單");
-    expect(uiText.header.languageShortLabel["zh-hant"]).toBe("ZH-HANT");
+    expect(uiText.header.languageShortLabel.ja).toBe("JA");
+    expect(uiText.header.languageShortLabel.en).toBe("EN");
+    expect(uiText.header.languageShortLabel["zh-hant"]).toBe("ZH");
     expect(uiText.header.languageName["zh-hant"]).toBe("繁體中文");
     expect(uiText.common.home).toBe("首頁");
     expect(uiText.common.about).toBe("個人簡介");
@@ -60,6 +62,30 @@ describe("ui text", () => {
     expect(uiText.common.contact).toBe("聯絡");
     expect(uiText.common.privacyPolicy).toBe("隱私權政策");
     expect(uiText.common.rssFeed).toBe("RSS 摘要");
+
+    expect(uiText.breadcrumb.home).toBe("Home");
+    expect(uiText.breadcrumb.about).toBe("About");
+  });
+
+  test("uses Korean labels while keeping breadcrumb labels unchanged", () => {
+    const uiText = getUiText("ko");
+
+    expect(uiText.header.primaryNavLabel).toBe("글로벌 내비게이션");
+    expect(uiText.header.menuToggle).toBe("메뉴 열기");
+    expect(uiText.header.languageShortLabel.ja).toBe("JA");
+    expect(uiText.header.languageShortLabel.en).toBe("EN");
+    expect(uiText.header.languageShortLabel["zh-hant"]).toBe("ZH");
+    expect(uiText.header.languageShortLabel.ko).toBe("KO");
+    expect(uiText.header.languageName.ko).toBe("한국어");
+    expect(uiText.common.home).toBe("홈");
+    expect(uiText.common.about).toBe("소개");
+    expect(uiText.common.games).toBe("게임");
+    expect(uiText.common.assets).toBe("에셋");
+    expect(uiText.common.articles).toBe("글");
+    expect(uiText.common.search).toBe("검색");
+    expect(uiText.common.contact).toBe("문의");
+    expect(uiText.common.privacyPolicy).toBe("개인정보 처리방침");
+    expect(uiText.common.rssFeed).toBe("RSS 피드");
 
     expect(uiText.breadcrumb.home).toBe("Home");
     expect(uiText.breadcrumb.about).toBe("About");

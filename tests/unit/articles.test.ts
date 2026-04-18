@@ -111,4 +111,32 @@ describe("article item helpers", () => {
       isFallback: true,
     });
   });
+
+  test("prefers English metadata for Korean external article cards before Japanese fallback", () => {
+    const externalArticle: ArticleActivity = {
+      id: "zenn:test",
+      source: "Zenn",
+      publishedAt: "2026-01-06T03:05:01.000Z",
+      locales: {
+        ja: {
+          title: "日本語記事",
+          description: "日本語概要",
+          url: "https://zenn.dev/makihiro_dev/articles/test",
+        },
+        en: {
+          title: "English article",
+          description: "English summary",
+          url: "https://zenn.dev/makihiro_dev/articles/test?locale=en",
+        },
+      },
+    };
+
+    expect(toExternalArticleItem(externalArticle, "ko")).toMatchObject({
+      title: "English article",
+      description: "English summary",
+      href: "https://zenn.dev/makihiro_dev/articles/test?locale=en",
+      contentLocale: "en",
+      isFallback: true,
+    });
+  });
 });

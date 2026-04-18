@@ -255,6 +255,29 @@ test.describe("games page", () => {
     await expect(detailTable).toContainText("Android（已停止發佈） / 瀏覽器");
   });
 
+  test("renders the translated Korean game detail page without fallback UI", { tag: "@size:medium" }, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 960 });
+    await page.goto("/ko/games/treasure-rogue/");
+
+    const main = page.getByRole("main");
+    const hero = main.locator(".game-hero");
+    const detailTable = main.locator('.game-detail-table[aria-label="게임 기본 정보"]');
+
+    await expect(page.locator(".game-fallback-notice")).toHaveCount(0);
+    await expect(main.locator(".game-page__eyebrow")).toHaveText("Home / Games");
+    await expect(hero.getByRole("heading", { level: 1, name: "Treasure Rogue" })).toBeVisible();
+    await expect(hero).toContainText("주운 아이템을 활용해 적을 쓰러뜨리며 끝까지 나아가 보세요!");
+    await expect(hero).toContainText("아카이브됨");
+    await expect(detailTable).toContainText("장르");
+    await expect(detailTable).toContainText("Roguelike");
+    await expect(detailTable).toContainText("공개일");
+    await expect(detailTable).toContainText("2020/04/09");
+    await expect(detailTable).toContainText("지원 언어");
+    await expect(detailTable).toContainText("일본어 / 영어");
+    await expect(detailTable).toContainText("플랫폼");
+    await expect(detailTable).toContainText("Android(배포 종료) / 브라우저");
+  });
+
   test("tracks external game actions as external link clicks", { tag: "@size:medium" }, async ({ page }) => {
     await setJapaneseLocaleWithAnalyticsCapture(page);
     await page.goto("/games/treasure-rogue/");

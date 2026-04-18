@@ -47,6 +47,21 @@ const profileContentMap = {
       summary: "我是一位開發遊戲與開發資產的獨立開發者，也持續整理並公開在過程中獲得的知識。",
     },
   },
+  ko: {
+    avatarLinkAriaLabel: "Twitter 열기",
+    avatar: {
+      alt: "Makihiro 아바타",
+    },
+    primaryExternalLinkId: "twitter" as ExternalLinkId,
+    home: {
+      name: "Makihiro",
+      summary: "Makihiro는 게임과 개발용 에셋을 만드는 인디 개발자이며, 이 사이트는 작업물, 에셋, 글을 한곳에 모아 둡니다.",
+    },
+    about: {
+      name: "Hiroya Aramaki / Makihiro",
+      summary: "저는 게임과 개발용 에셋을 만드는 인디 개발자이며, 그 과정에서 얻은 지식을 정리해 계속 공개하고 있습니다.",
+    },
+  },
 } as const;
 
 export function getProfileContent(locale: SiteLocale) {

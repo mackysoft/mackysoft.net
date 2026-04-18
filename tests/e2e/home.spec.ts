@@ -36,9 +36,11 @@ const latestReleaseRepoName = latestRelease.repo.split("/").at(-1)!;
 const homePageContentJa = getHomePageContent("ja");
 const homePageContentEn = getHomePageContent("en");
 const homePageContentZhHant = getHomePageContent("zh-hant");
+const homePageContentKo = getHomePageContent("ko");
 const homeHeroJa = getProfileContent("ja").home;
 const homeHeroEn = getProfileContent("en").home;
 const homeHeroZhHant = getProfileContent("zh-hant").home;
+const homeHeroKo = getProfileContent("ko").home;
 const mobileViewport = { width: 375, height: 812 };
 const tinyPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9sX6s2sAAAAASUVORK5CYII=",
@@ -295,6 +297,61 @@ test.describe("home page", () => {
     await expect(footerInner).toHaveCSS("justify-content", "space-between");
   });
 
+  test("keeps footer links in two columns once there is enough width", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 420, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const columns = page.locator(".site-footer__columns");
+    const firstColumn = page.locator(".site-footer__column").first();
+    const secondColumn = page.locator(".site-footer__column").nth(1);
+    const rssLink = page.locator(".site-footer__rss-link");
+
+    const columnsBox = await columns.boundingBox();
+    const firstColumnBox = await firstColumn.boundingBox();
+    const secondColumnBox = await secondColumn.boundingBox();
+    const rssLinkBox = await rssLink.boundingBox();
+
+    if (!columnsBox || !firstColumnBox || !secondColumnBox || !rssLinkBox) {
+      throw new Error("footer columns and RSS link must be visible before layout assertions");
+    }
+
+    expect(Math.abs(firstColumnBox.y - secondColumnBox.y)).toBeLessThanOrEqual(2);
+    expect(secondColumnBox.x).toBeGreaterThan(firstColumnBox.x + firstColumnBox.width - 1);
+    expect(rssLinkBox.x).toBeGreaterThan(columnsBox.x + columnsBox.width - 1);
+
+    await context.close();
+  });
+
+  test("stacks footer links on phone-sized screens", { tag: "@size:medium" }, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 375, height: 812 }, colorScheme: "light" });
+    await context.addInitScript(() => {
+      window.localStorage.setItem("mackysoft-locale", "ja");
+    });
+    const page = await context.newPage();
+
+    await page.goto("/");
+
+    const firstColumn = page.locator(".site-footer__column").first();
+    const secondColumn = page.locator(".site-footer__column").nth(1);
+
+    const firstColumnBox = await firstColumn.boundingBox();
+    const secondColumnBox = await secondColumn.boundingBox();
+
+    if (!firstColumnBox || !secondColumnBox) {
+      throw new Error("footer columns must be visible before stack assertions");
+    }
+
+    expect(secondColumnBox.y).toBeGreaterThan(firstColumnBox.y + firstColumnBox.height - 1);
+    expect(Math.abs(secondColumnBox.x - firstColumnBox.x)).toBeLessThanOrEqual(2);
+
+    await context.close();
+  });
+
   test("redirects the first root visit to /en/ when English is preferred", async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem("mackysoft-locale");
@@ -364,6 +421,42 @@ test.describe("home page", () => {
     await expect(page.getByRole("heading", { level: 2, name: "最新文章" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "遊戲" })).toBeVisible();
     await expect(page.getByRole("link", { name: homePageContentZhHant.gamesCta, exact: true })).toHaveAttribute("href", "/zh-hant/games/");
+  });
+
+  test("redirects the first root visit to /ko/ when Korean is preferred", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.removeItem("mackysoft-locale");
+      Object.defineProperty(window.navigator, "languages", {
+        configurable: true,
+        value: ["ko-KR"],
+      });
+      Object.defineProperty(window.navigator, "language", {
+        configurable: true,
+        value: "ko-KR",
+      });
+    });
+
+    await page.goto("/");
+
+    const homeHero = page.getByRole("main").locator("[data-home-hero]");
+
+    await expect(page).toHaveURL(/\/ko\/$/);
+    await expect(page.locator("html")).toHaveAttribute("data-ui-locale", "ko");
+    await expect(homeHero).toBeVisible();
+    await expect(homeHero.getByRole("img", { name: "Makihiro 아바타" })).toBeVisible();
+    await expect(homeHero.locator(".home-hero__name")).toHaveText(homeHeroKo.name);
+    await expect(homeHero).toContainText(homeHeroKo.summary);
+    await expect(homeHero.getByRole("link", { name: homePageContentKo.heroPrimaryCta, exact: true })).toHaveAttribute(
+      "href",
+      "/ko/about/",
+    );
+    await expect(homeHero.getByRole("link", { name: homePageContentKo.heroContactCta, exact: true })).toHaveAttribute(
+      "href",
+      "/ko/contact/",
+    );
+    await expect(page.getByRole("heading", { level: 2, name: "최신 글" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "게임" })).toBeVisible();
+    await expect(page.getByRole("link", { name: homePageContentKo.gamesCta, exact: true })).toHaveAttribute("href", "/ko/games/");
   });
 
   test("tracks the redirected English root visit only once", async ({ page }) => {

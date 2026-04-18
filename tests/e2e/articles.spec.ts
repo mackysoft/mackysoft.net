@@ -33,6 +33,7 @@ const latestZennArticleEn = latestZennArticle.locales.en ?? latestZennArticle.lo
 const visionTitleJa = "【Unity】CullingGroupをより簡単に実装する【Vision】";
 const translatedVisionTitle = "[Unity] Implementing CullingGroup More Easily [Vision]";
 const translatedVisionTitleZhHant = "【Unity】更輕鬆地實作 CullingGroup【Vision】";
+const translatedVisionTitleKo = "[Unity] Vision으로 CullingGroup 더 쉽게 구현하기 [Vision]";
 
 test.describe("articles page", () => {
   test("shows local and Zenn articles in the same card format", { tag: "@size:medium" }, async ({ page }) => {
@@ -351,6 +352,26 @@ test.describe("articles page", () => {
     await expect(page.locator(".article-content__tags").getByRole("link", { name: "資產", exact: true })).toHaveAttribute(
       "href",
       "/zh-hant/tags/asset/",
+    );
+  });
+
+  test("renders translated Korean local article routes without fallback notice", { tag: "@size:medium" }, async ({ page }) => {
+    await page.goto("/ko/articles/vision-introduction/");
+
+    const breadcrumb = page.locator(".article-page-header .eyebrow");
+
+    await expect(page).toHaveURL("/ko/articles/vision-introduction/");
+    await expect(page.locator(".article-fallback-notice")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1, name: translatedVisionTitleKo })).toBeVisible();
+    await expect(breadcrumb).toHaveText("Home / Articles");
+    await expect(page.locator(".article-content")).toContainText("CullingGroup API란?");
+    await expect(page.locator(".article-content__tags").getByRole("link", { name: "에셋", exact: true })).toHaveAttribute(
+      "href",
+      "/ko/tags/asset/",
+    );
+    await expect(page.locator(".article-content__tags").getByRole("link", { name: "튜토리얼", exact: true })).toHaveAttribute(
+      "href",
+      "/ko/tags/tutorial/",
     );
   });
 

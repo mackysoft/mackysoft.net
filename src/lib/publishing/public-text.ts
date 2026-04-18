@@ -22,6 +22,7 @@ const languageLabelMap: Record<SiteLocale, string> = {
   ja: "Japanese",
   en: "English",
   "zh-hant": "Traditional Chinese",
+  ko: "Korean",
 };
 
 export function renderRobotsTxt(site: URL) {

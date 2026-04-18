@@ -41,6 +41,7 @@ test.describe("publishing endpoints", () => {
     expect(body).toContain("- Japanese: https://mackysoft.net/");
     expect(body).toContain("- English: https://mackysoft.net/en/");
     expect(body).toContain("- Traditional Chinese: https://mackysoft.net/zh-hant/");
+    expect(body).toContain("- Korean: https://mackysoft.net/ko/");
     expect(body).toContain("[RSS Feed](https://mackysoft.net/feed.xml)");
     expect(body).not.toContain("English About");
   });
@@ -68,29 +69,37 @@ test.describe("publishing endpoints", () => {
     expect(body).toContain("https://mackysoft.net/");
     expect(body).toContain("https://mackysoft.net/en/");
     expect(body).toContain("https://mackysoft.net/zh-hant/");
+    expect(body).toContain("https://mackysoft.net/ko/");
     expect(body).toContain("https://mackysoft.net/en/articles/vision-introduction/");
     expect(body).toContain("https://mackysoft.net/zh-hant/articles/vision-introduction/");
+    expect(body).toContain("https://mackysoft.net/ko/articles/vision-introduction/");
     expect(body).toContain("https://mackysoft.net/games/treasure-rogue/");
     expect(body).not.toContain("https://mackysoft.net/contact/");
     expect(body).not.toContain("https://mackysoft.net/en/contact/");
     expect(body).not.toContain("https://mackysoft.net/zh-hant/contact/");
+    expect(body).not.toContain("https://mackysoft.net/ko/contact/");
     expect(body).not.toContain("https://mackysoft.net/search/");
     expect(body).not.toContain("https://mackysoft.net/en/search/");
     expect(body).not.toContain("https://mackysoft.net/zh-hant/search/");
+    expect(body).not.toContain("https://mackysoft.net/ko/search/");
     expect(body).not.toContain("https://mackysoft.net/privacy-policy/");
     expect(body).not.toContain("https://mackysoft.net/en/privacy-policy/");
     expect(body).not.toContain("https://mackysoft.net/zh-hant/privacy-policy/");
+    expect(body).not.toContain("https://mackysoft.net/ko/privacy-policy/");
     expect(body).not.toContain("https://mackysoft.net/en/articles/debug-context/");
     expect(body).not.toContain("https://mackysoft.net/zh-hant/articles/debug-context/");
+    expect(body).not.toContain("https://mackysoft.net/ko/articles/debug-context/");
   });
 
   test("serves generated article OGP PNG endpoints", { tag: "@size:medium" }, async ({ request }) => {
     const response = await request.get("/og/articles/turnbased-gameloop.png");
     const localizedResponse = await request.get("/en/og/articles/turnbased-gameloop.png");
     const localizedZhHantResponse = await request.get("/zh-hant/og/articles/turnbased-gameloop.png");
+    const localizedKoResponse = await request.get("/ko/og/articles/turnbased-gameloop.png");
     const cardResponse = await request.get("/og/articles/cards/turnbased-gameloop.png");
     const localizedCardResponse = await request.get("/en/og/articles/cards/turnbased-gameloop.png");
     const localizedZhHantCardResponse = await request.get("/zh-hant/og/articles/cards/turnbased-gameloop.png");
+    const localizedKoCardResponse = await request.get("/ko/og/articles/cards/turnbased-gameloop.png");
 
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"]).toContain("image/png");
@@ -104,6 +113,10 @@ test.describe("publishing endpoints", () => {
     expect(localizedZhHantResponse.headers()["content-type"]).toContain("image/png");
     expect((await localizedZhHantResponse.body()).byteLength).toBeGreaterThan(0);
 
+    expect(localizedKoResponse.ok()).toBeTruthy();
+    expect(localizedKoResponse.headers()["content-type"]).toContain("image/png");
+    expect((await localizedKoResponse.body()).byteLength).toBeGreaterThan(0);
+
     expect(cardResponse.ok()).toBeTruthy();
     expect(cardResponse.headers()["content-type"]).toContain("image/png");
     expect((await cardResponse.body()).byteLength).toBeGreaterThan(0);
@@ -115,5 +128,9 @@ test.describe("publishing endpoints", () => {
     expect(localizedZhHantCardResponse.ok()).toBeTruthy();
     expect(localizedZhHantCardResponse.headers()["content-type"]).toContain("image/png");
     expect((await localizedZhHantCardResponse.body()).byteLength).toBeGreaterThan(0);
+
+    expect(localizedKoCardResponse.ok()).toBeTruthy();
+    expect(localizedKoCardResponse.headers()["content-type"]).toContain("image/png");
+    expect((await localizedKoCardResponse.body()).byteLength).toBeGreaterThan(0);
   });
 });

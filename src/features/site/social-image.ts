@@ -6,12 +6,14 @@ const defaultSocialImageAltMap: Record<SiteLocale, string> = {
   ja: "mackysoft.net のカバー画像",
   en: "mackysoft.net cover image",
   "zh-hant": "mackysoft.net 封面圖片",
+  ko: "mackysoft.net 커버 이미지",
 };
 
 const articleTitleSocialImageAltMap: Record<SiteLocale, (title: string) => string> = {
   ja: (title) => `${title} の記事タイトル画像`,
   en: (title) => `Title card for ${title}`,
   "zh-hant": (title) => `${title} 的文章標題圖片`,
+  ko: (title) => `${title} 글 제목 이미지`,
 };
 
 export const defaultSocialImagePath = "/og/default.png";
