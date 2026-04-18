@@ -19,6 +19,7 @@ This site, or the external services used by this site, may process the following
 - Browser language preferences such as `navigator.languages`, used to decide the initial display language
 - `mackysoft-theme` and `mackysoft-locale` stored in `localStorage` to preserve theme and language preferences
 - `mackysoft-locale-scroll` stored in `sessionStorage` to restore scroll position after a language switch
+- Search terms and analytics parameters temporarily stored in `sessionStorage` under `__pending_site_search__` so site-search measurement can complete after navigation
 
 If you contact the operator by email or through GitHub, the site may receive your name, email address, account name, subject, message body, and any other information you choose to send.
 
@@ -46,7 +47,7 @@ This site is delivered on Cloudflare Workers. When the site is accessed, Cloudfl
 
 This site uses Google Fonts to deliver fonts. When fonts are loaded, the visitor's browser communicates with Google's servers.
 
-Some pages load profile images from GitHub and repository images served from GitHub-related domains. Displaying those images causes the visitor's browser to contact GitHub-related servers directly.
+This site may generate and publish descriptions and cover images at build time based on public GitHub repository and release information. In the current implementation, ordinary page views on the published site do not require the visitor's browser to fetch those images directly from GitHub-related servers.
 
 Video embeds on game pages use `youtube-nocookie.com` in YouTube's privacy-enhanced mode. Showing the embedded player or playing the video may still involve communication related to YouTube.
 
@@ -68,4 +69,4 @@ If you want to stop information collection by Google Analytics, use Google's opt
 
 Effective date: April 12, 2026
 
-Last updated: April 18, 2026
+Last updated: April 19, 2026
