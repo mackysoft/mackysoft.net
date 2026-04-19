@@ -11,7 +11,6 @@ const scrollRestoreObserveDurationMs = 8_000;
 const scrollRestoreIgnoreScrollWindowMs = 250;
 const scrollRestoreReapplyIntervalMs = 150;
 const scrollRestoreProgressTolerance = 0.01;
-const scrollProgressSyncTolerance = 0.01;
 const scrollRestoreNavigationKeys = new Set([
   "ArrowDown",
   "ArrowUp",
@@ -27,7 +26,12 @@ const desktopHeaderQuery = "(min-width: 900px)";
 
 let headerInteractionsReady = false;
 let latestKnownScrollProgress = 0;
-let ignoredLocaleDisclosureScrollProgress: number | null = null;
+let localeDisclosureScrollState:
+  | {
+    disclosure: HTMLDetailsElement;
+    hasManualScrollInput: boolean;
+  }
+  | null = null;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -65,40 +69,68 @@ function isLocaleDisclosure(disclosure: HTMLDetailsElement) {
 
 function armLocaleDisclosureScrollGuard(disclosure: HTMLDetailsElement) {
   if (!isLocaleDisclosure(disclosure) || disclosure.open) {
-    ignoredLocaleDisclosureScrollProgress = null;
+    clearLocaleDisclosureScrollGuard(disclosure);
     return;
   }
 
-  const currentProgress = getScrollProgress();
-
-  if (Math.abs(currentProgress - latestKnownScrollProgress) > scrollProgressSyncTolerance) {
-    ignoredLocaleDisclosureScrollProgress = currentProgress;
-    return;
-  }
-
-  ignoredLocaleDisclosureScrollProgress = null;
+  localeDisclosureScrollState = {
+    disclosure,
+    hasManualScrollInput: false,
+  };
 }
 
-function clearLocaleDisclosureScrollGuard(disclosure: HTMLDetailsElement) {
-  if (!isLocaleDisclosure(disclosure)) {
+function clearLocaleDisclosureScrollGuard(disclosure?: HTMLDetailsElement) {
+  if (disclosure && !isLocaleDisclosure(disclosure)) {
     return;
   }
 
-  ignoredLocaleDisclosureScrollProgress = null;
+  if (disclosure && localeDisclosureScrollState?.disclosure !== disclosure) {
+    return;
+  }
+
+  localeDisclosureScrollState = null;
+}
+
+function markLocaleDisclosureManualScrollInput() {
+  if (!localeDisclosureScrollState) {
+    return;
+  }
+
+  if (!localeDisclosureScrollState.disclosure.open) {
+    clearLocaleDisclosureScrollGuard(localeDisclosureScrollState.disclosure);
+    return;
+  }
+
+  localeDisclosureScrollState.hasManualScrollInput = true;
+}
+
+function clearLocaleDisclosureScrollGuardOnNavigationKey(event: KeyboardEvent) {
+  if (!scrollRestoreNavigationKeys.has(event.key)) {
+    return;
+  }
+
+  markLocaleDisclosureManualScrollInput();
+}
+
+function shouldIgnoreLocaleDisclosureScrollSync() {
+  if (!localeDisclosureScrollState) {
+    return false;
+  }
+
+  if (!localeDisclosureScrollState.disclosure.open) {
+    clearLocaleDisclosureScrollGuard(localeDisclosureScrollState.disclosure);
+    return false;
+  }
+
+  return !localeDisclosureScrollState.hasManualScrollInput;
 }
 
 function syncLatestKnownScrollProgress() {
-  const currentProgress = getScrollProgress();
-
-  if (
-    ignoredLocaleDisclosureScrollProgress !== null
-    && Math.abs(currentProgress - ignoredLocaleDisclosureScrollProgress) <= scrollProgressSyncTolerance
-  ) {
+  if (shouldIgnoreLocaleDisclosureScrollSync()) {
     return;
   }
 
-  ignoredLocaleDisclosureScrollProgress = null;
-  latestKnownScrollProgress = currentProgress;
+  latestKnownScrollProgress = getScrollProgress();
 }
 
 function consumeScrollRestoreState() {
@@ -397,6 +429,11 @@ function initHeaderDisclosures() {
       toggle.addEventListener("pointerdown", () => {
         armLocaleDisclosureScrollGuard(disclosure);
       });
+      toggle.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " " || event.key === "Spacebar" || event.key === "Space") {
+          armLocaleDisclosureScrollGuard(disclosure);
+        }
+      });
     }
 
     disclosure.addEventListener("toggle", () => {
@@ -498,6 +535,9 @@ export function initSiteHeader() {
     closeDisclosures();
   });
 
+  window.addEventListener("wheel", markLocaleDisclosureManualScrollInput, { passive: true });
+  window.addEventListener("touchmove", markLocaleDisclosureManualScrollInput, { passive: true });
+  window.addEventListener("keydown", clearLocaleDisclosureScrollGuardOnNavigationKey);
   window.addEventListener("scroll", syncLatestKnownScrollProgress, { passive: true });
   initMobileNavBreakpointSync();
 }
