@@ -25,6 +25,7 @@ const scrollRestoreNavigationKeys = new Set([
 const desktopHeaderQuery = "(min-width: 900px)";
 
 let headerInteractionsReady = false;
+let latestKnownScrollProgress = 0;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -54,6 +55,19 @@ function clearScrollRestoreState() {
   } catch {
     // Ignore storage failures and continue without restoration state.
   }
+}
+
+function isLocaleDisclosureOpen() {
+  const disclosure = document.querySelector('[data-site-tool="language"]');
+  return disclosure instanceof HTMLDetailsElement && disclosure.open;
+}
+
+function syncLatestKnownScrollProgress() {
+  if (isLocaleDisclosureOpen()) {
+    return;
+  }
+
+  latestKnownScrollProgress = getScrollProgress();
 }
 
 function consumeScrollRestoreState() {
@@ -233,7 +247,7 @@ function persistScrollRestoreState(link: HTMLAnchorElement) {
 
     window.sessionStorage.setItem(scrollRestoreStorageKey, JSON.stringify({
       pathname: nextUrl.pathname,
-      progress: getScrollProgress(),
+      progress: latestKnownScrollProgress,
       timestamp: Date.now(),
     }));
   } catch {
@@ -412,6 +426,7 @@ function initMobileNavBreakpointSync() {
 }
 
 export function initSiteHeader() {
+  syncLatestKnownScrollProgress();
   initLocaleSwitchLinks();
   initHeaderDisclosures();
 
@@ -441,5 +456,6 @@ export function initSiteHeader() {
     closeDisclosures();
   });
 
+  window.addEventListener("scroll", syncLatestKnownScrollProgress, { passive: true });
   initMobileNavBreakpointSync();
 }

@@ -629,6 +629,7 @@ test.describe("site header", () => {
   });
 
   test("restores scroll progress when switching article index routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
+    await installScrollRestoreWriteRecorder(page);
     await page.goto("/articles/");
 
     const beforeNavigation = await scrollToProgress(page, 0.58);
@@ -639,6 +640,10 @@ test.describe("site header", () => {
 
     await expect(page).toHaveURL("/en/articles/");
     await page.waitForLoadState("load");
+    const recordedState = await getRecordedScrollRestoreWrite(page);
+    expect(recordedState).not.toBeNull();
+    expect(recordedState?.pathname).toBe("/en/articles/");
+    expect(Math.abs((recordedState?.progress as number) - beforeNavigation.progress)).toBeLessThanOrEqual(0.03);
     await page.waitForFunction((expectedProgress) => {
       const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
       const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
