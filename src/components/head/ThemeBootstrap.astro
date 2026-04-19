@@ -1,9 +1,21 @@
-<script is:inline>
+---
+import { SITE_THEME_CHROME_COLORS } from "../../lib/theme";
+---
+
+<script is:inline define:vars={{ themeChromeColors: SITE_THEME_CHROME_COLORS }}>
   (() => {
     const storageKey = "mackysoft-theme";
     const root = document.documentElement;
     const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const themeColorMeta = document.querySelector('meta[name="theme-color"][data-site-theme-color]');
     const isValidTheme = (value) => value === "light" || value === "dark";
+    const syncThemeColor = (theme) => {
+      if (!(themeColorMeta instanceof HTMLMetaElement)) {
+        return;
+      }
+
+      themeColorMeta.content = themeChromeColors[theme] ?? themeChromeColors.light;
+    };
     const readStoredTheme = () => {
       try {
         const value = window.localStorage.getItem(storageKey);
@@ -16,5 +28,6 @@
 
     root.dataset.theme = nextTheme;
     root.style.colorScheme = nextTheme;
+    syncThemeColor(nextTheme);
   })();
 </script>
