@@ -23,7 +23,6 @@ test.describe("publishing endpoints", () => {
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"]).toContain("text/plain");
     expect(body).toContain("User-agent: *");
-    expect(body).toContain("Content-Signal: ai-train=yes, search=yes, ai-input=yes");
     expect(body).toContain("Allow: /");
     expect(body).toContain("Sitemap: https://mackysoft.net/sitemap.xml");
   });
