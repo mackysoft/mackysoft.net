@@ -11,6 +11,7 @@ const scrollRestoreObserveDurationMs = 8_000;
 const scrollRestoreIgnoreScrollWindowMs = 250;
 const scrollRestoreReapplyIntervalMs = 150;
 const scrollRestoreProgressTolerance = 0.01;
+const scrollProgressSyncTolerance = 0.01;
 const scrollRestoreNavigationKeys = new Set([
   "ArrowDown",
   "ArrowUp",
@@ -26,6 +27,7 @@ const desktopHeaderQuery = "(min-width: 900px)";
 
 let headerInteractionsReady = false;
 let latestKnownScrollProgress = 0;
+let ignoredLocaleDisclosureScrollProgress: number | null = null;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -57,17 +59,46 @@ function clearScrollRestoreState() {
   }
 }
 
-function isLocaleDisclosureOpen() {
-  const disclosure = document.querySelector('[data-site-tool="language"]');
-  return disclosure instanceof HTMLDetailsElement && disclosure.open;
+function isLocaleDisclosure(disclosure: HTMLDetailsElement) {
+  return disclosure.dataset.siteTool === "language";
 }
 
-function syncLatestKnownScrollProgress() {
-  if (isLocaleDisclosureOpen()) {
+function armLocaleDisclosureScrollGuard(disclosure: HTMLDetailsElement) {
+  if (!isLocaleDisclosure(disclosure) || disclosure.open) {
+    ignoredLocaleDisclosureScrollProgress = null;
     return;
   }
 
-  latestKnownScrollProgress = getScrollProgress();
+  const currentProgress = getScrollProgress();
+
+  if (Math.abs(currentProgress - latestKnownScrollProgress) > scrollProgressSyncTolerance) {
+    ignoredLocaleDisclosureScrollProgress = currentProgress;
+    return;
+  }
+
+  ignoredLocaleDisclosureScrollProgress = null;
+}
+
+function clearLocaleDisclosureScrollGuard(disclosure: HTMLDetailsElement) {
+  if (!isLocaleDisclosure(disclosure)) {
+    return;
+  }
+
+  ignoredLocaleDisclosureScrollProgress = null;
+}
+
+function syncLatestKnownScrollProgress() {
+  const currentProgress = getScrollProgress();
+
+  if (
+    ignoredLocaleDisclosureScrollProgress !== null
+    && Math.abs(currentProgress - ignoredLocaleDisclosureScrollProgress) <= scrollProgressSyncTolerance
+  ) {
+    return;
+  }
+
+  ignoredLocaleDisclosureScrollProgress = null;
+  latestKnownScrollProgress = currentProgress;
 }
 
 function consumeScrollRestoreState() {
@@ -354,6 +385,7 @@ function initHeaderDisclosures() {
 
     disclosure.dataset.siteDisclosureReady = "true";
     const panel = getDisclosurePanel(disclosure);
+    const toggle = getDisclosureToggle(disclosure);
 
     if (panel) {
       prepareDropdownPanel(panel, disclosure.open);
@@ -361,8 +393,18 @@ function initHeaderDisclosures() {
 
     syncDisclosureState(disclosure);
 
+    if (toggle) {
+      toggle.addEventListener("pointerdown", () => {
+        armLocaleDisclosureScrollGuard(disclosure);
+      });
+    }
+
     disclosure.addEventListener("toggle", () => {
       syncDisclosureState(disclosure);
+
+      if (!disclosure.open) {
+        clearLocaleDisclosureScrollGuard(disclosure);
+      }
 
       if (!panel) {
         return;
