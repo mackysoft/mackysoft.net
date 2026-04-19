@@ -629,6 +629,7 @@ test.describe("site header", () => {
   });
 
   test("restores scroll progress when switching article index routes through the language menu", { tag: "@size:medium" }, async ({ page }) => {
+    await installScrollRestoreWriteRecorder(page);
     await page.goto("/articles/");
 
     const beforeNavigation = await scrollToProgress(page, 0.58);
@@ -639,6 +640,10 @@ test.describe("site header", () => {
 
     await expect(page).toHaveURL("/en/articles/");
     await page.waitForLoadState("load");
+    const recordedState = await getRecordedScrollRestoreWrite(page);
+    expect(recordedState).not.toBeNull();
+    expect(recordedState?.pathname).toBe("/en/articles/");
+    expect(Math.abs((recordedState?.progress as number) - beforeNavigation.progress)).toBeLessThanOrEqual(0.03);
     await page.waitForFunction((expectedProgress) => {
       const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
       const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
@@ -651,6 +656,45 @@ test.describe("site header", () => {
 
     expect(afterNavigation.scrollY).toBeGreaterThan(200);
     expect(Math.abs(afterNavigation.progress - beforeNavigation.progress)).toBeLessThanOrEqual(0.12);
+  });
+
+  test("tracks updated scroll progress after the reader scrolls with the language menu open", { tag: "@size:medium" }, async ({ page }) => {
+    await installScrollRestoreWriteRecorder(page);
+    await page.goto("/articles/");
+
+    const beforeNavigation = await scrollToProgress(page, 0.58);
+    expect(beforeNavigation.maxScroll).toBeGreaterThan(800);
+
+    await page.locator("[data-site-language-toggle]").click();
+    await page.evaluate(() => {
+      window.dispatchEvent(new WheelEvent("wheel", { deltaY: 600 }));
+      window.scrollBy({ left: 0, top: 600, behavior: "auto" });
+    });
+    await page.waitForFunction((previousScrollY) => {
+      return window.scrollY >= previousScrollY + 200;
+    }, beforeNavigation.scrollY);
+
+    const afterManualScroll = await getScrollMetrics(page);
+    expect(afterManualScroll.scrollY).toBeGreaterThan(beforeNavigation.scrollY + 200);
+    await page.getByRole("menuitemradio", { name: "English" }).click();
+
+    await expect(page).toHaveURL("/en/articles/");
+    await page.waitForLoadState("load");
+    const recordedState = await getRecordedScrollRestoreWrite(page);
+    expect(recordedState).not.toBeNull();
+    expect(recordedState?.pathname).toBe("/en/articles/");
+    expect(Math.abs((recordedState?.progress as number) - afterManualScroll.progress)).toBeLessThanOrEqual(0.03);
+    await page.waitForFunction((expectedProgress) => {
+      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight ?? 0);
+      const maxScroll = Math.max(documentHeight - window.innerHeight, 0);
+      const progress = maxScroll === 0 ? 0 : window.scrollY / maxScroll;
+
+      return Math.abs(progress - expectedProgress) <= 0.12;
+    }, afterManualScroll.progress);
+
+    const afterNavigation = await getScrollMetrics(page);
+
+    expect(Math.abs(afterNavigation.progress - afterManualScroll.progress)).toBeLessThanOrEqual(0.12);
   });
 
   test("shows the translated article locale as both selected and current", { tag: "@size:medium" }, async ({ page }) => {
