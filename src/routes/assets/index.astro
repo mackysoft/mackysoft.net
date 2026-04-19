@@ -61,9 +61,9 @@ const sponsorLink = getExternalLink("githubSponsors");
     --sponsor-accent-color: #cf4f92;
     --sponsor-accent-surface-color: color-mix(in srgb, var(--sponsor-accent-color) 8%, var(--surface-color));
     --sponsor-accent-border-color: color-mix(in srgb, var(--sponsor-accent-color) 22%, var(--border-color));
-    --sponsor-accent-button-bg-color: color-mix(in srgb, var(--sponsor-accent-color) 10%, var(--surface-raised-color));
-    --sponsor-accent-button-border-color: color-mix(in srgb, var(--sponsor-accent-color) 28%, transparent);
-    --sponsor-accent-button-hover-bg-color: color-mix(in srgb, var(--sponsor-accent-color) 16%, var(--surface-raised-strong-color));
+    --sponsor-accent-button-bg-color: color-mix(in srgb, var(--sponsor-accent-color) 12%, var(--surface-color));
+    --sponsor-accent-button-border-color: color-mix(in srgb, var(--sponsor-accent-color) 30%, var(--border-color));
+    --sponsor-accent-button-hover-bg-color: color-mix(in srgb, var(--sponsor-accent-color) 18%, var(--surface-color));
     display: grid;
     gap: 0.85rem;
     align-items: center;
@@ -93,8 +93,9 @@ const sponsorLink = getExternalLink("githubSponsors");
 
   .sponsor-callout__action:hover,
   .sponsor-callout__action:focus-visible {
-    border-color: color-mix(in srgb, var(--sponsor-accent-color) 44%, transparent);
+    border-color: color-mix(in srgb, var(--sponsor-accent-color) 44%, var(--border-color));
     background: var(--sponsor-accent-button-hover-bg-color);
+    color: var(--text-color);
   }
 
   .assets-list {
