@@ -11,6 +11,7 @@ const scrollRestoreObserveDurationMs = 8_000;
 const scrollRestoreIgnoreScrollWindowMs = 250;
 const scrollRestoreReapplyIntervalMs = 150;
 const scrollRestoreProgressTolerance = 0.01;
+const scrollProgressSnapshotTolerance = 0.03;
 const scrollRestoreNavigationKeys = new Set([
   "ArrowDown",
   "ArrowUp",
@@ -26,10 +27,14 @@ const desktopHeaderQuery = "(min-width: 900px)";
 
 let headerInteractionsReady = false;
 let latestKnownScrollProgress = 0;
+let latestKnownScrollTimestamp = 0;
+let previousKnownScrollProgress = 0;
+let previousKnownScrollTimestamp = 0;
 let localeDisclosureScrollState:
   | {
     disclosure: HTMLDetailsElement;
     hasManualScrollInput: boolean;
+    openedScrollProgress: number;
   }
   | null = null;
 
@@ -73,9 +78,17 @@ function armLocaleDisclosureScrollGuard(disclosure: HTMLDetailsElement) {
     return;
   }
 
+  const now = window.performance.now();
+  const openedScrollProgress = now - latestKnownScrollTimestamp <= scrollRestoreIgnoreScrollWindowMs
+    && previousKnownScrollTimestamp > 0
+    && previousKnownScrollProgress - latestKnownScrollProgress > scrollProgressSnapshotTolerance
+    ? previousKnownScrollProgress
+    : latestKnownScrollProgress;
+
   localeDisclosureScrollState = {
     disclosure,
     hasManualScrollInput: false,
+    openedScrollProgress,
   };
 }
 
@@ -130,7 +143,16 @@ function syncLatestKnownScrollProgress() {
     return;
   }
 
-  latestKnownScrollProgress = getScrollProgress();
+  const currentProgress = getScrollProgress();
+
+  if (Math.abs(currentProgress - latestKnownScrollProgress) <= Number.EPSILON) {
+    return;
+  }
+
+  previousKnownScrollProgress = latestKnownScrollProgress;
+  previousKnownScrollTimestamp = latestKnownScrollTimestamp;
+  latestKnownScrollProgress = currentProgress;
+  latestKnownScrollTimestamp = window.performance.now();
 }
 
 function consumeScrollRestoreState() {
@@ -307,10 +329,16 @@ function persistSelectedLocale(link: HTMLAnchorElement) {
 function persistScrollRestoreState(link: HTMLAnchorElement) {
   try {
     const nextUrl = new URL(link.href, window.location.href);
+    const disclosure = link.closest("[data-site-disclosure]");
+    const disclosureScrollProgress = disclosure instanceof HTMLDetailsElement
+      && localeDisclosureScrollState?.disclosure === disclosure
+      && !localeDisclosureScrollState.hasManualScrollInput
+      ? localeDisclosureScrollState.openedScrollProgress
+      : latestKnownScrollProgress;
 
     window.sessionStorage.setItem(scrollRestoreStorageKey, JSON.stringify({
       pathname: nextUrl.pathname,
-      progress: latestKnownScrollProgress,
+      progress: disclosureScrollProgress,
       timestamp: Date.now(),
     }));
   } catch {
@@ -428,12 +456,12 @@ function initHeaderDisclosures() {
     if (toggle) {
       toggle.addEventListener("pointerdown", () => {
         armLocaleDisclosureScrollGuard(disclosure);
-      });
+      }, { capture: true });
       toggle.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " " || event.key === "Spacebar" || event.key === "Space") {
           armLocaleDisclosureScrollGuard(disclosure);
         }
-      });
+      }, { capture: true });
     }
 
     disclosure.addEventListener("toggle", () => {
