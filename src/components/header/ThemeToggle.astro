@@ -1,6 +1,7 @@
 ---
 import { getUiText } from "../../lib/ui-text";
 import type { SiteLocale } from "../../lib/i18n";
+import { SITE_THEME_CHROME_COLORS } from "../../lib/theme";
 
 type Props = {
   locale: SiteLocale;
@@ -48,10 +49,11 @@ const uiText = getUiText(locale);
   </span>
 </button>
 
-<script is:inline>
+<script is:inline define:vars={{ themeChromeColors: SITE_THEME_CHROME_COLORS }}>
   (() => {
     const storageKey = "mackysoft-theme";
     const root = document.documentElement;
+    const themeColorMeta = document.querySelector('meta[name="theme-color"][data-site-theme-color]');
     const themeButtons = Array.from(document.querySelectorAll("[data-theme-toggle]")).filter((button) => {
       return button instanceof HTMLButtonElement;
     });
@@ -64,6 +66,13 @@ const uiText = getUiText(locale);
     const getCurrentTheme = () => {
       return isValidTheme(root.dataset.theme) ? root.dataset.theme : "light";
     };
+    const syncThemeColor = (theme) => {
+      if (!(themeColorMeta instanceof HTMLMetaElement)) {
+        return;
+      }
+
+      themeColorMeta.content = themeChromeColors[theme] ?? themeChromeColors.light;
+    };
     const syncButtons = (theme) => {
       for (const button of themeButtons) {
         button.disabled = false;
@@ -74,6 +83,7 @@ const uiText = getUiText(locale);
     const applyTheme = (theme) => {
       root.dataset.theme = theme;
       root.style.colorScheme = theme;
+      syncThemeColor(theme);
       syncButtons(theme);
     };
     const withoutThemeTransitions = (callback) => {

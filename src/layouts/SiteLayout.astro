@@ -12,6 +12,7 @@ import SiteHeaderTools from "../components/SiteHeaderTools.astro";
 import MobileNavMenu from "../components/header/MobileNavMenu.astro";
 import PrimaryNav from "../components/header/PrimaryNav.astro";
 import { getUiText } from "../lib/ui-text";
+import { SITE_THEME_CHROME_COLORS } from "../lib/theme";
 import { localizePath, stripLocaleFromPath, toLanguageTag, type SiteLocale } from "../lib/i18n";
 import { externalLinks, getPrimaryNav, getSiteMeta } from "../lib/site";
 import { buildSiteLayoutUrls } from "../lib/site-url.mjs";
@@ -99,6 +100,7 @@ const googleFontsStylesheetUrl = getGoogleFontsStylesheetUrl(fontLocale);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content={SITE_THEME_CHROME_COLORS.light} data-site-theme-color />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/png" href="/favicon.png" />
