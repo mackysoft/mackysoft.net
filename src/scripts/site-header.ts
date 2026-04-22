@@ -34,6 +34,7 @@ let localeDisclosureScrollState:
   | {
     disclosure: HTMLDetailsElement;
     hasManualScrollInput: boolean;
+    pendingManualScrollSync: boolean;
     openedScrollProgress: number;
   }
   | null = null;
@@ -88,6 +89,7 @@ function armLocaleDisclosureScrollGuard(disclosure: HTMLDetailsElement) {
   localeDisclosureScrollState = {
     disclosure,
     hasManualScrollInput: false,
+    pendingManualScrollSync: false,
     openedScrollProgress,
   };
 }
@@ -115,36 +117,10 @@ function markLocaleDisclosureManualScrollInput() {
   }
 
   localeDisclosureScrollState.hasManualScrollInput = true;
+  localeDisclosureScrollState.pendingManualScrollSync = true;
 }
 
-function clearLocaleDisclosureScrollGuardOnNavigationKey(event: KeyboardEvent) {
-  if (!scrollRestoreNavigationKeys.has(event.key)) {
-    return;
-  }
-
-  markLocaleDisclosureManualScrollInput();
-}
-
-function shouldIgnoreLocaleDisclosureScrollSync() {
-  if (!localeDisclosureScrollState) {
-    return false;
-  }
-
-  if (!localeDisclosureScrollState.disclosure.open) {
-    clearLocaleDisclosureScrollGuard(localeDisclosureScrollState.disclosure);
-    return false;
-  }
-
-  return !localeDisclosureScrollState.hasManualScrollInput;
-}
-
-function syncLatestKnownScrollProgress() {
-  if (shouldIgnoreLocaleDisclosureScrollSync()) {
-    return;
-  }
-
-  const currentProgress = getScrollProgress();
-
+function commitLatestKnownScrollProgress(currentProgress: number) {
   if (Math.abs(currentProgress - latestKnownScrollProgress) <= Number.EPSILON) {
     return;
   }
@@ -153,6 +129,21 @@ function syncLatestKnownScrollProgress() {
   previousKnownScrollTimestamp = latestKnownScrollTimestamp;
   latestKnownScrollProgress = currentProgress;
   latestKnownScrollTimestamp = window.performance.now();
+}
+
+function syncLatestKnownScrollProgress() {
+  if (localeDisclosureScrollState) {
+    if (!localeDisclosureScrollState.disclosure.open) {
+      clearLocaleDisclosureScrollGuard(localeDisclosureScrollState.disclosure);
+    } else if (!localeDisclosureScrollState.hasManualScrollInput || !localeDisclosureScrollState.pendingManualScrollSync) {
+      return;
+    } else {
+      localeDisclosureScrollState.pendingManualScrollSync = false;
+    }
+  }
+
+  const currentProgress = getScrollProgress();
+  commitLatestKnownScrollProgress(currentProgress);
 }
 
 function consumeScrollRestoreState() {
@@ -409,6 +400,14 @@ function closeDisclosures(except?: HTMLDetailsElement | null) {
 
     closeDisclosure(disclosure);
   }
+}
+
+function clearLocaleDisclosureScrollGuardOnNavigationKey(event: KeyboardEvent) {
+  if (!scrollRestoreNavigationKeys.has(event.key)) {
+    return;
+  }
+
+  markLocaleDisclosureManualScrollInput();
 }
 
 function initLocaleSwitchLinks() {
