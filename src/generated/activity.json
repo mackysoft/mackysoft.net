@@ -92,7 +92,7 @@
       "repo": "mackysoft/Unity-SerializeReferenceExtensions",
       "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
       "license": "MIT",
-      "stargazerCount": 1257,
+      "stargazerCount": 1260,
       "name": "1.7.0",
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
