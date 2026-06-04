@@ -87,6 +87,20 @@
   ],
   "releases": [
     {
+      "groupId": "GitHub:mackysoft/ucli",
+      "source": "GitHub",
+      "repo": "mackysoft/ucli",
+      "description": "CLI for contract-first Unity automation",
+      "license": "MIT",
+      "stargazerCount": 1,
+      "name": "0.1.0",
+      "version": "0.1.0",
+      "url": "https://github.com/mackysoft/ucli/releases/tag/0.1.0",
+      "publishedAt": "2026-06-04T16:08:40Z",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=942d9b1d2351",
+      "coverAlt": "mackysoft/ucli のリポジトリサムネイル"
+    },
+    {
       "groupId": "GitHub:mackysoft/agent-skills",
       "source": "GitHub",
       "repo": "mackysoft/agent-skills",
@@ -97,7 +111,7 @@
       "version": "0.2.0",
       "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.2.0",
       "publishedAt": "2026-05-21T18:33:10Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=1917c9ca31d8",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=fe3613438476",
       "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
     },
     {
@@ -111,7 +125,7 @@
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
       "publishedAt": "2026-01-18T14:37:19Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-unity-serializereferenceextensions.png?v=891f3475690f",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-unity-serializereferenceextensions.png?v=7c4dccb47e17",
       "coverAlt": "mackysoft/Unity-SerializeReferenceExtensions のリポジトリサムネイル"
     },
     {
@@ -125,7 +139,7 @@
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/MasterTools/releases/tag/1.0.0",
       "publishedAt": "2024-08-15T16:19:05Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-mastertools.png?v=6c55e0f40d67",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-mastertools.png?v=d9aacf3f9a37",
       "coverAlt": "mackysoft/MasterTools のリポジトリサムネイル"
     },
     {
@@ -153,7 +167,7 @@
       "version": "1.0.0",
       "url": "https://github.com/mackysoft/UnityCapture-URP/releases/tag/1.0.0",
       "publishedAt": "2022-12-25T14:49:51Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-unitycapture-urp.png?v=ada9ba9e85c4",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-unitycapture-urp.png?v=7ffcc0fb1d60",
       "coverAlt": "mackysoft/UnityCapture-URP のリポジトリサムネイル"
     },
     {
