@@ -87,6 +87,20 @@
   ],
   "releases": [
     {
+      "groupId": "GitHub:mackysoft/agent-skills",
+      "source": "GitHub",
+      "repo": "mackysoft/agent-skills",
+      "description": "Agent Skills generation and distribution tooling.",
+      "license": "MIT",
+      "stargazerCount": 0,
+      "name": "0.3.0",
+      "version": "0.3.0",
+      "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.3.0",
+      "publishedAt": "2026-06-11T14:17:23Z",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=fe3613438476",
+      "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
+    },
+    {
       "groupId": "GitHub:mackysoft/ucli",
       "source": "GitHub",
       "repo": "mackysoft/ucli",
@@ -97,22 +111,8 @@
       "version": "0.1.0",
       "url": "https://github.com/mackysoft/ucli/releases/tag/0.1.0",
       "publishedAt": "2026-06-04T16:08:40Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=942d9b1d2351",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=c5ac22750d2f",
       "coverAlt": "mackysoft/ucli のリポジトリサムネイル"
-    },
-    {
-      "groupId": "GitHub:mackysoft/agent-skills",
-      "source": "GitHub",
-      "repo": "mackysoft/agent-skills",
-      "description": "Agent Skills generation and distribution tooling.",
-      "license": "MIT",
-      "stargazerCount": 0,
-      "name": "0.2.0",
-      "version": "0.2.0",
-      "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.2.0",
-      "publishedAt": "2026-05-21T18:33:10Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=fe3613438476",
-      "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
     },
     {
       "groupId": "GitHub:mackysoft/Unity-SerializeReferenceExtensions",
