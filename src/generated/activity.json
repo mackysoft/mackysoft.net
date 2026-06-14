@@ -87,6 +87,20 @@
   ],
   "releases": [
     {
+      "groupId": "GitHub:mackysoft/ucli",
+      "source": "GitHub",
+      "repo": "mackysoft/ucli",
+      "description": "CLI for contract-first Unity automation",
+      "license": "MIT",
+      "stargazerCount": 4,
+      "name": "0.2.1",
+      "version": "0.2.1",
+      "url": "https://github.com/mackysoft/ucli/releases/tag/0.2.1",
+      "publishedAt": "2026-06-14T13:53:50Z",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=db47836d7531",
+      "coverAlt": "mackysoft/ucli のリポジトリサムネイル"
+    },
+    {
       "groupId": "GitHub:mackysoft/agent-skills",
       "source": "GitHub",
       "repo": "mackysoft/agent-skills",
@@ -101,26 +115,12 @@
       "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
     },
     {
-      "groupId": "GitHub:mackysoft/ucli",
-      "source": "GitHub",
-      "repo": "mackysoft/ucli",
-      "description": "CLI for contract-first Unity automation",
-      "license": "MIT",
-      "stargazerCount": 1,
-      "name": "0.1.0",
-      "version": "0.1.0",
-      "url": "https://github.com/mackysoft/ucli/releases/tag/0.1.0",
-      "publishedAt": "2026-06-04T16:08:40Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=0ff0c9f6b9a0",
-      "coverAlt": "mackysoft/ucli のリポジトリサムネイル"
-    },
-    {
       "groupId": "GitHub:mackysoft/Unity-SerializeReferenceExtensions",
       "source": "GitHub",
       "repo": "mackysoft/Unity-SerializeReferenceExtensions",
       "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
       "license": "MIT",
-      "stargazerCount": 1282,
+      "stargazerCount": 1284,
       "name": "1.7.0",
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
