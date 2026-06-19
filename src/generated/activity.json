@@ -97,7 +97,7 @@
       "version": "0.2.1",
       "url": "https://github.com/mackysoft/ucli/releases/tag/0.2.1",
       "publishedAt": "2026-06-14T13:53:50Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=c257298a8ca7",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=854b3cee60a4",
       "coverAlt": "mackysoft/ucli のリポジトリサムネイル"
     },
     {
@@ -120,7 +120,7 @@
       "repo": "mackysoft/Unity-SerializeReferenceExtensions",
       "description": "Provide popup to specify the type of the field serialized by the [SerializeReference] attribute in the inspector.",
       "license": "MIT",
-      "stargazerCount": 1288,
+      "stargazerCount": 1290,
       "name": "1.7.0",
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
