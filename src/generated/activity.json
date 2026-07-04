@@ -87,6 +87,20 @@
   ],
   "releases": [
     {
+      "groupId": "GitHub:mackysoft/agent-skills",
+      "source": "GitHub",
+      "repo": "mackysoft/agent-skills",
+      "description": "Agent Skills generation and distribution tooling.",
+      "license": "MIT",
+      "stargazerCount": 0,
+      "name": "0.7.1",
+      "version": "0.7.1",
+      "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.7.1",
+      "publishedAt": "2026-07-04T09:21:21Z",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=75a884655147",
+      "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
+    },
+    {
       "groupId": "GitHub:mackysoft/skills-pack",
       "source": "GitHub",
       "repo": "mackysoft/skills-pack",
@@ -99,20 +113,6 @@
       "publishedAt": "2026-07-01T07:52:26Z",
       "coverUrl": "/generated/activity-covers/github/mackysoft-skills-pack.png?v=ff86a6760220",
       "coverAlt": "mackysoft/skills-pack のリポジトリサムネイル"
-    },
-    {
-      "groupId": "GitHub:mackysoft/agent-skills",
-      "source": "GitHub",
-      "repo": "mackysoft/agent-skills",
-      "description": "Agent Skills generation and distribution tooling.",
-      "license": "MIT",
-      "stargazerCount": 0,
-      "name": "0.7.0",
-      "version": "0.7.0",
-      "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.7.0",
-      "publishedAt": "2026-07-01T07:31:41Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=75a884655147",
-      "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
     },
     {
       "groupId": "GitHub:mackysoft/ucli",
@@ -190,7 +190,7 @@
       "repo": "mackysoft/Choice",
       "description": "Weighted random selector for Unity.",
       "license": "MIT",
-      "stargazerCount": 102,
+      "stargazerCount": 103,
       "name": "1.2.3",
       "version": "1.2.3",
       "url": "https://github.com/mackysoft/Choice/releases/tag/1.2.3",
@@ -232,7 +232,7 @@
       "repo": "mackysoft/Vision",
       "description": "UnityEngine.CullingGroup API for everyone.",
       "license": "MIT",
-      "stargazerCount": 165,
+      "stargazerCount": 166,
       "name": "1.2.1",
       "version": "1.2.1",
       "url": "https://github.com/mackysoft/Vision/releases/tag/1.2.1",
