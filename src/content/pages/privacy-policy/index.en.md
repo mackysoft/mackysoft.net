@@ -45,8 +45,6 @@ Google signals and advertising personalization features are not used.
 
 This site is delivered on Cloudflare Workers. When the site is accessed, Cloudflare may process IP addresses, request information, and response information for delivery, security, and availability purposes.
 
-This site uses Google Fonts to deliver fonts. When fonts are loaded, the visitor's browser communicates with Google's servers.
-
 This site may generate and publish descriptions and cover images at build time based on public GitHub repository and release information. In the current implementation, ordinary page views on the published site do not require the visitor's browser to fetch those images directly from GitHub-related servers.
 
 Video embeds on game pages use `youtube-nocookie.com` in YouTube's privacy-enhanced mode. Showing the embedded player or playing the video may still involve communication related to YouTube.
@@ -69,4 +67,4 @@ If you want to stop information collection by Google Analytics, use Google's opt
 
 Effective date: April 12, 2026
 
-Last updated: April 19, 2026
+Last updated: July 9, 2026

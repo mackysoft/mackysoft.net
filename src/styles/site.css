@@ -48,11 +48,11 @@
   --action-button-text-color: #f8fdff;
   --action-button-shadow-color: rgba(31, 146, 213, 0.24);
   --action-button-shadow-hover-color: rgba(31, 139, 201, 0.28);
-  --font-ui: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-ui: system-ui, sans-serif;
   --font-copy: var(--font-ui);
-  --font-brand: "IBM Plex Sans", "Roboto", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
-  --font-code: Consolas, "Roboto Mono", "SFMono-Regular", monospace;
+  --font-brand: var(--font-ui);
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --font-code: Consolas, "SFMono-Regular", "Liberation Mono", Menlo, monospace;
   --site-brand-icon-size: 2.25rem;
   --site-header-offset: 5rem;
   --site-sticky-panel-top: calc(var(--site-header-offset) + 0.75rem);
@@ -60,10 +60,6 @@
   --site-dropdown-enter-duration: 180ms;
   --site-dropdown-exit-duration: 140ms;
   --site-dropdown-easing: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-html:lang(ja) {
-  --font-copy: "Roboto", "Zen Kaku Gothic New", "Helvetica Neue", "Hiragino Sans", Arial, sans-serif;
 }
 
 html[data-theme="dark"] {
