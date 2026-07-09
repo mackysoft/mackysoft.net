@@ -93,10 +93,10 @@
       "description": "CLI for contract-first Unity automation [PREVIEW]",
       "license": "MIT",
       "stargazerCount": 1,
-      "name": "0.7.0",
-      "version": "0.7.0",
-      "url": "https://github.com/mackysoft/ucli/releases/tag/0.7.0",
-      "publishedAt": "2026-07-08T20:48:28Z",
+      "name": "0.7.2",
+      "version": "0.7.2",
+      "url": "https://github.com/mackysoft/ucli/releases/tag/0.7.2",
+      "publishedAt": "2026-07-09T13:29:35Z",
       "coverUrl": "/generated/activity-covers/github/mackysoft-ucli.png?v=650691deab82",
       "coverAlt": "mackysoft/ucli のリポジトリサムネイル"
     },
@@ -107,10 +107,10 @@
       "description": "Agent Skills generation and distribution tooling.",
       "license": "MIT",
       "stargazerCount": 0,
-      "name": "0.8.0",
-      "version": "0.8.0",
-      "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.8.0",
-      "publishedAt": "2026-07-08T19:17:25Z",
+      "name": "0.8.2",
+      "version": "0.8.2",
+      "url": "https://github.com/mackysoft/agent-skills/releases/tag/0.8.2",
+      "publishedAt": "2026-07-09T11:11:12Z",
       "coverUrl": "/generated/activity-covers/github/mackysoft-agent-skills.png?v=fe3613438476",
       "coverAlt": "mackysoft/agent-skills のリポジトリサムネイル"
     },
@@ -125,7 +125,7 @@
       "version": "1.6.0",
       "url": "https://github.com/mackysoft/skills-pack/releases/tag/1.6.0",
       "publishedAt": "2026-07-07T18:16:17Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-skills-pack.png?v=9f1051b3c13d",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-skills-pack.png?v=f60dfc314651",
       "coverAlt": "mackysoft/skills-pack のリポジトリサムネイル"
     },
     {
