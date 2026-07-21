@@ -42,6 +42,6 @@
     "wrangler": "^4.108.0"
   },
   "dependencies": {
-    "@astrojs/rss": "^4.0.18"
+    "@astrojs/rss": "^4.0.19"
   }
 }
