@@ -88,19 +88,23 @@ npm run deploy:workers
 
 GitHub Actions の `Sync Activity` workflow が毎日 `06:00 JST` に実行され、Zenn と GitHub Releases の外部更新を `src/generated/activity.json` へ同期します。
 
-- 差分が無い場合は、既存の `automation/sync-activity` PR や branch が残っていれば自動で片付けたうえで成功終了します。
-- 差分がある場合は `automation/sync-activity` branch へ自動 commit し、`master` 向け PR を作成または更新します。
-- `CI` が `quality` と `e2e` を通過すると、`Merge Sync Activity` workflow が PR を squash merge します。`master` が先に進んでいた場合は branch を追従させて再検証します。
-- merge 後は既存の `master` 向け CI と `Deploy Workers` workflow が流れ、Cloudflare Workers へ反映されます。
+- 差分がない場合は、commit や push を行わずに成功終了します。
+- 差分がある場合は、GitHub App のインストールアクセストークンを使い、App の bot アカウントをコミット作成者として `master` へ直接 push します。force push は行わないため、`master` が先に更新されていた場合は失敗します。
+- `master` への push によって既存の `CI` が実行され、成功後に `Deploy Workers` workflow が Cloudflare Workers へ反映します。
 
-この自動化は `ACTIONS_BOT_TOKEN` secret を使います。`automation/sync-activity` への push、PR 更新、branch update、squash merge を bot token で実行し、後続の `CI` と `Deploy Workers` を通常イベントとして発火させます。
+この自動化には、対象リポジトリへインストール済みで `Contents: Read and write` 権限を持つ release bot GitHub App が必要です。次の repository variable と repository secret を設定します。
 
-- fine-grained PAT を使う場合は `Contents: Read and write`, `Pull requests: Read and write`, `Actions: Read and write` を付与してください。
-- classic PAT を使う場合は `repo` と `workflow` を付与してください。
-- secret 名は repository secrets の `ACTIONS_BOT_TOKEN` で固定です。
+- `RELEASE_BOT_APP_ID`：GitHub App ID `4559975` を保持する repository variable
+- `RELEASE_BOT_PRIVATE_KEY`：GitHub App の private key を保持する repository secret
 
-- token が失効すると `Sync Activity` または `Merge Sync Activity` が `gh` の認証・権限エラーや push エラーで失敗します。
-- 失敗した場合は `ACTIONS_BOT_TOKEN` を更新し、必要なら `Sync Activity` を手動実行して同期を再開してください。
+`master` の保護設定は、Classic branch protection ではなく、repository の `Settings > Rules > Rulesets` にある次の Ruleset を正本とします。
+
+- `master-merge-requirements`：pull request と strict な required status check を必須にし、`quality` と `e2e` を指定します。bypass actor は release bot の App Integration `4559975` だけとし、bypass mode は `Always` にします。
+- `master-ref-integrity`：non-fast-forward update と deletion を全 actor に対して禁止します。bypass actor は設定しません。
+
+この構成により、release bot は `master-merge-requirements` を bypass して fast-forward push できますが、`master-ref-integrity` は bypass できません。
+
+`Sync Activity` が失敗した場合は、workflow run の `Create GitHub App token`、`Resolve GitHub App bot identity`、`Push activity update` のログを順に確認します。あわせて variable と secret、App のインストール先と権限、2つの Ruleset の設定を確認してください。non-fast-forward で push が失敗した場合は、`master` の最新状態から workflow を再実行します。push 後の処理で失敗した場合は、該当コミットの `CI` と、それに続く `Deploy Workers` の実行結果を確認します。
 
 ## 記事の追加方法
 
