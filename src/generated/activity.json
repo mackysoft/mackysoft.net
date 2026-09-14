@@ -167,7 +167,7 @@
       "version": "1.7.0",
       "url": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions/releases/tag/1.7.0",
       "publishedAt": "2026-01-18T14:37:19Z",
-      "coverUrl": "/generated/activity-covers/github/mackysoft-unity-serializereferenceextensions.png?v=b8ec2381e3c9",
+      "coverUrl": "/generated/activity-covers/github/mackysoft-unity-serializereferenceextensions.png?v=fb873efa1b8f",
       "coverAlt": "mackysoft/Unity-SerializeReferenceExtensions のリポジトリサムネイル"
     },
     {
@@ -218,7 +218,7 @@
       "repo": "mackysoft/Choice",
       "description": "Weighted random selector for Unity.",
       "license": "MIT",
-      "stargazerCount": 103,
+      "stargazerCount": 104,
       "name": "1.2.3",
       "version": "1.2.3",
       "url": "https://github.com/mackysoft/Choice/releases/tag/1.2.3",
@@ -232,7 +232,7 @@
       "repo": "mackysoft/XPool",
       "description": "Object pooling system for Unity.",
       "license": "MIT",
-      "stargazerCount": 80,
+      "stargazerCount": 81,
       "name": "0.1.1",
       "version": "0.1.1",
       "url": "https://github.com/mackysoft/XPool/releases/tag/0.1.1",
