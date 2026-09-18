@@ -2,6 +2,9 @@ import { formatBreadcrumb } from "../../lib/breadcrumb";
 import type { ExternalLinkId } from "../../lib/site";
 import type { SiteLocale } from "../../lib/i18n";
 
+const contactFormUrl =
+  "https://docs.google.com/forms/d/e/1FAIpQLSf2zosaQMlb2cSqkDMRnzx1TSchGjuaHakxfy7LsK5_zLzrBQ/viewform?usp=publish-editor";
+
 const contactPageContentMap = {
   ja: {
     title: "問い合わせ",
@@ -14,11 +17,11 @@ const contactPageContentMap = {
     channels: [
       {
         heading: "仕事・相談",
-        description: "仕事の相談やお問い合わせは、メールで受け付けています。",
+        description: "仕事の相談やお問い合わせは、Google フォームで受け付けています。",
         action: {
-          type: "email",
-          href: "mailto:mackysoft0129@gmail.com",
-          label: "メールで問い合わせる",
+          type: "externalUrl",
+          href: contactFormUrl,
+          label: "問い合わせフォームを開く",
         },
       },
       {
@@ -50,11 +53,11 @@ const contactPageContentMap = {
     channels: [
       {
         heading: "Work and Consulting",
-        description: "For work, consulting, or general inquiries, email is the main contact path.",
+        description: "For work, consulting, or general inquiries, use the inquiry form.",
         action: {
-          type: "email",
-          href: "mailto:mackysoft0129@gmail.com",
-          label: "Send email",
+          type: "externalUrl",
+          href: contactFormUrl,
+          label: "Open inquiry form",
         },
       },
       {
@@ -86,11 +89,11 @@ const contactPageContentMap = {
     channels: [
       {
         heading: "工作與諮詢",
-        description: "工作洽談、顧問需求或一般聯絡，請以電子郵件為主。",
+        description: "工作洽談、顧問需求或一般聯絡，請使用聯絡表單。",
         action: {
-          type: "email",
-          href: "mailto:mackysoft0129@gmail.com",
-          label: "寄送電子郵件",
+          type: "externalUrl",
+          href: contactFormUrl,
+          label: "開啟聯絡表單",
         },
       },
       {
@@ -122,11 +125,11 @@ const contactPageContentMap = {
     channels: [
       {
         heading: "업무 및 상담",
-        description: "업무 상담이나 일반 문의는 이메일로 받고 있습니다.",
+        description: "업무 상담이나 일반 문의는 문의 양식으로 받고 있습니다.",
         action: {
-          type: "email",
-          href: "mailto:mackysoft0129@gmail.com",
-          label: "이메일로 문의하기",
+          type: "externalUrl",
+          href: contactFormUrl,
+          label: "문의 양식 열기",
         },
       },
       {

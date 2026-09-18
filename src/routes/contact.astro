@@ -13,23 +13,14 @@ const { locale: localeProp } = Astro.props as Props;
 const locale = localeProp ?? getPathLocale(Astro.url.pathname);
 const contactPageContent = getContactPageContent(locale);
 const contactChannels = contactPageContent.channels.map((channel) => {
-  if (channel.action.type === "external") {
-    return {
-      ...channel,
-      action: {
-        href: getExternalLink(channel.action.externalLinkId).href,
-        label: channel.action.label,
-        isExternal: true,
-      },
-    };
-  }
-
   return {
     ...channel,
     action: {
-      href: channel.action.href,
+      href:
+        channel.action.type === "external"
+          ? getExternalLink(channel.action.externalLinkId).href
+          : channel.action.href,
       label: channel.action.label,
-      isExternal: false,
     },
   };
 });
@@ -58,8 +49,8 @@ const contactChannels = contactPageContent.channels.map((channel) => {
           <a
             href={channel.action.href}
             class="button-link contact-card__action"
-            target={channel.action.isExternal ? "_blank" : undefined}
-            rel={channel.action.isExternal ? "noreferrer" : undefined}
+            target="_blank"
+            rel="noreferrer"
             data-analytics-event="external_link_click"
             data-analytics-label={channel.action.label}
             data-analytics-location="contact-page"
