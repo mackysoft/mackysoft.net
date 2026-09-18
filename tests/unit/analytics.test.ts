@@ -78,7 +78,7 @@ describe("analytics helpers", () => {
         eventName: "external_link_click",
         explicitLabel: "Send email",
         location: "contact-page",
-        href: "mailto:mackysoft0129@gmail.com",
+        href: "mailto:contact@example.com",
       }),
     ).toEqual({
       eventName: "external_link_click",

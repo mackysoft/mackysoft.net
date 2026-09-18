@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+const contactFormUrl =
+  "https://docs.google.com/forms/d/e/1FAIpQLSf2zosaQMlb2cSqkDMRnzx1TSchGjuaHakxfy7LsK5_zLzrBQ/viewform?usp=publish-editor";
+
 test.describe("contact page", () => {
   test("shows contact channels and the reply policy", { tag: "@size:medium" }, async ({ page }) => {
     await page.goto("/contact/");
@@ -14,12 +17,12 @@ test.describe("contact page", () => {
     const contactCards = main.locator(".contact-card");
     await expect(contactCards).toHaveCount(2);
 
-    await expect(contactCards.first().getByRole("link", { name: "メールで問い合わせる" })).toHaveAttribute(
-      "href",
-      "mailto:mackysoft0129@gmail.com",
-    );
+    const contactFormLink = contactCards.first().getByRole("link", { name: "問い合わせフォームを開く" });
+    await expect(contactFormLink).toHaveAttribute("href", contactFormUrl);
+    await expect(contactFormLink).toHaveAttribute("target", "_blank");
+    await expect(contactFormLink).toHaveAttribute("rel", "noreferrer");
     await expect(contactCards.first()).toHaveCSS("background-color", "rgb(220, 239, 255)");
-    await expect(contactCards.first().getByRole("link", { name: "メールで問い合わせる" })).toHaveCSS(
+    await expect(contactFormLink).toHaveCSS(
       "background-color",
       "rgb(210, 235, 255)",
     );
@@ -44,7 +47,7 @@ test.describe("contact page", () => {
 
     await expect(main.getByText("Home / Contact", { exact: true })).toBeVisible();
     await expect(main.getByRole("heading", { level: 1, name: "聯絡" })).toBeVisible();
-    await expect(contactCards.first().getByRole("link", { name: "寄送電子郵件" })).toHaveAttribute("href", "mailto:mackysoft0129@gmail.com");
+    await expect(contactCards.first().getByRole("link", { name: "開啟聯絡表單" })).toHaveAttribute("href", contactFormUrl);
     await expect(contactCards.nth(1).getByRole("link", { name: "開啟 GitHub" })).toHaveAttribute("href", "https://github.com/mackysoft");
     await expect(main.locator(".reply-policy").getByRole("heading", { level: 2, name: "回覆方針" })).toBeVisible();
   });

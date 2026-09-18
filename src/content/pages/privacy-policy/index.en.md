@@ -9,7 +9,7 @@ This site is a personal website for publishing games, assets, and technical writ
 
 This site is operated by Hiroya Aramaki / Makihiro.
 
-You can contact the operator through the methods listed on the [Contact](/contact/) page. Messages sent through GitHub are also handled in line with this policy.
+You can contact the operator through the methods listed on the [Contact](/contact/) page. Messages sent through Google Forms or GitHub are handled in line with this policy.
 
 ## Information Collected
 
@@ -21,7 +21,7 @@ This site, or the external services used by this site, may process the following
 - `mackysoft-locale-scroll` stored in `sessionStorage` to restore scroll position after a language switch
 - A temporary value stored in `sessionStorage` so an on-site search submission from the header search can be measured once after navigation within the same tab
 
-If you contact the operator by email or through GitHub, the site may receive your name, email address, account name, subject, message body, and any other information you choose to send.
+If you contact the operator through Google Forms or GitHub, the operator may receive your name, email address, account name, subject, message body, and any other information you choose to send.
 
 ## Purpose of Use
 
@@ -45,6 +45,8 @@ Google signals and advertising personalization features are not used.
 
 This site is delivered on Cloudflare Workers. When the site is accessed, Cloudflare may process IP addresses, request information, and response information for delivery, security, and availability purposes.
 
+Google Forms is used for work, consulting, and general inquiries. When you open the form, Google may process your IP address, browser and device information, and related technical data. When you submit the form, the information you entered is sent to Google and the site operator.
+
 This site may generate and publish descriptions and cover images at build time based on public GitHub repository and release information. In the current implementation, ordinary page views on the published site do not require the visitor's browser to fetch those images directly from GitHub-related servers.
 
 Video embeds on game pages use `youtube-nocookie.com` in YouTube's privacy-enhanced mode. Showing the embedded player or playing the video may still involve communication related to YouTube.
@@ -67,4 +69,4 @@ If you want to stop information collection by Google Analytics, use Google's opt
 
 Effective date: April 12, 2026
 
-Last updated: July 9, 2026
+Last updated: September 18, 2026
